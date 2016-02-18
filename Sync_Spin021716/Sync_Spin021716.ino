@@ -119,6 +119,7 @@ void setup() {
   //Transmitter Setup
   //Initialize Serial and I2C communications
   Wire.begin();
+
   //Put the HMC5883 IC into the correct operating mode
   Wire.beginTransmission(address); //open communication with HMC5883
   Wire.write(0x02); //select mode register
