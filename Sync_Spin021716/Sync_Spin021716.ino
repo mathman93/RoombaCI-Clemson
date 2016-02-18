@@ -25,7 +25,7 @@ const int receive_pin = 2;
 /* Global variables for transmission and receiving */
 char pulse[2] = {'a'};
 char palse[2] = {'b'};
-// Are these needed? There are local variables set up in the getHeading() function. -> int x, y, z, t, i; //triple axis data
+int x, y, z, t, i; //triple axis data
 uint8_t buf[VW_MAX_MESSAGE_LEN];
 uint8_t buflen = VW_MAX_MESSAGE_LEN;
 
@@ -119,7 +119,6 @@ void setup() {
   //Transmitter Setup
   //Initialize Serial and I2C communications
   Wire.begin();
-
   //Put the HMC5883 IC into the correct operating mode
   Wire.beginTransmission(address); //open communication with HMC5883
   Wire.write(0x02); //select mode register
@@ -221,7 +220,7 @@ void sendPulse() {
 
 void sendPalse() {
   digitalWrite(greenPin, HIGH); // Tell me that I'm sending a palse
-  digitalWrite(redPin, High);
+  digitalWrite(redPin, HIGH);
   vw_send((uint8_t *)palse, strlen(palse));
   vw_wait_tx();                 // Wait until the whole message is gone
   digitalWrite(greenPin, LOW);  // Tell me that I'm done sending a palse
