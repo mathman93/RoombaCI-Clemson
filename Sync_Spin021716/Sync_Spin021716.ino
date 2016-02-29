@@ -180,12 +180,12 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
     else if (buf[i] == 'a') {      // charater of pulse signal
       PRC_Sync(millisRatio *(long)(millis() - millisCounter)); // Find desired amount of turn based on PRC for synchronization
       /* Turn by d_angle */           // Now that I have the angle that I want to change, spin by that amount
-      turn = FindTurnSpeed(d_angle, TIMER);     // Calculate the turn speed for that angle and amount of time
+      // turn = FindTurnSpeed(d_angle, TIMER);     // Calculate the turn speed for that angle and amount of time
       // We will want to implement code that moves at a constant speed and varies the time to turn
-      // TIMER = FindTurnTime(d_angle, SPEED);     // Calculate the turn time for that angle at given constant speed
+      TIMER = FindTurnTime(d_angle, SPEED);     // Calculate the turn time for that angle at given constant speed
       digitalWrite(yellowPin, HIGH);  // Tell me that the robot is turning
-      Move(forward, turn);            // Turn Roomba by d_angle
-      // Move(forward, WheelDir*SPEED);
+      // Move(forward, turn);            // Turn Roomba by d_angle
+      Move(forward, WheelDir*SPEED);
       turnCounter = millis();         // Set Turn counter base
     }
   } // Ignore if no pulse has been received
