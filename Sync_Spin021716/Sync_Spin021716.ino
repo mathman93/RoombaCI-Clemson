@@ -9,7 +9,7 @@
 #include <SoftwareSerial.h>
 #include <SPI.h>
 #include "VirtualWire.h"
-#include "HMC5883L.h"
+#include "Wire.h"
 
 #define address 0x1E //0011110b, I2C 7bit address of HMC5883
 
@@ -66,8 +66,6 @@ SoftwareSerial Roomba(rxPin, txPin); // Set up communnication with Roomba
 /* Data Point Collector Setup */
 unsigned long deltime = 0;
 long sno = 0;
-
-HMC5883L mgmtr;	//Magnetometer
 
 /* Start up Roomba */
 void setup() {
@@ -151,7 +149,7 @@ void setup() {
   digitalWrite(greenPin, LOW);  // say we've finished setup
   
   /* Initialize synchronization */
-  mgmtr.initialize();           // Start up compass reading
+  
   sendPalse();                  // Reset counters for all online robots.
 
   deltime = millis();           // Set base value for data output.
@@ -180,12 +178,12 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
     else if (buf[i] == 'a') {      // charater of pulse signal
       PRC_Sync(millisRatio *(long)(millis() - millisCounter)); // Find desired amount of turn based on PRC for synchronization
       /* Turn by d_angle */           // Now that I have the angle that I want to change, spin by that amount
-      turn = FindTurnSpeed(d_angle, TIMER);     // Calculate the turn speed for that angle and amount of time
+      // turn = FindTurnSpeed(d_angle, TIMER);     // Calculate the turn speed for that angle and amount of time
       // We will want to implement code that moves at a constant speed and varies the time to turn
-      // TIMER = FindTurnTime(d_angle, SPEED);     // Calculate the turn time for that angle at given constant speed
+      TIMER = FindTurnTime(d_angle, SPEED);     // Calculate the turn time for that angle at given constant speed
       digitalWrite(yellowPin, HIGH);  // Tell me that the robot is turning
-      Move(forward, turn);            // Turn Roomba by d_angle
-      // Move(forward, WheelDir*SPEED);
+      // Move(forward, turn);            // Turn Roomba by d_angle
+      Move(forward, WheelDir*SPEED);
       turnCounter = millis();         // Set Turn counter base
     }
   } // Ignore if no pulse has been received
@@ -324,7 +322,22 @@ void Move(int X, int Y) {
 int getHeading() {
   /* Local variables need for function */
   int x, y, z, t;
-  mgmtr.getHeading(&x, &y, &z);
+  //Tell the HMC5883 where to begin reading data
+  Wire.beginTransmission(address);
+  Wire.write(0x03); //select register 3, X MSB register
+  Wire.endTransmission();
+
+  //Read data from each axis, 2 registers per axis
+  Wire.requestFrom(address, 6);
+  if (6 <= Wire.available()) {
+    x = Wire.read() << 8; //X msb
+    x |= Wire.read(); //X lsb
+    z = Wire.read() << 8; //Z msb
+    z |= Wire.read(); //Z lsb
+    y = Wire.read() << 8; //Y msb
+    y |= Wire.read(); //Y lsb
+  }
+  
   /* Convert coordinates to an angle for heading */
   t = 180 + (atan2(-y, x)*180/pi); 
   if(t >= 360) t = t - 360;
