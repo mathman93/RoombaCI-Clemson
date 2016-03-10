@@ -9,7 +9,7 @@
 #include <SoftwareSerial.h>
 #include <SPI.h>
 #include "VirtualWire.h"
-#include "HMC5883L.h"
+#include "Wire.h"
 
 #define address 0x1E //0011110b, I2C 7bit address of HMC5883
 
@@ -66,8 +66,6 @@ SoftwareSerial Roomba(rxPin, txPin); // Set up communnication with Roomba
 /* Data Point Collector Setup */
 unsigned long deltime = 0;
 long sno = 0;
-
-HMC5883L mgmtr;	//Magnetometer
 
 /* Start up Roomba */
 void setup() {
@@ -151,7 +149,7 @@ void setup() {
   digitalWrite(greenPin, LOW);  // say we've finished setup
   
   /* Initialize synchronization */
-  mgmtr.initialize();           // Start up compass reading
+  
   sendPalse();                  // Reset counters for all online robots.
 
   deltime = millis();           // Set base value for data output.
@@ -324,7 +322,22 @@ void Move(int X, int Y) {
 int getHeading() {
   /* Local variables need for function */
   int x, y, z, t;
-  mgmtr.getHeading(&x, &y, &z);
+  //Tell the HMC5883 where to begin reading data
+  Wire.beginTransmission(address);
+  Wire.write(0x03); //select register 3, X MSB register
+  Wire.endTransmission();
+
+  //Read data from each axis, 2 registers per axis
+  Wire.requestFrom(address, 6);
+  if (6 <= Wire.available()) {
+    x = Wire.read() << 8; //X msb
+    x |= Wire.read(); //X lsb
+    z = Wire.read() << 8; //Z msb
+    z |= Wire.read(); //Z lsb
+    y = Wire.read() << 8; //Y msb
+    y |= Wire.read(); //Y lsb
+  }
+  
   /* Convert coordinates to an angle for heading */
   t = 180 + (atan2(-y, x)*180/pi); 
   if(t >= 360) t = t - 360;
