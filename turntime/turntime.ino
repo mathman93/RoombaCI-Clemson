@@ -1,24 +1,28 @@
-/* Copied from original 'heading_leader' file */
+/* Compass Calibration Code
+ * Taken from Vijay over Christmas. Runs compass calibration code.
+ * We need to figure out what this does, and how to modify the existing code to be compatible with SyncSpin.ino
+ * 
+ * Last Updated: 3/24/2016
+ */
+ 
 #include <SoftwareSerial.h>
 #include <SPI.h>
 #include "VirtualWire.h"
 #include <Wire.h>
 #include "compass.h"
 
-//Testing changes - pushing to git from client
-
 #define address 0x1E //0011110b, I2C 7bit address of HMC5883
 
-int rxPin = 3;
-int txPin = 4;
-int ddPin = 5;
-int greenPin = 7;
-int redPin = 8;
-const int yellowPin = 11;
-const int transmit_pin = 12;
+const int rxPin = 3;            // Communication links to Roomba
+const int txPin = 4;
+const int ddPin = 5;
+const int greenPin = 7;         // On when the Roomba sends a pulse. (very fast, may not see)
+const int redPin = 8;           // On when the Roomba is told to turn 0 mm/s.
+const int yellowPin = 11;       // On when the Roomba is turning.
+const int transmit_pin = 12;    // Communication links to RF transmitter/receiver
 const int receive_pin = 2;
 
-/* global variables for transmission and receiving */
+/* Global variables for transmission and receiving */
 char pulse[2] = {'a'};
 char palse[2] = {'b'};
 int x, y, z, t, i; //triple axis data
@@ -57,22 +61,23 @@ unsigned long LookUp[7][2]; //Initialize the lookup table
 /* Copied from original 'heading_leader' file; Start up Roomba */
 void setup() {
   Serial.begin(57600);
-  display_Running_Sketch();
+  display_Running_Sketch();     // Show sketch information in the serial monitor at startup
   Serial.println("Loading...");
-  pinMode(ddPin,  OUTPUT);   // sets the pins as output
-  pinMode(greenPin, OUTPUT);   // sets the pins as output
+  pinMode(ddPin,  OUTPUT);      // sets the pins as output
+  pinMode(greenPin, OUTPUT);
   pinMode(redPin, OUTPUT);
-  Roomba.begin(115200);
+  pinMode(yellowPin, OUTPUT);
+  Roomba.begin(115200);         // Declare Roomba communication baud rate.
   digitalWrite(greenPin, HIGH); // say we're alive
 
-  // wake up the robot
+  // wake up the robot (Is this needed, since we are reseting the roomba 9 lines later? See page 7 of Roomba manual.)
   digitalWrite(ddPin, HIGH);
   delay(100);
   digitalWrite(ddPin, LOW);
   delay(500);
   digitalWrite(ddPin, HIGH);
   delay(2000);
-
+  
   // set up ROI to receive commands
   Roomba.write(byte(7));  // RESTART
   delay(10000);
@@ -81,10 +86,9 @@ void setup() {
   delay(50);
   Roomba.write(byte(131));  // CONTROL
   //131 - Safe Mode
-  //132 - Full mode (be ready to catch it!)
-  //digitalWrite(ledPin, HIGH);
+  //132 - Full mode (Be ready to catch it!)
 
-  //Light up the blue dirt detect light
+  //Light up the blue dirt detect light (Needs better comments!)
   Roomba.write(byte(139));
   Roomba.write(byte(25));
   Roomba.write(byte(0));
@@ -119,7 +123,6 @@ void setup() {
   vw_set_rx_pin(receive_pin);
   vw_set_ptt_inverted(true); // Required for DR3100
   vw_setup(2000);       // Bits per sec
-  pinMode(yellowPin, OUTPUT);
 
   //Receiver Setup
   delay(1000);
@@ -133,29 +136,26 @@ void setup() {
 
   vw_rx_start();       // Start the receiver PLL running
 
-  pinMode(yellowPin, OUTPUT);
   digitalWrite(yellowPin, HIGH);
   Serial.println("...complete");
   delay(500);
   digitalWrite(yellowPin, LOW);
 
   delay(1000);
-  //Make sure that the Roomba is receiving commands
+/* Compass Calibration: I'm not sure what this code does. Need to look up documentation */
   //Keep spinning for calibration
   compass_init(1);
-  Move(forward, 100);
+  Move(0, 100);
   compass_debug = 1;
   compass_offset_calibration(2);
   Move(forward, 0);
   /* Wait for command to initialize synchronization */
 
+  sendPalse();                  // Reset counters for all online robots.
 
-  sendPalse();
-
-  deltime = millis();
+  deltime = millis();           // Set base value for data output.
   delayflag = true;
   
-
 }
 
 void loop() { // Swarm "Set Orientation" Code
