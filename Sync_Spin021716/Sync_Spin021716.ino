@@ -1,11 +1,11 @@
 /*  Heading Synchronization Code
- *  Bases the global counter on the clock speed of the Arduino Uno (millis() function).
- *  Eliminates use of the delay() function to improve synchronization between robots.
- *  Updated getHeading() subroutine to give correct heading direction.
- *  
- *  Last Updated: 2/17/2016
- */
- 
+    Bases the global counter on the clock speed of the Arduino Uno (millis() function).
+    Eliminates use of the delay() function to improve synchronization between robots.
+    Updated getHeading() subroutine to give correct heading direction.
+
+    Last Updated: 2/17/2016
+*/
+
 #include <SoftwareSerial.h>
 #include <SPI.h>
 #include "VirtualWire.h"
@@ -53,8 +53,8 @@ const float ENCODER = 508.8;      // 508.8 Counts per wheel revolution
 unsigned long millisCounter = 0;                // Base time for Counter difference calculation
 /* Adjust this value to vary the speed/frequency of the counter */
 const float counterspeed = 30;                  // Number of times per second that the counter increments - range (0,1000]
-const float millisRatio = counterspeed/1000;    // Counter increments per millisecond
-const float millisAdjust = 360000/counterspeed; // Amount of counter adjustment per firing
+const float millisRatio = counterspeed / 1000;  // Counter increments per millisecond
+const float millisAdjust = 360000 / counterspeed; // Amount of counter adjustment per firing
 const unsigned long counterAdjust = (unsigned long) millisAdjust; // Truncate to unsigned long
 
 /* Turn Counter Setup */
@@ -136,33 +136,63 @@ void setup() {
 
   vw_rx_start();       // Start the receiver PLL running
 
-  digitalWrite(yellowPin, HIGH);
-  Serial.println("...complete");
-  delay(500);
-  digitalWrite(yellowPin, LOW);
-  
   //Make sure that the Roomba is receiving commands
   Move(0, 41);
   delay(1000);
   Move(0, 0);
   delay(1000);
   digitalWrite(greenPin, LOW);  // say we've finished setup
-  
+
   /* Initialize synchronization */
-  
+
   sendPalse();                  // Reset counters for all online robots.
 
   deltime = millis();           // Set base value for data output.
   millisCounter = millis();     // Set base value for counter.
 
+
+/*Added 3/24/2016
+ * This part makes the Roomba turn to heading 200. It is used to see how a Roomba's magnetometer reading
+ * differs from other Roomba's.
+ * NOTE: Occasionally the Roomba may freak out and spin really fast. This is probably due
+ * to the incorrect implementation of the Move() function. 
+ */
+digitalWrite(redPin, HIGH);
+digitalWrite(greenPin, HIGH);
+digitalWrite(yellowPin, LOW);
+
+  int initAngle, angleDiff, currHeading;
+  initAngle = 200;
+  Serial.println("Format: [current heading]-->[target heading]. [diff between both]");
+  while (angleDiff > 5) {
+    currHeading = getHeading();
+    angleDiff = abs(currHeading - initAngle);
+    Serial.print("[setup] ");
+    Serial.print(currHeading);
+    Serial.print("-->");
+    Serial.print(initAngle);
+    Serial.print(". headng diff = ");
+    Serial.println(angleDiff);
+    Move(forward, 20);
+    delay(100);
+  }
+  Move(forward, 0);
+digitalWrite(redPin, LOW);
+digitalWrite(greenPin, LOW);
+//end 3/24/2016 addition
+
+    digitalWrite(yellowPin, HIGH);
+  Serial.println("...complete");
+  delay(500);
+  digitalWrite(yellowPin, LOW);
 }
 
 void loop() { // Swarm "Heading Synchronizaiton" Code
   /* Read angle from compass */
   angle = getHeading();        // Set angle to the compass reading
-  
+
   /* Send a pulse signal */
-  if (angle + millisRatio *(long)(millis() - millisCounter) >= 360) { // If my angle and counter reach 360 degrees...
+  if (angle + millisRatio * (long)(millis() - millisCounter) >= 360) { // If my angle and counter reach 360 degrees...
     sendPulse();                                    // Fire pulse
     millisCounter = millisCounter + counterAdjust;  // Adjust base counter.
   } // Ignore if the angle and counter are less than 360 degrees.
@@ -176,33 +206,33 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
     }
 
     else if (buf[i] == 'a') {      // charater of pulse signal
-      PRC_Sync(millisRatio *(long)(millis() - millisCounter)); // Find desired amount of turn based on PRC for synchronization
+      PRC_Sync(millisRatio * (long)(millis() - millisCounter)); // Find desired amount of turn based on PRC for synchronization
       /* Turn by d_angle */           // Now that I have the angle that I want to change, spin by that amount
       // turn = FindTurnSpeed(d_angle, TIMER);     // Calculate the turn speed for that angle and amount of time
       // We will want to implement code that moves at a constant speed and varies the time to turn
       TIMER = FindTurnTime(d_angle, SPEED);     // Calculate the turn time for that angle at given constant speed
       digitalWrite(yellowPin, HIGH);  // Tell me that the robot is turning
       // Move(forward, turn);            // Turn Roomba by d_angle
-      Move(forward, WheelDir*SPEED);
+      Move(forward, WheelDir * SPEED);
       turnCounter = millis();         // Set Turn counter base
     }
   } // Ignore if no pulse has been received
 
   /* Send to Serial monitor a data point */
-  if(millis() - deltime >= 1000) { // If 1 second = 1000 milliseconds have passed...
+  if (millis() - deltime >= 1000) { // If 1 second = 1000 milliseconds have passed...
     deltime = millis();     // Reset base value for data points
     Serial.print(sno);      // Data point number
     Serial.print(". ");
     Serial.print("Angle: ");
     Serial.print(angle);    // Robot Heading
     Serial.print("    Counter: ");
-    Serial.println(millisRatio*(long)(millis() - millisCounter)); // Counter value
+    Serial.println(millisRatio * (long)(millis() - millisCounter)); // Counter value
     sno++; // Increment the data point number
   }
-  
+
   /* Stop turning if TIMER has passed */
-  if((millis() - turnCounter >= TIMER)) { // If I've been turning long enough
-    Move(forward,0);                // Stop turning
+  if ((millis() - turnCounter >= TIMER)) { // If I've been turning long enough
+    Move(forward, 0);               // Stop turning
     digitalWrite(yellowPin, LOW);   // Tell me that the robot is done turning
   }
 
@@ -337,11 +367,11 @@ int getHeading() {
     y = Wire.read() << 8; //Y msb
     y |= Wire.read(); //Y lsb
   }
-  
+
   /* Convert coordinates to an angle for heading */
-  t = 180 + (atan2(-y, x)*180/pi); 
-  if(t >= 360) t = t - 360;
-  
+  t = 180 + (atan2(-y, x) * 180 / pi);
+  if (t >= 360) t = t - 360;
+
   return t;
 }
 
