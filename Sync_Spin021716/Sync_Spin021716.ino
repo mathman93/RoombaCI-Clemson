@@ -369,6 +369,17 @@ int getHeading() {
   }
 
   /* Convert coordinates to an angle for heading */
+  /* compass.cpp heading conversion
+    if (y>0){
+    bearing = 90-atan(x/y)*compass_rad2degree;
+  }else if (y<0){
+    bearing = 270-atan(x/y)*compass_rad2degree;
+  }else if (y==0 & x<0){
+    bearing = 180;
+  }else{
+    bearing = 0;
+  }
+  */
   t = 180 + (atan2(-y, x) * 180 / pi);
   if (t >= 360) t = t - 360;
 
