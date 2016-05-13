@@ -208,7 +208,7 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
 
     else if (buf[i] == 'a') {      // charater of pulse signal
       digitalWrite(yellowPin, HIGH);  // Tell me that the robot is turning
-      PRC_Sync(millisRatio * (long)(millis() - millisCounter)); // Find desired amount of turn based on PRC for synchronization
+      PRC_Sync(angle + millisRatio * (long)(millis() - millisCounter)); // Find desired amount of turn based on PRC for synchronization
       /* Turn by d_angle */           // Now that I have the angle that I want to change, spin by that amount
       // turn = FindTurnSpeed(d_angle, TIMER);     // Calculate the turn speed for that angle and amount of time
       // We will want to implement code that moves at a constant speed and varies the time to turn
