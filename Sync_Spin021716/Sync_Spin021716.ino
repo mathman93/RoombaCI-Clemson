@@ -3,7 +3,7 @@
     Eliminates use of the delay() function to improve synchronization between robots.
     Updated getHeading() subroutine to give correct heading direction.
 
-    Last Updated: 2/17/2016
+    Last Updated: 5/13/2016
 */
 
 #include <SoftwareSerial.h>
@@ -157,6 +157,7 @@ void setup() {
  * NOTE: Occasionally the Roomba may freak out and spin really fast. This is probably due
  * to the incorrect implementation of the Move() function. 
  */
+ /*
 digitalWrite(redPin, HIGH);
 digitalWrite(greenPin, HIGH);
 digitalWrite(yellowPin, LOW);
@@ -180,7 +181,7 @@ digitalWrite(yellowPin, LOW);
 digitalWrite(redPin, LOW);
 digitalWrite(greenPin, LOW);
 //end 3/24/2016 addition
-
+*/
     digitalWrite(yellowPin, HIGH);
   Serial.println("...complete");
   delay(500);
@@ -241,6 +242,7 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
 /* SUBROUTINES */
 /*Sends out a pulse when the counter and angle equal 360 degrees*/
 void sendPulse() {
+  Serial.print("\n Sending Pulse \n");
   digitalWrite(greenPin, HIGH); // Tell me that I'm sending a pulse
   vw_send((uint8_t *)pulse, strlen(pulse));
   vw_wait_tx();                 // Wait until the whole message is gone
