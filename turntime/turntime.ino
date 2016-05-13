@@ -1,6 +1,6 @@
 /* Compass Calibration Code
  * Taken from Vijay over Christmas. Runs compass calibration code.
- * We need to figure out what this does, and how to modify the existing code to be compatible with SyncSpin.ino
+ * Modified to run heading synchronization code.
  * 
  * Last Updated: 5/13/2016
  */
