@@ -2,7 +2,7 @@
  * Taken from Vijay over Christmas. Runs compass calibration code.
  * We need to figure out what this does, and how to modify the existing code to be compatible with SyncSpin.ino
  * 
- * Last Updated: 3/24/2016
+ * Last Updated: 5/13/2016
  */
  
 #include <SoftwareSerial.h>
@@ -25,40 +25,48 @@ const int receive_pin = 2;
 /* Global variables for transmission and receiving */
 char pulse[2] = {'a'};
 char palse[2] = {'b'};
-int x, y, z, t, i; //triple axis data
+//int x, y, z, t, i; //triple axis data
 uint8_t buf[VW_MAX_MESSAGE_LEN];
 uint8_t buflen = VW_MAX_MESSAGE_LEN;
 
-/* global variables needed to implement turn functions */
+/* Global variables needed to implement turn functions */
 float angle;                     // Heading of Roomba (found from digital compass)
-float counter = 0;                 // Angle counter to implement swarm behavior
 float d_angle;                   // change in angle that Roomba will turn (updates each cycle)
 int forward = 0;                 // Speed in mm/s that Roomba wheels turn to move forward - must be in range [0,128]
-unsigned long turn_time;                   // Time in ms that Roomba wheels turn to rotate a given d_angle
-const float RATIO = 1.0;         // Ratio for amount to turn - must be in range (0 1] - 0.85
-const int DELAY = 3;            // Counter delay - must be in range of (0 1000]
-const int TIMER = 5000;          // Amount of time in milliseconds that the Roomba spends turning (can be adjusted)
-const float EPSILON = 5.0;       // Smallest resolution of digital compass (used in PRC function) - 5.0
+int turn;                         // Speed in mm/s that Roomba wheels turn to rotate a given d_angle - must be in range [-128,128]
+int WheelDir = 1;                 // Determines direction of rotation for FindTurnTime() function (1 = CCW; -1 = CW)
 const float pi = 3.1415926;      // pi to 7 decimal places
+
+/* Adjustable Synchronization Parameters */
+const float RATIO = 0.5;         // Ratio for amount to turn - must be in range (0 1] - 0.85
+int TIMER = 1025;                 // Amount of time in milliseconds that the Roomba spends turning (can be adjusted)
+//TIMER = 2.0507 seconds results in approximately 1 degree of spin per 1 mm/s turn speed.
+const float EPSILON = 5.0;       // Smallest resolution of digital compass (used in PRC function) - 5.0
+const int SPEED = 50;             // Amount of speed in mm/s that the wheels will spin when the Roomba turns (can be adjusted)
 
 /* Roomba parameters */
 const int WHEELDIAMETER = 72;    // 72 millimeter wheel diameter
 const int WHEELSEPARATION = 235; // 235 millimeters between center of main wheels
 const float ENCODER = 508.8;     // 508.8 Counts per wheel revolution
 
-const int TSPEED = 100;           //Speed of the turns
+/* Sync Counter Setup */
+unsigned long millisCounter = 0;                // Base time for Counter difference calculation
+/* Adjust this value to vary the speed/frequency of the counter */
+const float counterspeed = 30;                  // Number of times per second that the counter increments - range (0,1000]
+const float millisRatio = counterspeed / 1000;  // Counter increments per millisecond
+const float millisAdjust = 360000 / counterspeed; // Amount of counter adjustment per firing
+const unsigned long counterAdjust = (unsigned long) millisAdjust; // Truncate to unsigned long
+
+/* Turn Counter Setup */
+unsigned long turnCounter = 0;   // Base time for Turn Timer difference calculation
 
 /* Copied from original 'heading_leader' file; */
-SoftwareSerial Roomba(rxPin, txPin);
+SoftwareSerial Roomba(rxPin, txPin); // Set up communnication with Roomba
+
 unsigned long deltime = 0;
-unsigned long delaytime = 0;
-bool delayflag;
-bool negative = false; //check if angle is +ve or -ve
 long sno = 0;
-unsigned long LookUp[7][2]; //Initialize the lookup table
 
-
-/* Copied from original 'heading_leader' file; Start up Roomba */
+/* Start up Roomba */
 void setup() {
   Serial.begin(57600);
   display_Running_Sketch();     // Show sketch information in the serial monitor at startup
@@ -105,14 +113,12 @@ void setup() {
   Roomba.write(byte(0));
   delay(50);
 
-  digitalWrite(greenPin, LOW);  // say we've finished setup
-  /* I removed the "happiness indicator". You're welcome. */
-
   //Transmitter Setup
   //Initialize Serial and I2C communications
   Wire.begin();
 
   //Put the HMC5883 IC into the correct operating mode
+  // May not need, since this is part of the "compass_reading()" function in "compass.cpp"
   Wire.beginTransmission(address); //open communication with HMC5883
   Wire.write(0x02); //select mode register
   Wire.write(0x00); //continuous measurement mode
@@ -128,12 +134,6 @@ void setup() {
   delay(1000);
   Serial.print("setup");
 
-  // Initialise the IO and ISR
-  vw_set_tx_pin(transmit_pin);
-  vw_set_rx_pin(receive_pin);
-  vw_set_ptt_inverted(true); // Required for DR3100
-  vw_setup(2000);   // Bits per sec
-
   vw_rx_start();       // Start the receiver PLL running
 
   digitalWrite(yellowPin, HIGH);
@@ -142,136 +142,76 @@ void setup() {
   digitalWrite(yellowPin, LOW);
 
   delay(1000);
-/* Compass Calibration: I'm not sure what this code does. Need to look up documentation */
+/* Compass Calibration: */
   //Keep spinning for calibration
-  compass_init(1);
-  Move(0, 100);
-  compass_debug = 1;
-  compass_offset_calibration(2);
-  Move(forward, 0);
+  compass_init(1); // Set Compass Gain
+  Move(0, 100);    // Set roomba spinning to calibrate the compass
+  compass_debug = 1; // Show Debug Code in Serial Monitor (Set to 0 to hide Debug Code)
+  compass_offset_calibration(2); // Find compass axis offsets
+  Move(forward, 0); // Stop spinning after completing calibration
   /* Wait for command to initialize synchronization */
+  
+  digitalWrite(greenPin, LOW);  // say we've finished setup
 
   sendPalse();                  // Reset counters for all online robots.
 
   deltime = millis();           // Set base value for data output.
-  delayflag = true;
-  
+  millisCounter = millis();     // Set base value for counter.
 }
 
-void loop() { // Swarm "Set Orientation" Code
+void loop() { // Swarm "Heading Synchronizaiton" Code
  
-  compass_scalled_reading();
-  compass_heading();
-  
-
+  //compass_scalled_reading();
+  compass_heading(); // Get Bearing information from compass
   // Read angle from compass 
-  angle = bearing;
-
-  //Lookup Table tries
-/*
-
-  Move(forward, 100); //176 , 88, 11           // Stop Roomba from turning
-  delay(1650); //235
-  Move(forward, 0); 
-
-  Serial.print("\nCompass Heading angle = ");
-  Serial.print(bearing);
-  Serial.println(" Degree\n");
-
-  delay(5000); 
-
-*/
+  angle = bearing;   // Set the value of our angle
   
-
-  // Send a pulse signal 
-  digitalWrite(greenPin, HIGH);
-  if (angle + (int)counter >= 360 ) { // If my angle and counter reach 360 degrees...
-    sendPulse();
+  /* Send a pulse signal */
+  if (angle + millisRatio * (long)(millis() - millisCounter) >= 360) { // If my angle and counter reach 360 degrees...
+    sendPulse();                                    // Fire pulse
+    millisCounter = millisCounter + counterAdjust;  // Adjust base counter.
   } // Ignore if the angle and counter are less than 360 degrees.
 
   // Receive a pulse signal 
   if (vw_get_message(buf, &buflen)) {  // If I receive a pulse signal (a high bit)... (perhaps something stored in a buffer?)
 
-
-    //Ahhhhhhhhhhhhhhhhhhhhhhhhhhh FLASH EVERYTHING if there is a b
-    if (buf[i] == 'b') {           // charater of pulse signal
-      Serial.print("\nReceived Broadcast\n");
-      digitalWrite(redPin, HIGH);
-      digitalWrite(greenPin, HIGH);
-      digitalWrite(yellowPin, HIGH);
-      counter = 0;
-      delay(500);                 //Not happy about this delay - remove later
-      digitalWrite(redPin, LOW);
-      digitalWrite(greenPin, LOW);
-      digitalWrite(yellowPin, LOW);     // Tell me that the robot is done
+    if (buf[i] == 'b') {           // charater of palse signal
+      deltime = millis();          // Reset base value for data output
+      millisCounter = millis();    // Reset base counter (on all robots)
+      sno = 0;                     // Reset data point counter
     }
 
-    if (buf[i] == 'a') {           // charater of pulse signal
-      Serial.print("\nReceived Pulse\n");
-      changeAngle();                //Adjust the angle of the robot
-
-      if(d_angle<0)
-      {
-        negative = true;
-        d_angle*=-1;
-      
-      }
-      
-      if(d_angle > 1) //Roomba is not accurate enough to turn by 1 degree (actually 3 degrees)
-      {
-        turn_time = LookupTurnTime(d_angle);
-      }
-      else
-        turn_time = 0;
-        
-      Serial.print("Lookup Value");
-      Serial.println(turn_time);
-
-      if(turn_time)
-      {
-        digitalWrite(yellowPin, HIGH);   // Tell me that the robot is turning
-        if(!negative)
-          Move(forward, TSPEED);         // Turn Roomba by d_angle
-        else
-          Move(forward, -1*TSPEED);
-        
-        if(delayflag)
-        {
-          delaytime = millis();
-          delayflag = false;
-        }
-      }
+    else if (buf[i] == 'a') {      // charater of pulse signal
+      PRC_Sync(millisRatio * (long)(millis() - millisCounter)); // Find desired amount of turn based on PRC for synchronization
+      /* Turn by d_angle */           // Now that I have the angle that I want to change, spin by that amount
+      // turn = FindTurnSpeed(d_angle, TIMER);     // Calculate the turn speed for that angle and amount of time
+      // We will want to implement code that moves at a constant speed and varies the time to turn
+      TIMER = FindTurnTime(d_angle, SPEED);     // Calculate the turn time for that angle at given constant speed
+      digitalWrite(yellowPin, HIGH);  // Tell me that the robot is turning
+      // Move(forward, turn);            // Turn Roomba by d_angle
+      Move(forward, WheelDir * SPEED);
+      turnCounter = millis();         // Set Turn counter base
     }
 
   } // Ignore if no pulse has been received
 
-  if(!delayflag && (millis()-delaytime >= turn_time))
-  {
-    Move(forward, 0);            // Stop Roomba from turning
-    delayflag = true;
-    Serial.print("\nTurn completed\n");
-    digitalWrite(yellowPin, LOW);     // Tell me that the robot is done
+  /* Stop turning if TIMER has passed */
+  if ((millis() - turnCounter >= TIMER)) { // If I've been turning long enough
+    Move(forward, 0);               // Stop turning
+    digitalWrite(yellowPin, LOW);   // Tell me that the robot is done turning
   }
 
-  //counter++; // Increment the counter variable
-  counter = counter + 0.1;
-
-//  if(millis() - deltime >= 1000)  //--Toggle to enable per second reading
-//  {
-  Serial.print(sno);
-  Serial.print(". ");
-  Serial.print("Angle: ");
-  Serial.print(angle);
-  Serial.print("    Counter: ");
-  Serial.println(counter);
-  deltime = millis();
-  sno++;
-  //if(sno % 6000 == 0) sendPalse(); //ensure synchronization by resetting counter - modify this to (if there is a mismatch in the counter
-//  }
-
-  
-  delay(DELAY); // Include small delay for the counter variable
-
+  /* Send to Serial monitor a data point */
+  if (millis() - deltime >= 1000) { // If 1 second = 1000 milliseconds have passed...
+    deltime = millis();     // Reset base value for data points
+    Serial.print(sno);      // Data point number
+    Serial.print(". ");
+    Serial.print("Angle: ");
+    Serial.print(angle);    // Robot Heading
+    Serial.print("    Counter: ");
+    Serial.println(millisRatio * (long)(millis() - millisCounter)); // Counter value
+    sno++; // Increment the data point number
+  }
 
 }// Go back and check everything again. 
 
@@ -279,100 +219,83 @@ void loop() { // Swarm "Set Orientation" Code
 /* SUBROUTINES */
 /*Sends out a pulse when the counter and angle equal 360 degrees*/
 void sendPulse() {
-  Serial.print("\nSending Pulse \n");
-  digitalWrite(greenPin, HIGH);
+  Serial.print("\n Sending Pulse \n");
+  digitalWrite(greenPin, HIGH); // Tell me that I'm sending a pulse
   vw_send((uint8_t *)pulse, strlen(pulse));
-  vw_wait_tx();             // Wait until the whole message is gone
-  digitalWrite(redPin, HIGH);
- // delay(TIMER);             // Wait for the other Roombas to finish turning
-  counter = (int)counter - 360;              // Reset counter back so that the sum of counter and angle is less than 360 degrees
-  digitalWrite(redPin, LOW);
-  digitalWrite(greenPin, LOW);
+  vw_wait_tx();                 // Wait until the whole message is gone
+  digitalWrite(greenPin, LOW);  // Tell me that I'm done sending a pulse
 }
 
 void sendPalse() {
-  Serial.print("\nBcast \n");
-  digitalWrite(greenPin, HIGH);
-  vw_send((uint8_t *)palse, strlen(palse));
-  vw_wait_tx();             // Wait until the whole message is gone
+  digitalWrite(greenPin, HIGH); // Tell me that I'm sending a palse
   digitalWrite(redPin, HIGH);
-  delay(500);             // Wait to see the lights in the receivers
-  counter = 0;              // Reset counter back so that the sum of counter and angle is less than 360 degrees
+  vw_send((uint8_t *)palse, strlen(palse));
+  vw_wait_tx();                 // Wait until the whole message is gone
+  digitalWrite(greenPin, LOW);  // Tell me that I'm done sending a palse
   digitalWrite(redPin, LOW);
-  digitalWrite(greenPin, LOW);
 }
 
-
-/*Changes the angle of the robot according to the pulse received*/
-void changeAngle() {
+/* Determines the necessary change in angle of the robot according to the pulse received */
+void PRC_Sync(float counter) {
   /* Set d_angle, the amount to turn */
- 
-  if ((angle + (int)counter) > (360 - EPSILON)) { // If the angle is close to where I want...
-    d_angle = 0;                    // Don't turn at all.
-    Serial.print("\nNo Turn\n");
-    return;
-  } else if ((angle + (int)counter) >= 180) {      // If angle + counter is greater than 180 degrees...
-    // increase angle 
-    d_angle = (360 - (angle + (int)counter)) * RATIO; // amount I want to change angle
-    Serial.print("\nClockwise\n");
-    return;
-  } else if ((angle + (int)counter) > EPSILON) {   // If angle + counter is less than 180, but not close...
-    // decrease angle 
-    d_angle = -1 * (angle + (int)counter) * RATIO;    // amount I want to change angle
-    Serial.print("\nCounterclockwise\n");
-    return;
-  } else {                                    // If the angle is close to where I want.
-    d_angle = 0;                    // Don't turn at all.
-    Serial.print("\nNo Turn\n");
+  /* Red LED turns on if d_angle is set to 0 */
+  if ((angle + counter) > (360 - EPSILON)) {          // If the angle is close to where I want...
+    d_angle = 0;                                      // Don't turn at all.
+    digitalWrite(redPin, HIGH); // Indicates received pulse, but no turning.
+  } else if ((angle + counter) >= 180) {              // If angle + counter is greater than 180 degrees...
+    /* increase angle */
+    d_angle = (360 - (angle + counter)) * RATIO;      // amount I want to change angle
+    digitalWrite(redPin, LOW); // Indicates the last pulse received caused a turn
+  } else if ((angle + (angle + counter)) > EPSILON) { // If angle + counter is less than 180, but not close...
+    /* decrease angle */
+    d_angle = -1 * (angle + counter) * RATIO;         // amount I want to change angle
+    digitalWrite(redPin, LOW); // Indicates the last pulse received caused a turn
+  } else {                                            // If the angle is close to where I want.
+    d_angle = 0;                                      // Don't turn at all.
+    digitalWrite(redPin, HIGH); // Indicates received pulse, but no turning.
   }
 }
 
-
-unsigned long LookupTurnTime(int angle)
-{
-  int delta = 0, i, index;
-  int minval=700; //greater than 180 would do
-  unsigned long LookUp[7][2] = {{180,3700},{90,1800},{40,900},{20,400},{10,235},{5,80},{3,50}}; //Roomba 1 
- // unsigned long LookUp[7][2] = {{180,3400},{90,1750},{40,900},{20,400},{10,235},{5,80},{3,50}}; //Roomba 2
- // unsigned long LookUp[7][2] = {{180,3300},{90,1650},{40,800},{20,400},{10,200},{5,80},{3,50}}; //Roomba 3
-
-  
-  Serial.print("\nThe fn lookup value");
-  
-  if(angle < 0)   //This is an unnecessary check - scrap it
-  {
-    angle*=-1;
-  }
-  
-  for(i=0;i<7;i++)
-  {
-    delta = angle - (int)LookUp[i][0];
-    Serial.print(angle);
-    Serial.print(" - ");
-    Serial.println(LookUp[i][0]);
-    if(delta<0) delta *= -1;
-    if(minval>delta)
-    { 
-      minval = delta;
-      index = i;
-    }
-  }
-  Serial.print("\nThe final lookup value returned");
-  Serial.println(LookUp[index][1]);
-  return LookUp[index][1];
-
-/*  //Uncomment for future Roombas -- replacement for lookup table
-  unsigned long turntime;
+/* Finds necessary speed of wheels to turn at given angle (angledegrees) in given time (TIMER) */
+int FindTurnSpeed(float angledegrees, const int TIMER) {
+  /* Local variables for computation */
+  int turnspeed;
   float angleradians, holder, timeseconds;
-  // Computation 
-  angleradians = (angle * pi) / 180; // Find angle in radians
-  holder = (angleradians * WHEELSEPARATION * 1000) / (2 * TSPEED); // Calculate the turning time (ms for speed of TSPEED)
-  holder = holder + 0.5;                   // Needed for rounding turnspeed value on next line
-  turntime = (int) holder;                // Truncate value of buffer to an integer
-  // Limit the value, so the Roomba doesn't turn too aggresively 
+  /* Computation */
+  angleradians = (angledegrees * pi) / 180;   // Find angle in radians
+  timeseconds = TIMER / 1000;                 // Find time in seconds
+  holder = (angleradians * WHEELSEPARATION) / (2 * timeseconds); // Calculate the turning speed (mm/s)
+  holder = holder + 0.5;                      // Needed for rounding turnspeed value on next line
+  turnspeed = (int) holder;                   // Truncate value of buffer to an integer
+  /* Limit the value, so the Roomba doesn't turn too aggresively */
+  if (turnspeed > 128) {
+    turnspeed = 128;  // Cap value off at 128 mm/s (slightly arbitrary)
+  }
+  else if (turnspeed < -128) {
+    turnspeed = -128; // Cap value off at -128 mm/s (slightly arbitrary)
+  }
 
-  return turntime;     // Send back the speed at which to turn.
-*/
+  return turnspeed;   // Send back the speed at which to turn.
+}
+
+/* Finds necessary time for wheels to turn a given angle (angledegrees) at given speed (SPEED) */
+int FindTurnTime(float angledegrees, const int SPEED) {
+  /* Local variables for computation */
+  int turntime;
+  float holder;
+  /* Computation */
+  holder = (1000 * angledegrees * pi * WHEELSEPARATION) / (360 * SPEED); // Calculate the turning time (ms)
+  holder = holder + 0.5;                   // Needed for rounding turntime value on next line
+  turntime = (int) holder;                 // Truncate value of holder to an integer
+  /* Determine if wheel direction should be CW or CCW */
+  if (turntime < 0) {
+    WheelDir = -1;      // Set wheels to turn CW
+    turntime = turntime * -1; // negate time value
+  } else {
+    WheelDir = 1;       // Set wheels to turn CCW
+  }
+
+  return turntime;      // Send back the speed at which to turn.
 }
 
 /* General Wheel Motor command function.
@@ -405,13 +328,13 @@ void Move(int X, int Y) {
   Roomba.write(byte(X - Y)); // Combine common and differential speeds for left wheel
 }
 
-
-// displays at startup the Sketch running on the Arduino
+/* Displays the Sketch running on the Arduino. Use at startup on all code. */
 void display_Running_Sketch (void) {
+  /* Find the necessary informaiton */
   String the_path = __FILE__;
   int slash_loc = the_path.lastIndexOf('\\');
   String the_cpp_name = the_path.substring(slash_loc + 1);
-
+  /* Display to the Serial Monitor */
   Serial.print("\nSketch Name: ");
   Serial.println(the_cpp_name);
   Serial.print("Compiled on: ");
