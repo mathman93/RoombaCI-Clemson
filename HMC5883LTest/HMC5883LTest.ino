@@ -154,7 +154,10 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
   y = compass_y_scalled;
   z = compass_z_scalled;
   // Calculated desired angle from raw data
-  angle2 = (atan2(y,x) * (180/pi) - 90) % 360;
+  angle2 = (atan2(y,x) * (180/pi) - 90);
+  if (angle2 < 0){
+  angle2 = angle2 + 360;
+  }
   
   /* Stop turning if TIMER has passed */
   if ((millis() - turnCounter >= TIMER)) { // If I've been turning long enough
