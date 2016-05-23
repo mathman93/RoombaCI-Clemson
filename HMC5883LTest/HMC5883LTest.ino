@@ -26,7 +26,9 @@ float x, y, z; //triple axis data
 
 /* Global variables needed to implement turn functions */
 float angle;                     // Heading of Roomba (found from digital compass)
+float angle2;                    // Correct Heading calculation :)
 int forward = 0;                 // Speed in mm/s that Roomba wheels turn to move forward - must be in range [0,128]
+float pi = 3.1415926;            // pi to 7 decimal places
 
 int TIMER;                       // Amount of time in milliseconds that the Roomba spends turning (can be adjusted)
 //TIMER = 2.0507 seconds results in approximately 1 degree of spin per 1 mm/s turn speed.
@@ -138,6 +140,7 @@ void setup() {
   TIMER = 100000; // Milliseconds
   turnCounter = millis();  
   Move(100,0); // millimeters per second
+  Serial.print("["); // For MATLAB matrix form
 
 }
 
@@ -150,28 +153,29 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
   x = compass_x_scalled;
   y = compass_y_scalled;
   z = compass_z_scalled;
+  // Calculated desired angle from raw data
+  angle2 = (atan2(y,x) * (180/pi) - 90) % 360;
   
   /* Stop turning if TIMER has passed */
   if ((millis() - turnCounter >= TIMER)) { // If I've been turning long enough
     Move(0, 0);               // Stop turning
-    Serial.println("Done");
+    Serial.println("180; 90; -500; 0; 999];"); // Random Data (To make MATLAB work...)
     digitalWrite(yellowPin, LOW);   // Tell me that the robot is done turning
   }
 
   /* Send to Serial monitor a data point */
   if (millis() - deltime >= 200) { // If 1 second = 1000 milliseconds have passed...
     deltime = millis();     // Reset base value for data points
-    Serial.print(sno);      // Data point number
-    Serial.print(". ");
-    Serial.print("Angle: ");
-    Serial.print(angle);    // Robot Heading
-    Serial.print(", X: ");
-    Serial.print(x);    // Robot Heading
-    Serial.print(", Y: ");
-    Serial.print(y);    // Robot Heading
-    Serial.print(", Z: ");
-    Serial.println(z);    // Robot Heading
-    sno++; // Increment the data point number
+    Serial.print(angle);    // Robot Heading (from compass.cpp)
+    Serial.print(", ");    // For MATLAB matrix form
+    Serial.print(angle2);    // Robot Heading (desired heading)
+    Serial.print(", ");    // For MATLAB matrix form
+    Serial.print(x);    // Raw X value
+    Serial.print(", ");    // For MATLAB matrix form
+    Serial.print(y);    // Raw Y value
+    Serial.print(", ");    // For MATLAB matrix form
+    Serial.print(z);    // Raw Z value
+    Serial.print("; ");    // For MATLAB matrix form
   }
 
 }// Go back and check everything again. 
