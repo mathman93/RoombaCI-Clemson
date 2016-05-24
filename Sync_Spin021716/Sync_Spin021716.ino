@@ -382,8 +382,14 @@ int getHeading() {
     bearing = 0;
   }
   */
-  t = 180 + (atan2(-y, x) * 180 / pi);
-  if (t >= 360) t = t - 360;
+  /* Old Calculation (assumes x is forward) */
+  //t = 180 + (atan2(-y, x) * 180 / pi);
+  //if (t >= 360) t = t - 360;
+  /* New Calculation (assumes y is forward) */
+  t = (atan2(y,x) * (180/pi) - 90);
+  if (t < 0){
+    t = t + 360;
+  }
 
   return t;
 }
