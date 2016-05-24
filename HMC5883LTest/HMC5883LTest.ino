@@ -125,23 +125,23 @@ void setup() {
   //Keep spinning for calibration
   compass_init(1); // Set Compass Gain
   Move(0, 100);    // Set roomba spinning to calibrate the compass
+                   // Spins 4 + 1/4 rotations CCW.
   compass_debug = 1; // Show Debug Code in Serial Monitor (Set to 0 to hide Debug Code)
   compass_offset_calibration(2); // Find compass axis offsets
-  Move(forward, 0); // Stop spinning after completing calibration
+  Move(0, 0); // Stop spinning after completing calibration
   /* Wait for command to initialize synchronization */
   
   digitalWrite(greenPin, LOW);  // say we've finished setup
   delay(1000);
-  //sendPalse();                  // Reset counters for all online robots.
 
+  Serial.print("["); // For MATLAB matrix form
+  TIMER = 100000; // Milliseconds
+
+  Move(100,0); // millimeters per second
+  turnCounter = millis();  
   deltime = millis();           // Set base value for data output.
   millisCounter = millis();     // Set base value for counter.
   
-  TIMER = 100000; // Milliseconds
-  turnCounter = millis();  
-  Move(100,0); // millimeters per second
-  Serial.print("["); // For MATLAB matrix form
-
 }
 
 void loop() { // Swarm "Heading Synchronizaiton" Code
@@ -160,10 +160,11 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
   }
   
   /* Stop turning if TIMER has passed */
-  if ((millis() - turnCounter >= TIMER)) { // If I've been turning long enough
+  if ((millis() - turnCounter) >= TIMER && (millis() - turnCounter) < (TIMER + 1000)) { // If I've been turning long enough
     Move(0, 0);               // Stop turning
     Serial.println("180, 90, -500, 0, 999];"); // Random Data (To make MATLAB work...)
     digitalWrite(yellowPin, LOW);   // Tell me that the robot is done turning
+    delay(2000);
   }
 
   /* Send to Serial monitor a data point */
