@@ -162,22 +162,22 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
   /* Stop turning if TIMER has passed */
   if ((millis() - turnCounter >= TIMER)) { // If I've been turning long enough
     Move(0, 0);               // Stop turning
-    Serial.println("180; 90; -500; 0; 999];"); // Random Data (To make MATLAB work...)
+    Serial.println("180, 90, -500, 0, 999];"); // Random Data (To make MATLAB work...)
     digitalWrite(yellowPin, LOW);   // Tell me that the robot is done turning
   }
 
   /* Send to Serial monitor a data point */
   if (millis() - deltime >= 200) { // If 1 second = 1000 milliseconds have passed...
     deltime = millis();     // Reset base value for data points
-    Serial.print(angle);    // Robot Heading (from compass.cpp)
+    Serial.print(angle);     // Robot Heading (from compass.cpp)
     Serial.print(", ");    // For MATLAB matrix form
     Serial.print(angle2);    // Robot Heading (desired heading)
     Serial.print(", ");    // For MATLAB matrix form
-    Serial.print(x);    // Raw X value
+    Serial.print(x);         // Raw X value
     Serial.print(", ");    // For MATLAB matrix form
-    Serial.print(y);    // Raw Y value
+    Serial.print(y);         // Raw Y value
     Serial.print(", ");    // For MATLAB matrix form
-    Serial.print(z);    // Raw Z value
+    Serial.print(z);         // Raw Z value
     Serial.print("; ");    // For MATLAB matrix form
   }
 
