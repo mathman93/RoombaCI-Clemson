@@ -25,7 +25,7 @@ const int receive_pin = 2;
 /* Global variables for transmission and receiving */
 char pulse[2] = {'a'};
 char palse[2] = {'b'};
-int x, y, z, t, i; //triple axis data
+//int x, y, z, t, i; //triple axis data
 uint8_t buf[VW_MAX_MESSAGE_LEN];
 uint8_t buflen = VW_MAX_MESSAGE_LEN;
 
@@ -157,7 +157,6 @@ void setup() {
 
   deltime = millis();           // Set base value for data output.
   millisCounter = millis();     // Set base value for counter.
-  Move(0,-50);
 }
 
 void loop() { // Swarm "Heading Synchronizaiton" Code
@@ -168,7 +167,7 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
   angle = bearing;   // Set the value of our angle
   
   /* Send a pulse signal */
-  /*if (angle + millisRatio * (long)(millis() - millisCounter) >= 360) { // If my angle and counter reach 360 degrees...
+  if (angle + millisRatio * (long)(millis() - millisCounter) >= 360) { // If my angle and counter reach 360 degrees...
     sendPulse();                                    // Fire pulse
     millisCounter = millisCounter + counterAdjust;  // Adjust base counter.
   } // Ignore if the angle and counter are less than 360 degrees.
@@ -184,7 +183,7 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
 
     else if (buf[i] == 'a') {      // charater of pulse signal
       PRC_Sync(millisRatio * (long)(millis() - millisCounter)); // Find desired amount of turn based on PRC for synchronization
-      // Turn by d_angle            // Now that I have the angle that I want to change, spin by that amount
+      /* Turn by d_angle */           // Now that I have the angle that I want to change, spin by that amount
       // turn = FindTurnSpeed(d_angle, TIMER);     // Calculate the turn speed for that angle and amount of time
       // We will want to implement code that moves at a constant speed and varies the time to turn
       TIMER = FindTurnTime(d_angle, SPEED);     // Calculate the turn time for that angle at given constant speed
@@ -195,15 +194,15 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
     }
 
   } // Ignore if no pulse has been received
-*/
+
   /* Stop turning if TIMER has passed */
-/*  if ((millis() - turnCounter >= TIMER)) { // If I've been turning long enough
+  if ((millis() - turnCounter >= TIMER)) { // If I've been turning long enough
     Move(forward, 0);               // Stop turning
     digitalWrite(yellowPin, LOW);   // Tell me that the robot is done turning
   }
-/*
+
   /* Send to Serial monitor a data point */
-  if (millis() - deltime >= 200) { // If 1 second = 1000 milliseconds have passed...
+  if (millis() - deltime >= 1000) { // If 1 second = 1000 milliseconds have passed...
     deltime = millis();     // Reset base value for data points
     Serial.print(sno);      // Data point number
     Serial.print(". ");
