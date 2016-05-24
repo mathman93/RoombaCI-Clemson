@@ -145,8 +145,6 @@ void setup() {
 
   /* Initialize synchronization */
 
-  sendPalse();                  // Reset counters for all online robots.
-
   deltime = millis();           // Set base value for data output.
   millisCounter = millis();     // Set base value for counter.
 
@@ -157,7 +155,7 @@ void setup() {
  * NOTE: Occasionally the Roomba may freak out and spin really fast. This is probably due
  * to the incorrect implementation of the Move() function. 
  */
- /*
+ 
 digitalWrite(redPin, HIGH);
 digitalWrite(greenPin, HIGH);
 digitalWrite(yellowPin, LOW);
@@ -181,11 +179,13 @@ digitalWrite(yellowPin, LOW);
 digitalWrite(redPin, LOW);
 digitalWrite(greenPin, LOW);
 //end 3/24/2016 addition
-*/
-    digitalWrite(yellowPin, HIGH);
+
+  digitalWrite(yellowPin, HIGH);
   Serial.println("...complete");
   delay(500);
   digitalWrite(yellowPin, LOW);
+  
+  sendPalse();                  // Reset counters for all online robots.
 }
 
 void loop() { // Swarm "Heading Synchronizaiton" Code
@@ -207,12 +207,12 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
     }
 
     else if (buf[i] == 'a') {      // charater of pulse signal
-      PRC_Sync(millisRatio * (long)(millis() - millisCounter)); // Find desired amount of turn based on PRC for synchronization
+      digitalWrite(yellowPin, HIGH);  // Tell me that the robot is turning
+      PRC_Sync(angle + millisRatio * (long)(millis() - millisCounter)); // Find desired amount of turn based on PRC for synchronization
       /* Turn by d_angle */           // Now that I have the angle that I want to change, spin by that amount
       // turn = FindTurnSpeed(d_angle, TIMER);     // Calculate the turn speed for that angle and amount of time
       // We will want to implement code that moves at a constant speed and varies the time to turn
       TIMER = FindTurnTime(d_angle, SPEED);     // Calculate the turn time for that angle at given constant speed
-      digitalWrite(yellowPin, HIGH);  // Tell me that the robot is turning
       // Move(forward, turn);            // Turn Roomba by d_angle
       Move(forward, WheelDir * SPEED);
       turnCounter = millis();         // Set Turn counter base
