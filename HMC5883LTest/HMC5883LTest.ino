@@ -30,7 +30,7 @@ float angle2;                    // Correct Heading calculation :)
 int forward = 0;                 // Speed in mm/s that Roomba wheels turn to move forward - must be in range [0,128]
 float pi = 3.1415926;            // pi to 7 decimal places
 
-int TIMER;                       // Amount of time in milliseconds that the Roomba spends turning (can be adjusted)
+unsigned long TIMER;                       // Amount of time in milliseconds that the Roomba spends turning (can be adjusted)
 //TIMER = 2.0507 seconds results in approximately 1 degree of spin per 1 mm/s turn speed.
 
 /* Sync Counter Setup */
@@ -124,8 +124,8 @@ void setup() {
 /* Compass Calibration: */
   //Keep spinning for calibration
   compass_init(1); // Set Compass Gain
-  Move(0, 100);    // Set roomba spinning to calibrate the compass
-                   // Spins 4 + 1/4 rotations CCW.
+  Move(0, -100);    // Set roomba spinning to calibrate the compass
+                   // Spins 5 + 1/4 rotations CCW.
   compass_debug = 1; // Show Debug Code in Serial Monitor (Set to 0 to hide Debug Code)
   compass_offset_calibration(2); // Find compass axis offsets
   Move(0, 0); // Stop spinning after completing calibration
@@ -135,9 +135,11 @@ void setup() {
   delay(1000);
 
   Serial.print("["); // For MATLAB matrix form
-  TIMER = 100000; // Milliseconds
+  calculate_heading();  // Find Initial heading Information
+  Print_Heading_Data(); // Display Initial heading Information
+  TIMER = 60000; // Milliseconds
 
-  Move(100,0); // millimeters per second
+  Move(0,30); // millimeters per second
   turnCounter = millis();  
   deltime = millis();           // Set base value for data output.
   millisCounter = millis();     // Set base value for counter.
@@ -146,7 +148,59 @@ void setup() {
 
 void loop() { // Swarm "Heading Synchronizaiton" Code
  
-  //compass_scalled_reading();
+  calculate_heading(); // Update heading information
+  
+  /* Stop turning if TIMER has passed */
+  if ((millis() - turnCounter) >= TIMER && (millis() - turnCounter) < (TIMER + 1000)) { // If I've been turning long enough
+    Move(0, 0);               // Stop turning
+    Serial.println("]");    // For MATLAB matrix form
+    digitalWrite(yellowPin, LOW);   // Tell me that the robot is done turning
+    delay(2000);
+    Serial.print("[");
+  }
+
+  /* Send to Serial monitor a data point */
+  if (millis() - deltime >= 100) { // If 1 second = 1000 milliseconds have passed...
+    deltime = millis();     // Reset base value for data points
+    sno++;
+    Serial.println(";");    // For MATLAB matrix form
+    Print_Heading_Data();
+  }
+
+}// Go back and check everything again. 
+
+/* SUBROUTINES */
+/* General Wheel Motor command function.
+    X = common wheel speed (mm/s); Y = differential wheel speed;
+    X > 0 -> forward motion; Y > 0 -> CW motion
+    This function is in essence a combination of Spin and Straight,
+    allowing for both turning and forward motion */
+void Move(int X, int Y) {
+  /* Local Variables needed for function */
+  int RWHigh, LWHigh;
+  /* Determine what the high 8-bits should be for each wheel*/
+  /* Right Wheel High byte */
+  if (X - Y >= 0) { // If the desired right wheel speed is a positive number
+    RWHigh = 0;    // Positive filler for a 2's complement number
+  }  else  {       // If the desired right wheel speed is a negative number
+    RWHigh = 255;  // Negative filler for a 2's complement number
+  }
+  /* Left Wheel High byte */
+  if (X + Y >= 0) { // If the desired left wheel speed is a positive number
+    LWHigh = 0;    // Positive filler for a 2's complement number
+  }  else  {       // If the desired left wheel speed is a negative number
+    LWHigh = 255;  // Negative filler for a 2's complement number
+  }
+
+  Roomba.write(byte(145));  // Syntax: [145] [RW High 8-bit] [RW Low 8-bit] [LW High 8-bit] [LW Low 8-bit]
+  Roomba.write(byte(RWHigh));
+  Roomba.write(byte(X - Y)); // Combine common and differential speeds for right wheel
+  Roomba.write(byte(LWHigh));
+  Roomba.write(byte(X + Y)); // Combine common and differential speeds for left wheel
+}
+
+/* Perform Heading Calculations */
+void calculate_heading (void) {
   compass_heading(); // Get Bearing information from compass
   // Read angle from compass 
   angle = bearing;   // Set the value of our angle
@@ -158,60 +212,21 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
   if (angle2 < 0){
   angle2 = angle2 + 360;
   }
-  
-  /* Stop turning if TIMER has passed */
-  if ((millis() - turnCounter) >= TIMER && (millis() - turnCounter) < (TIMER + 1000)) { // If I've been turning long enough
-    Move(0, 0);               // Stop turning
-    Serial.println("180, 90, -500, 0, 999];"); // Random Data (To make MATLAB work...)
-    digitalWrite(yellowPin, LOW);   // Tell me that the robot is done turning
-    delay(2000);
-  }
+}
 
-  /* Send to Serial monitor a data point */
-  if (millis() - deltime >= 200) { // If 1 second = 1000 milliseconds have passed...
-    deltime = millis();     // Reset base value for data points
-    Serial.print(angle);     // Robot Heading (from compass.cpp)
-    Serial.print(", ");    // For MATLAB matrix form
-    Serial.print(angle2);    // Robot Heading (desired heading)
-    Serial.print(", ");    // For MATLAB matrix form
-    Serial.print(x);         // Raw X value
-    Serial.print(", ");    // For MATLAB matrix form
-    Serial.print(y);         // Raw Y value
-    Serial.print(", ");    // For MATLAB matrix form
-    Serial.print(z);         // Raw Z value
-    Serial.print("; ");    // For MATLAB matrix form
-  }
-
-}// Go back and check everything again. 
-
-/* SUBROUTINES */
-/* General Wheel Motor command function.
-    X = common wheel speed (mm/s); Y = differential wheel speed;
-    X > 0 -> forward motion; Y > 0 -> CCW motion
-    This function is in essence a combination of Spin and Straight,
-    allowing for both turning and forward motion */
-void Move(int X, int Y) {
-  /* Local Variables needed for function */
-  int RWHigh, LWHigh;
-  /* Determine what the high 8-bits should be for each wheel*/
-  /* Right Wheel High byte */
-  if (X + Y >= 0) { // If the desired right wheel speed is a positive number
-    RWHigh = 0;    // Positive filler for a 2's complement number
-  }  else  {       // If the desired right wheel speed is a negative number
-    RWHigh = 255;  // Negative filler for a 2's complement number
-  }
-  /* Left Wheel High byte */
-  if (X - Y >= 0) { // If the desired left wheel speed is a positive number
-    LWHigh = 0;    // Positive filler for a 2's complement number
-  }  else  {       // If the desired left wheel speed is a negative number
-    LWHigh = 255;  // Negative filler for a 2's complement number
-  }
-
-  Roomba.write(byte(145));  // Syntax: [145] [RW High 8-bit] [RW Low 8-bit] [LW High 8-bit] [LW Low 8-bit]
-  Roomba.write(byte(RWHigh));
-  Roomba.write(byte(X + Y)); // Combine common and differential speeds for right wheel
-  Roomba.write(byte(LWHigh));
-  Roomba.write(byte(X - Y)); // Combine common and differential speeds for left wheel
+/* Display Important Heading Data to Serial Monitor */
+void Print_Heading_Data (void) {
+  Serial.print(sno);       // Data point number
+  Serial.print(", ");    // For MATLAB matrix form
+  Serial.print(angle);     // Robot Heading (from compass.cpp)
+  Serial.print(", ");    // For MATLAB matrix form
+  Serial.print(angle2);    // Robot Heading (desired heading)
+  Serial.print(", ");    // For MATLAB matrix form
+  Serial.print(x);         // Raw X value
+  Serial.print(", ");    // For MATLAB matrix form
+  Serial.print(y);         // Raw Y value
+  Serial.print(", ");    // For MATLAB matrix form
+  Serial.print(z);         // Raw Z value
 }
 
 /* Displays the Sketch running on the Arduino. Use at startup on all code. */
