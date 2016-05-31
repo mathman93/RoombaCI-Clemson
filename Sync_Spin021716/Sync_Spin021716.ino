@@ -25,7 +25,8 @@ const int receive_pin = 2;
 /* Global variables for transmission and receiving */
 char pulse[2] = {'a'};
 char palse[2] = {'b'};
-int x, y, z, t, i; //triple axis data
+int x, y, z, i; //triple axis data
+float t;
 uint8_t buf[VW_MAX_MESSAGE_LEN];
 uint8_t buflen = VW_MAX_MESSAGE_LEN;
 
@@ -42,7 +43,7 @@ const float RATIO = 0.35;         // Ratio for amount to turn - must be in range
 int TIMER = 1025;                 // Amount of time in milliseconds that the Roomba spends turning (can be adjusted)
 /* TIMER = 2.0507 seconds results in approximately 1 degree of spin per 1 mm/s turn speed.*/
 const float EPSILON = 4.0;        // (ideally) Smallest resolution of digital compass (used in PRC function) - 5.0
-const int SPEED = 50;             // Amount of speed in mm/s that the wheels will spin when the Roomba turns (can be adjusted)
+const int SPEED = 40;             // Amount of speed in mm/s that the wheels will spin when the Roomba turns (can be adjusted)
 
 /* Roomba parameters */
 const int WHEELDIAMETER = 72;     // 72 millimeter wheel diameter
@@ -144,18 +145,19 @@ void setup() {
   digitalWrite(greenPin, LOW);  // say we've finished setup
 
   /* Initialize synchronization */
-
-  deltime = millis();           // Set base value for data output.
+  sendPalse();                  // Reset counters for all online robots.
   millisCounter = millis();     // Set base value for counter.
+  deltime = millis();           // Set base value for data output.
+  sno = 0;                      // Reset data point counter
+  Print_Heading_Data();         // Display initial heading information 
 
 
 /*Added 3/24/2016
  * This part makes the Roomba turn to heading 200. It is used to see how a Roomba's magnetometer reading
  * differs from other Roomba's.
- * NOTE: Occasionally the Roomba may freak out and spin really fast. This is probably due
- * to the incorrect implementation of the Move() function. 
+ * NOTE: Occasionally the Roomba may freak out and spin really fast. 
  */
- 
+ /*
 digitalWrite(redPin, HIGH);
 digitalWrite(greenPin, HIGH);
 digitalWrite(yellowPin, LOW);
@@ -172,10 +174,10 @@ digitalWrite(yellowPin, LOW);
     Serial.print(initAngle);
     Serial.print(". headng diff = ");
     Serial.println(angleDiff);
-    Move(forward, 20);
+    Move(0, 20);
     delay(100);
   }
-  Move(forward, 0);
+  Move(0, 0);
 digitalWrite(redPin, LOW);
 digitalWrite(greenPin, LOW);
 //end 3/24/2016 addition
@@ -184,8 +186,8 @@ digitalWrite(greenPin, LOW);
   Serial.println("...complete");
   delay(500);
   digitalWrite(yellowPin, LOW);
+  */
   
-  sendPalse();                  // Reset counters for all online robots.
 }
 
 void loop() { // Swarm "Heading Synchronizaiton" Code
@@ -193,20 +195,21 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
   angle = getHeading();        // Set angle to the compass reading
 
   /* Send a pulse signal */
-  if (angle + millisRatio * (long)(millis() - millisCounter) >= 360) { // If my angle and counter reach 360 degrees...
+  if (angle + millisRatio * (long)(millis() - millisCounter) >= 360) { // If my "phase" reaches 360 degrees...
     sendPulse();                                    // Fire pulse
     millisCounter = millisCounter + counterAdjust;  // Adjust base counter.
   } // Ignore if the angle and counter are less than 360 degrees.
 
   /* Receive a pulse signal */
   if (vw_get_message(buf, &buflen)) {  // If I receive a pulse signal (a high bit)... (perhaps something stored in a buffer?)
-    if (buf[i] == 'b') {           // charater of palse signal
-      deltime = millis();          // Reset base value for data output
-      millisCounter = millis();    // Reset base counter (on all robots)
-      sno = 0;                     // Reset data point counter
+    if (buf[i] == 'b') {          // Charater of palse signal
+      millisCounter = millis();   // Reset base counter (on all robots)
+      deltime = millis();         // Reset base value for data output
+      sno = 0;                    // Reset data point counter
+      Print_Heading_Data();       // Display initial heading information 
     }
 
-    else if (buf[i] == 'a') {      // charater of pulse signal
+    else if (buf[i] == 'a') {      // Charater of pulse signal
       digitalWrite(yellowPin, HIGH);  // Tell me that the robot is turning
       PRC_Sync(angle + millisRatio * (long)(millis() - millisCounter)); // Find desired amount of turn based on PRC for synchronization
       /* Turn by d_angle */           // Now that I have the angle that I want to change, spin by that amount
@@ -214,7 +217,7 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
       // We will want to implement code that moves at a constant speed and varies the time to turn
       TIMER = FindTurnTime(d_angle, SPEED);     // Calculate the turn time for that angle at given constant speed
       // Move(forward, turn);            // Turn Roomba by d_angle
-      Move(forward, WheelDir * SPEED);
+      Move(forward, (WheelDir * SPEED));    // Turn Roomba by d_angle
       turnCounter = millis();         // Set Turn counter base
     }
   } // Ignore if no pulse has been received
@@ -222,13 +225,9 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
   /* Send to Serial monitor a data point */
   if (millis() - deltime >= 1000) { // If 1 second = 1000 milliseconds have passed...
     deltime = millis();     // Reset base value for data points
-    Serial.print(sno);      // Data point number
-    Serial.print(". ");
-    Serial.print("Angle: ");
-    Serial.print(angle);    // Robot Heading
-    Serial.print("    Counter: ");
-    Serial.println(millisRatio * (long)(millis() - millisCounter)); // Counter value
     sno++; // Increment the data point number
+    Serial.println(";");
+    Print_Heading_Data();
   }
 
   /* Stop turning if TIMER has passed */
@@ -240,7 +239,7 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
 }/* Go back and check everything again. Should be fast */
 
 /* SUBROUTINES */
-/*Sends out a pulse when the counter and angle equal 360 degrees*/
+/* Sends out a pulse when phase equals 360 degrees */
 void sendPulse() {
   Serial.print("\n Sending Pulse \n");
   digitalWrite(greenPin, HIGH); // Tell me that I'm sending a pulse
@@ -249,6 +248,7 @@ void sendPulse() {
   digitalWrite(greenPin, LOW);  // Tell me that I'm done sending a pulse
 }
 
+/* Sends out a palse when new Roomba finishes setup */
 void sendPalse() {
   digitalWrite(greenPin, HIGH); // Tell me that I'm sending a palse
   digitalWrite(redPin, HIGH);
@@ -258,23 +258,23 @@ void sendPalse() {
   digitalWrite(redPin, LOW);
 }
 
-/* Determines the necessary change in angle of the robot according to the pulse received */
-void PRC_Sync(float counter) {
+/* Determines the necessary change in heading of the robot according to the pulse received */
+void PRC_Sync(float phase) {
   /* Set d_angle, the amount to turn */
   /* Red LED turns on if d_angle is set to 0 */
-  if ((angle + counter) > (360 - EPSILON)) {          // If the angle is close to where I want...
-    d_angle = 0;                                      // Don't turn at all.
+  if ((phase) > (360 - EPSILON)) {          // If the phase is close to where I want...
+    d_angle = 0;  // Don't turn at all.
     digitalWrite(redPin, HIGH); // Indicates received pulse, but no turning.
-  } else if ((angle + counter) >= 180) {              // If angle + counter is greater than 180 degrees...
-    /* increase angle */
-    d_angle = (360 - (angle + counter)) * RATIO;      // amount I want to change angle
+  } else if ((phase) >= 180) {              // If phase is greater than 180 degrees...
+    /* Increase Heading */
+    d_angle = (360 - (phase)) * RATIO;  // Amount I want to change the heading
     digitalWrite(redPin, LOW); // Indicates the last pulse received caused a turn
-  } else if ((angle + (angle + counter)) > EPSILON) { // If angle + counter is less than 180, but not close...
-    /* decrease angle */
-    d_angle = -1 * (angle + counter) * RATIO;         // amount I want to change angle
+  } else if ((phase) > EPSILON) {           // If phase is less than 180, but not close...
+    /* Decrease Heading */
+    d_angle = -1 * (phase) * RATIO; // Amount I want to change the heading
     digitalWrite(redPin, LOW); // Indicates the last pulse received caused a turn
-  } else {                                            // If the angle is close to where I want.
-    d_angle = 0;                                      // Don't turn at all.
+  } else {                                  // If the phase is close to where I want.
+    d_angle = 0;  // Don't turn at all.
     digitalWrite(redPin, HIGH); // Indicates received pulse, but no turning.
   }
 }
@@ -313,7 +313,7 @@ int FindTurnTime(float angledegrees, const int SPEED) {
   /* Determine if wheel direction should be CW or CCW */
   if (turntime < 0) {
     WheelDir = -1;      // Set wheels to turn CW
-    turntime = turntime * -1; // negate time value
+    turntime = turntime * -1; // Negate time value
   } else {
     WheelDir = 1;       // Set wheels to turn CCW
   }
@@ -323,7 +323,7 @@ int FindTurnTime(float angledegrees, const int SPEED) {
 
 /* General Wheel Motor command function.
     X = common wheel speed (mm/s); Y = differential wheel speed;
-    X > 0 -> forward motion; Y > 0 -> CCW motion
+    X > 0 -> forward motion; Y > 0 -> CW motion
     This function allows for both turning and forward motion.
     Error may result if |X|+|Y| > 255 */
 void Move(int X, int Y) {
@@ -331,13 +331,13 @@ void Move(int X, int Y) {
   int RWHigh, LWHigh;
   /* Determine what the high 8-bits should be for each wheel*/
   /* Right Wheel High byte */
-  if (X + Y >= 0) {   // If the desired right wheel speed is a positive number
+  if (X - Y >= 0) {   // If the desired right wheel speed is a positive number
     RWHigh = 0;       // Positive filler for a 2's complement number
   }  else  {          // If the desired right wheel speed is a negative number
     RWHigh = 255;     // Negative filler for a 2's complement number
   }
   /* Left Wheel High byte */
-  if (X - Y >= 0) {   // If the desired left wheel speed is a positive number
+  if (X + Y >= 0) {   // If the desired left wheel speed is a positive number
     LWHigh = 0;       // Positive filler for a 2's complement number
   }  else  {          // If the desired left wheel speed is a negative number
     LWHigh = 255;     // Negative filler for a 2's complement number
@@ -345,15 +345,16 @@ void Move(int X, int Y) {
   /* Roomba Wheel Command */
   Roomba.write(byte(145));  // Syntax: [145] [RW High 8-bit] [RW Low 8-bit] [LW High 8-bit] [LW Low 8-bit]
   Roomba.write(byte(RWHigh));
-  Roomba.write(byte(X + Y)); // Combine common and differential speeds for right wheel
+  Roomba.write(byte(X - Y)); // Combine common and differential speeds for right wheel
   Roomba.write(byte(LWHigh));
-  Roomba.write(byte(X - Y)); // Combine common and differential speeds for left wheel
+  Roomba.write(byte(X + Y)); // Combine common and differential speeds for left wheel
 }
 
 /* This function gets the data from the magnetometer and returns the heading in degrees */
 int getHeading() {
-  /* Local variables need for function */
-  int x, y, z, t;
+  /* Local variables need for function (already declared as global) */
+  //int x, y, z;
+  //float t;
   //Tell the HMC5883 where to begin reading data
   Wire.beginTransmission(address);
   Wire.write(0x03); //select register 3, X MSB register
@@ -369,19 +370,8 @@ int getHeading() {
     y = Wire.read() << 8; //Y msb
     y |= Wire.read(); //Y lsb
   }
-
+  
   /* Convert coordinates to an angle for heading */
-  /* compass.cpp heading conversion
-    if (y>0){
-    bearing = 90-atan(x/y)*compass_rad2degree;
-  }else if (y<0){
-    bearing = 270-atan(x/y)*compass_rad2degree;
-  }else if (y==0 & x<0){
-    bearing = 180;
-  }else{
-    bearing = 0;
-  }
-  */
   /* Old Calculation (assumes x is forward) */
   //t = 180 + (atan2(-y, x) * 180 / pi);
   //if (t >= 360) t = t - 360;
@@ -392,6 +382,21 @@ int getHeading() {
   }
 
   return t;
+}
+
+/* Display Heading Information to the Serial Monitor */
+void Print_Heading_Data(void) {
+  Serial.print(sno);      // Data point number
+  Serial.print(", ");
+  Serial.print(angle);    // Robot Heading
+  Serial.print(", ");
+  Serial.print(millisRatio * (long)(millis() - millisCounter)); // Counter value
+  Serial.print(", ");
+  Serial.print(x);        // Raw X magnetometer value
+  Serial.print(", ");
+  Serial.print(y);        // Raw Y magnetometer value
+  Serial.print(", ");
+  Serial.print(z);        // Raw Z magnetometer value
 }
 
 /* Displays the Sketch running on the Arduino. Use at startup on all code. */
