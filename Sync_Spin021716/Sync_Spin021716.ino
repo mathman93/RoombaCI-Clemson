@@ -3,13 +3,14 @@
     Eliminates use of the delay() function to improve synchronization between robots.
     Updated getHeading() subroutine to give correct heading direction.
 
-    Last Updated: 5/13/2016
+    Last Updated: 6/1/2016
 */
 
 #include <SoftwareSerial.h>
 #include <SPI.h>
 #include "VirtualWire.h"
 #include "Wire.h"
+#include "compass.h"
 
 #define address 0x1E //0011110b, I2C 7bit address of HMC5883
 
@@ -26,7 +27,7 @@ const int receive_pin = 2;
 char pulse[2] = {'a'};
 char palse[2] = {'b'};
 int x, y, z, i; //triple axis data
-float t;
+//float t;
 uint8_t buf[VW_MAX_MESSAGE_LEN];
 uint8_t buflen = VW_MAX_MESSAGE_LEN;
 
@@ -51,7 +52,7 @@ const int WHEELSEPARATION = 235;  // 235 millimeters between center of main whee
 const float ENCODER = 508.8;      // 508.8 Counts per wheel revolution
 
 /* Sync Counter Setup */
-unsigned long millisCounter = 0;                // Base time for Counter difference calculation
+unsigned long millisCounter;                // Base time for Counter difference calculation
 /* Adjust this value to vary the speed/frequency of the counter */
 const float counterspeed = 30;                  // Number of times per second that the counter increments - range (0,1000]
 const float millisRatio = counterspeed / 1000;  // Counter increments per millisecond
@@ -133,22 +134,34 @@ void setup() {
 
   //Receiver Setup
   delay(1000);
-  Serial.print("setup");
+  Serial.print("Receiver setup");
 
   vw_rx_start();       // Start the receiver PLL running
 
-  //Make sure that the Roomba is receiving commands
-  Move(0, 41);
-  delay(1000);
-  Move(0, 0);
-  delay(1000);
+  digitalWrite(yellowPin, HIGH);
+  Serial.println("...complete");
+  delay(500);
+  digitalWrite(yellowPin, LOW);
+  
+  /* Compass Calibration: */
+  //Keep spinning for calibration
+  compass_init(1); // Set Compass Gain
+  Move(0, -75);    // Set roomba spinning to calibrate the compass
+                   // Spins ~4 rotations CCW.
+  compass_debug = 1; // Show Debug Code in Serial Monitor (Set to 0 to hide Debug Code)
+  compass_offset_calibration(2); // Find compass axis offsets
+  Move(0, 0); // Stop spinning after completing calibration
+  /* Wait for command to initialize synchronization */
+  
   digitalWrite(greenPin, LOW);  // say we've finished setup
-
+  delay(1000);
   /* Initialize synchronization */
+  angle = getHeading();         // Determine initial heading information
   sendPalse();                  // Reset counters for all online robots.
   millisCounter = millis();     // Set base value for counter.
   deltime = millis();           // Set base value for data output.
   sno = 0;                      // Reset data point counter
+  Serial.print("[");    // For MATLAB matrix form
   Print_Heading_Data();         // Display initial heading information 
 
 
@@ -181,12 +194,7 @@ digitalWrite(yellowPin, LOW);
 digitalWrite(redPin, LOW);
 digitalWrite(greenPin, LOW);
 //end 3/24/2016 addition
-
-  digitalWrite(yellowPin, HIGH);
-  Serial.println("...complete");
-  delay(500);
-  digitalWrite(yellowPin, LOW);
-  */
+*/
   
 }
 
@@ -241,7 +249,7 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
 /* SUBROUTINES */
 /* Sends out a pulse when phase equals 360 degrees */
 void sendPulse() {
-  Serial.print("\n Sending Pulse \n");
+  //Serial.print("\n Sending Pulse \n");
   digitalWrite(greenPin, HIGH); // Tell me that I'm sending a pulse
   vw_send((uint8_t *)pulse, strlen(pulse));
   vw_wait_tx();                 // Wait until the whole message is gone
@@ -354,7 +362,7 @@ void Move(int X, int Y) {
 int getHeading() {
   /* Local variables need for function (already declared as global) */
   //int x, y, z;
-  //float t;
+  float t;
   //Tell the HMC5883 where to begin reading data
   Wire.beginTransmission(address);
   Wire.write(0x03); //select register 3, X MSB register
