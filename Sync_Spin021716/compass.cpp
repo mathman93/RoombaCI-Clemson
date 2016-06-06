@@ -103,10 +103,10 @@ void compass_offset_calibration(int select){
    0 1 = 2 Sample average      0   0   1   =   1.5                    0   1   = Positive Bias
    1 0 = 4 Sample Average      0   1   0   =   3                      1   0   = Negative Bais
    1 1 = 8 Sample Average      0   1   1   =   7.5                    1   1   = -
-   1   0   0   =   15 (Default)
-   1   0   1   =   30
-   1   1   0   =   75
-   1   1   1   =   -
+                               1   0   0   =   15 (Default)
+                               1   0   1   =   30
+                               1   1   0   =   75
+                               1   1   1   =   -
    */
   Wire.endTransmission();
   

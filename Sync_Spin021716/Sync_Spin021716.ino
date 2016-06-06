@@ -26,7 +26,7 @@ const int receive_pin = 2;
 /* Global variables for transmission and receiving */
 char pulse[2] = {'a'};
 char palse[2] = {'b'};
-int x, y, z, i; //triple axis data
+int i; //triple axis data
 //float t;
 uint8_t buf[VW_MAX_MESSAGE_LEN];
 uint8_t buflen = VW_MAX_MESSAGE_LEN;
@@ -156,12 +156,11 @@ void setup() {
   digitalWrite(greenPin, LOW);  // say we've finished setup
   delay(1000);
   /* Initialize synchronization */
-  angle = getHeading();         // Determine initial heading information
+  angle = Calculate_Heading();  // Determine initial heading information
   sendPalse();                  // Reset counters for all online robots.
   millisCounter = millis();     // Set base value for counter.
   deltime = millis();           // Set base value for data output.
   sno = 0;                      // Reset data point counter
-  Serial.print("[");    // For MATLAB matrix form
   Print_Heading_Data();         // Display initial heading information 
 
 
@@ -200,7 +199,7 @@ digitalWrite(greenPin, LOW);
 
 void loop() { // Swarm "Heading Synchronizaiton" Code
   /* Read angle from compass */
-  angle = getHeading();        // Set angle to the compass reading
+  angle = Calculate_Heading();        // Set angle from the compass reading
 
   /* Send a pulse signal */
   if (angle + millisRatio * (long)(millis() - millisCounter) >= 360) { // If my "phase" reaches 360 degrees...
@@ -358,9 +357,9 @@ void Move(int X, int Y) {
   Roomba.write(byte(X + Y)); // Combine common and differential speeds for left wheel
 }
 
-/* This function gets the data from the magnetometer and returns the heading in degrees */
+/* This function gets the data from the magnetometer and returns the heading in degrees
 int getHeading() {
-  /* Local variables need for function (already declared as global) */
+  //Local variables need for function (already declared as global)
   //int x, y, z;
   float t;
   //Tell the HMC5883 where to begin reading data
@@ -379,13 +378,25 @@ int getHeading() {
     y |= Wire.read(); //Y lsb
   }
   
-  /* Convert coordinates to an angle for heading */
-  /* Old Calculation (assumes x is forward) */
+  // Convert coordinates to an angle for heading
+  // Old Calculation (assumes x is forward)
   //t = 180 + (atan2(-y, x) * 180 / pi);
   //if (t >= 360) t = t - 360;
-  /* New Calculation (assumes y is forward) */
+  // New Calculation (assumes y is forward)
   t = (atan2(y,x) * (180/pi) - 90);
   if (t < 0){
+    t = t + 360;
+  }
+
+  return t;
+}
+*/
+float Calculate_Heading(void) {
+  float t;
+  compass_scalled_reading(); // Get Raw data from the compass
+  /* Heading Calculation (y-axis front) */
+  t = (atan2(compass_y_scalled,compass_x_scalled) * (180/pi) - 90);
+  if (t < 0) {
     t = t + 360;
   }
 
@@ -400,11 +411,11 @@ void Print_Heading_Data(void) {
   Serial.print(", ");
   Serial.print(millisRatio * (long)(millis() - millisCounter)); // Counter value
   Serial.print(", ");
-  Serial.print(x);        // Raw X magnetometer value
+  Serial.print(compass_x_scalled);        // Raw X magnetometer value
   Serial.print(", ");
-  Serial.print(y);        // Raw Y magnetometer value
+  Serial.print(compass_y_scalled);        // Raw Y magnetometer value
   Serial.print(", ");
-  Serial.print(z);        // Raw Z magnetometer value
+  Serial.print(compass_z_scalled);        // Raw Z magnetometer value
 }
 
 /* Displays the Sketch running on the Arduino. Use at startup on all code. */
