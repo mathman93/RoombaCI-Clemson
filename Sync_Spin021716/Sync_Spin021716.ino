@@ -26,7 +26,7 @@ const int receive_pin = 2;
 /* Global variables for transmission and receiving */
 char pulse[2] = {'a'};
 char palse[2] = {'b'};
-int i; //triple axis data
+int i; // buffer element
 //float t;
 uint8_t buf[VW_MAX_MESSAGE_LEN];
 uint8_t buflen = VW_MAX_MESSAGE_LEN;
@@ -34,6 +34,7 @@ uint8_t buflen = VW_MAX_MESSAGE_LEN;
 /* Global variables needed to implement turn functions */
 float angle;                      // Heading of Roomba (found from digital compass)
 float d_angle;                    // change in angle that Roomba will turn (updates each cycle)
+float DesiredHeading;             // Heading set point of Roomba;
 int forward = 0;                  // Speed in mm/s that Roomba wheels turn to move forward - must be in range [-128,128]
 int turn;                         // Speed in mm/s that Roomba wheels turn to rotate a given d_angle - must be in range [-128,128]
 int WheelDir = 1;                 // Determines direction of rotation for FindTurnTime() function (1 = CCW; -1 = CW)
@@ -42,8 +43,8 @@ const float pi = 3.1415926;       // pi to 7 decimal places
 /* Adjustable Synchronization Parameters */
 const float RATIO = 0.35;         // Ratio for amount to turn - must be in range (0 1]
 int TIMER = 1025;                 // Amount of time in milliseconds that the Roomba spends turning (can be adjusted)
-/* TIMER = 2.0507 seconds results in approximately 1 degree of spin per 1 mm/s turn speed.*/
-const float EPSILON = 4.0;        // (ideally) Smallest resolution of digital compass (used in PRC function) - 5.0
+// TIMER = 2.0507 seconds results in approximately 1 degree of spin per 1 mm/s turn speed.
+const float EPSILON = 2.0;        // (ideally) Smallest resolution of digital compass (used in PRC function) - 5.0
 const int SPEED = 40;             // Amount of speed in mm/s that the wheels will spin when the Roomba turns (can be adjusted)
 
 /* Roomba parameters */
@@ -157,9 +158,10 @@ void setup() {
   delay(1000);
   /* Initialize synchronization */
   angle = Calculate_Heading();  // Determine initial heading information
-  sendPalse();                  // Reset counters for all online robots.
-  millisCounter = millis();     // Set base value for counter.
-  deltime = millis();           // Set base value for data output.
+  DesiredHeading = angle;       // Initial heading value
+  sendPalse();                  // Reset counters for all online robots
+  millisCounter = millis();     // Set base value for counter
+  deltime = millis();           // Set base value for data output
   sno = 0;                      // Reset data point counter
   Print_Heading_Data();         // Display initial heading information 
 
@@ -194,7 +196,7 @@ digitalWrite(redPin, LOW);
 digitalWrite(greenPin, LOW);
 //end 3/24/2016 addition
 */
-  
+
 }
 
 void loop() { // Swarm "Heading Synchronizaiton" Code
@@ -213,6 +215,7 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
       millisCounter = millis();   // Reset base counter (on all robots)
       deltime = millis();         // Reset base value for data output
       sno = 0;                    // Reset data point counter
+      DesiredHeading = angle;     // Reset heading set point
       Print_Heading_Data();       // Display initial heading information 
     }
 
@@ -220,12 +223,19 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
       digitalWrite(yellowPin, HIGH);  // Tell me that the robot is turning
       PRC_Sync(angle + millisRatio * (long)(millis() - millisCounter)); // Find desired amount of turn based on PRC for synchronization
       /* Turn by d_angle */           // Now that I have the angle that I want to change, spin by that amount
-      // turn = FindTurnSpeed(d_angle, TIMER);     // Calculate the turn speed for that angle and amount of time
-      // We will want to implement code that moves at a constant speed and varies the time to turn
-      TIMER = FindTurnTime(d_angle, SPEED);     // Calculate the turn time for that angle at given constant speed
-      // Move(forward, turn);            // Turn Roomba by d_angle
-      Move(forward, (WheelDir * SPEED));    // Turn Roomba by d_angle
-      turnCounter = millis();         // Set Turn counter base
+      //turn = FindTurnSpeed(d_angle, TIMER);     // Calculate the turn speed for that angle and amount of time
+      //Move(forward, turn);                      // Turn Roomba by d_angle
+      
+      //TIMER = FindTurnTime(d_angle, SPEED);     // Calculate the turn time for that angle at given constant speed
+      //Move(forward, (WheelDir * SPEED));    // Turn Roomba by d_angle
+      //turnCounter = millis();         // Set Turn counter base
+      
+      DesiredHeading += d_angle;        // Set new desired heading set point
+      if (DesiredHeading < 0) {         // Normalize the heading value to between 0 and 360
+        DesiredHeading += 360;
+      } else if (DesiredHeading >= 360) {
+        DesiredHeading -= 360;
+      }
     }
   } // Ignore if no pulse has been received
 
@@ -233,16 +243,17 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
   if (millis() - deltime >= 1000) { // If 1 second = 1000 milliseconds have passed...
     deltime = millis();     // Reset base value for data points
     sno++; // Increment the data point number
-    Serial.println(";");
+    Serial.println(";");    // End row, start new row of data
     Print_Heading_Data();
   }
 
-  /* Stop turning if TIMER has passed */
+  DH_Turn();                        // Turn to the DesiredHeading set point
+  /* Stop turning if TIMER has passed 
   if ((millis() - turnCounter >= TIMER)) { // If I've been turning long enough
     Move(forward, 0);               // Stop turning
     digitalWrite(yellowPin, LOW);   // Tell me that the robot is done turning
   }
-
+*/
 }/* Go back and check everything again. Should be fast */
 
 /* SUBROUTINES */
@@ -283,6 +294,49 @@ void PRC_Sync(float phase) {
   } else {                                  // If the phase is close to where I want.
     d_angle = 0;  // Don't turn at all.
     digitalWrite(redPin, HIGH); // Indicates received pulse, but no turning.
+  }
+}
+
+/* Set Roomba spin to acheive the value of DesiredHeading */
+void DH_Turn(void) {
+  // DesiredHeading is the set point for the heading
+  // EPSILON is desirably small (probably in range [0.5, 1])
+  // Need the amount of spin to be less than (2 * # of cycles through main loop in 1 second)
+     // or may need to grade the amount of spin (proportional to amount of heading change)
+  int spinValue; // Speed of wheels in mm/s to spin toward DesiredHeading
+  float holder;
+  holder = angle - DesiredHeading;
+  holder = abs(holder);   // absolute difference of where I am (angle) and where I want to be (DesiredHeading)
+  if (holder > 30) {
+    spinValue = 80;   // Move faster
+  } else if (holder > 5) {
+    spinValue = 40;   // Move fast
+  } else {
+    spinValue = 20;   // Move slow (keeps down oscillations due to main loop execution rate)
+  }
+  
+  if(DesiredHeading < 180) {
+    if(angle > (DesiredHeading + EPSILON) && angle < (DesiredHeading + 180) ) {
+      // Spin Left (CCW)
+      Move(forward, -spinValue);
+    } else if ((angle < (DesiredHeading - EPSILON)) || (angle >= (DesiredHeading + 180)) ) {
+      // Spin Right (CW)
+      Move(forward, spinValue);
+    } else { // if ((DesiredHeading - EPSILON) < angle < (DesiredHeading + EPSILON))
+      // Stop Spinning
+      Move(forward, 0);
+    }
+  } else { // if(DesiredHeading >= 180)...
+    if ((angle < (DesiredHeading - EPSILON)) && (angle > (DesiredHeading - 180)) ) {
+      // Spin Right (CW)
+      Move(forward, spinValue);
+    } else if ((angle > (DesiredHeading + EPSILON)) || (angle <= (DesiredHeading - 180)) ) {
+      // Spin Left (CCW)
+      Move(forward, -spinValue);
+    } else {  // if ((DesiredHeading - EPSILON) < angle < (DesiredHeading + EPSILON))
+      // Stop Spinning
+      Move(forward, 0);
+    }
   }
 }
 
@@ -332,21 +386,30 @@ int FindTurnTime(float angledegrees, const int SPEED) {
     X = common wheel speed (mm/s); Y = differential wheel speed;
     X > 0 -> forward motion; Y > 0 -> CW motion
     This function allows for both turning and forward motion.
-    Error may result if |X|+|Y| > 255 */
+    Error may result if |X|+|Y| > 511 (Max value is 500, so shouldn't be a problem)
+    */
 void Move(int X, int Y) {
   /* Local Variables needed for function */
   int RWHigh, LWHigh;
   /* Determine what the high 8-bits should be for each wheel*/
   /* Right Wheel High byte */
-  if (X - Y >= 0) {   // If the desired right wheel speed is a positive number
+  if (X - Y > 255) {          // If the desired right wheel speed is a big positive number
+    RWHigh = 1;       // Positive filler for a 2's complement number
+  } else if (X - Y >= 0) {    // If the desired right wheel speed is a small postive number
     RWHigh = 0;       // Positive filler for a 2's complement number
-  }  else  {          // If the desired right wheel speed is a negative number
+  } else if (X - Y < -255) {  // If the desired right wheel speed is a big negative number
+    RWHigh = 254;     // Negative filler for a 2's complement number
+  } else {                    // If the desired right wheel speed is a small negative number
     RWHigh = 255;     // Negative filler for a 2's complement number
   }
   /* Left Wheel High byte */
-  if (X + Y >= 0) {   // If the desired left wheel speed is a positive number
+  if (X + Y > 255) {          // If the desired left wheel speed is a big positive number
+    LWHigh = 1;       // Positive filler for a 2's complement number
+  } else if (X + Y >= 0) {    // If the desired left wheel speed is a small positive number
     LWHigh = 0;       // Positive filler for a 2's complement number
-  }  else  {          // If the desired left wheel speed is a negative number
+  } else if (X + Y < -255) {  // If the desired left wheel speed is a big negative number
+    LWHigh = 254;     // Negative filler for a 2's complement number
+  } else {                    // If the desired left wheel speed is a small negative number
     LWHigh = 255;     // Negative filler for a 2's complement number
   }
   /* Roomba Wheel Command */
