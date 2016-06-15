@@ -3,7 +3,7 @@
     Eliminates use of the delay() function to improve synchronization between robots.
     Updated getHeading() subroutine to give correct heading direction.
 
-    Last Updated: 6/1/2016
+    Last Updated: 6/15/2016
 */
 
 #include <SoftwareSerial.h>
@@ -26,7 +26,7 @@ const int receive_pin = 2;
 /* Global variables for transmission and receiving */
 char pulse[2] = {'a'};
 char palse[2] = {'b'};
-int i; // buffer element
+//int i = 0; // buffer element
 //float t;
 uint8_t buf[VW_MAX_MESSAGE_LEN];
 uint8_t buflen = VW_MAX_MESSAGE_LEN;
@@ -67,7 +67,7 @@ unsigned long turnCounter = 0;   // Base time for Turn Timer difference calculat
 SoftwareSerial Roomba(rxPin, txPin); // Set up communnication with Roomba
 
 /* Data Point Collector Setup */
-unsigned long deltime = 0;
+unsigned long deltime;
 long sno = 0;
 
 /* Start up Roomba */
@@ -153,50 +153,17 @@ void setup() {
   compass_offset_calibration(2); // Find compass axis offsets
   Move(0, 0); // Stop spinning after completing calibration
   /* Wait for command to initialize synchronization */
-  
   digitalWrite(greenPin, LOW);  // say we've finished setup
   delay(1000);
+  
   /* Initialize synchronization */
   angle = Calculate_Heading();  // Determine initial heading information
-  DesiredHeading = angle;       // Initial heading value
+  DesiredHeading = angle;       // Set initial heading value
   sendPalse();                  // Reset counters for all online robots
   millisCounter = millis();     // Set base value for counter
   deltime = millis();           // Set base value for data output
   sno = 0;                      // Reset data point counter
   Print_Heading_Data();         // Display initial heading information 
-
-
-/*Added 3/24/2016
- * This part makes the Roomba turn to heading 200. It is used to see how a Roomba's magnetometer reading
- * differs from other Roomba's.
- * NOTE: Occasionally the Roomba may freak out and spin really fast. 
- */
- /*
-digitalWrite(redPin, HIGH);
-digitalWrite(greenPin, HIGH);
-digitalWrite(yellowPin, LOW);
-
-  int initAngle, angleDiff, currHeading;
-  initAngle = 200;
-  Serial.println("Format: [current heading]-->[target heading]. [diff between both]");
-  while (angleDiff > 5) {
-    currHeading = getHeading();
-    angleDiff = abs(currHeading - initAngle);
-    Serial.print("[setup] ");
-    Serial.print(currHeading);
-    Serial.print("-->");
-    Serial.print(initAngle);
-    Serial.print(". headng diff = ");
-    Serial.println(angleDiff);
-    Move(0, 20);
-    delay(100);
-  }
-  Move(0, 0);
-digitalWrite(redPin, LOW);
-digitalWrite(greenPin, LOW);
-//end 3/24/2016 addition
-*/
-
 }
 
 void loop() { // Swarm "Heading Synchronizaiton" Code
@@ -211,15 +178,22 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
 
   /* Receive a pulse signal */
   if (vw_get_message(buf, &buflen)) {  // If I receive a pulse signal (a high bit)... (perhaps something stored in a buffer?)
-    if (buf[i] == 'b') {          // Charater of palse signal
+    Serial.print((char)buf[0]);
+    if (buf[0] == 'b') {          // Charater of palse signal
+      Serial.println(" Reset Palse.");
+      digitalWrite(redPin, HIGH);   // Notify that we received palse
+      digitalWrite(greenPin, HIGH);
       millisCounter = millis();   // Reset base counter (on all robots)
       deltime = millis();         // Reset base value for data output
       sno = 0;                    // Reset data point counter
       DesiredHeading = angle;     // Reset heading set point
-      Print_Heading_Data();       // Display initial heading information 
+      Print_Heading_Data();       // Display initial heading information
+      digitalWrite(redPin, LOW);    // End Notify that we received palse
+      digitalWrite(greenPin, LOW);
     }
 
-    else if (buf[i] == 'a') {      // Charater of pulse signal
+    else if (buf[0] == 'a') {      // Charater of pulse signal
+      Serial.println(" Sync Pulse.");
       digitalWrite(yellowPin, HIGH);  // Tell me that the robot is turning
       PRC_Sync(angle + millisRatio * (long)(millis() - millisCounter)); // Find desired amount of turn based on PRC for synchronization
       /* Turn by d_angle */           // Now that I have the angle that I want to change, spin by that amount
@@ -241,7 +215,7 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
 
   /* Send to Serial monitor a data point */
   if (millis() - deltime >= 1000) { // If 1 second = 1000 milliseconds have passed...
-    deltime = millis();     // Reset base value for data points
+    deltime += 1000;     // Reset base value for data points
     sno++; // Increment the data point number
     Serial.println(";");    // End row, start new row of data
     Print_Heading_Data();
@@ -259,7 +233,7 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
 /* SUBROUTINES */
 /* Sends out a pulse when phase equals 360 degrees */
 void sendPulse() {
-  //Serial.print("\n Sending Pulse \n");
+  Serial.println("Sync Pulse Sent.");
   digitalWrite(greenPin, HIGH); // Tell me that I'm sending a pulse
   vw_send((uint8_t *)pulse, strlen(pulse));
   vw_wait_tx();                 // Wait until the whole message is gone
@@ -268,6 +242,7 @@ void sendPulse() {
 
 /* Sends out a palse when new Roomba finishes setup */
 void sendPalse() {
+  Serial.println("Reset Pulse Sent.");
   digitalWrite(greenPin, HIGH); // Tell me that I'm sending a palse
   digitalWrite(redPin, HIGH);
   vw_send((uint8_t *)palse, strlen(palse));
@@ -305,17 +280,32 @@ void DH_Turn(void) {
      // or may need to grade the amount of spin (proportional to amount of heading change)
   int spinValue; // Speed of wheels in mm/s to spin toward DesiredHeading
   float holder;
+  float thresh1 = 25; // First threshold value
+  float thresh2 = 5;  // Second threshold value
   holder = angle - DesiredHeading;
   holder = abs(holder);   // absolute difference of where I am (angle) and where I want to be (DesiredHeading)
-  if (holder > 30) {
-    spinValue = 80;   // Move faster
-  } else if (holder > 5) {
-    spinValue = 40;   // Move fast
-  } else {
-    spinValue = 20;   // Move slow (keeps down oscillations due to main loop execution rate)
+  // Determine spin speed based on Thresholds
+  if (holder > thresh1 && holder < (360 - thresh1)) {
+    spinValue = 100;   // Move faster
+  } else if (holder > thresh2 && holder < (360 - thresh2)) { // and <= thresh1
+    spinValue = 50;   // Move fast
+  } else { // if (holder <= thresh2)
+    spinValue = 15;   // Move slow (keeps down oscillations due to main loop execution rate)
   }
-  
-  if(DesiredHeading < 180) {
+  // Determine direction of spin
+  if(DesiredHeading < EPSILON) {
+    if(angle > (DesiredHeading + EPSILON) && angle < (DesiredHeading + 180) ) {
+      // Spin Left (CCW)
+      Move(forward, -spinValue);
+    } else if ((angle < (360 + DesiredHeading - EPSILON)) && (angle >= (DesiredHeading + 180)) ) {
+      // Spin Right (CW)
+      Move(forward, spinValue);
+    } else { // if ((360 + DesiredHeading - EPSILON) < angle < (DesiredHeading + EPSILON))
+      // Stop Spinning
+      Move(forward, 0);
+      digitalWrite(yellowPin, LOW); // Say we have stopped turning.
+    }
+  } else if(DesiredHeading < 180) { // and DesiredHeading >= EPSILON...
     if(angle > (DesiredHeading + EPSILON) && angle < (DesiredHeading + 180) ) {
       // Spin Left (CCW)
       Move(forward, -spinValue);
@@ -325,8 +315,9 @@ void DH_Turn(void) {
     } else { // if ((DesiredHeading - EPSILON) < angle < (DesiredHeading + EPSILON))
       // Stop Spinning
       Move(forward, 0);
+      digitalWrite(yellowPin, LOW); // Say we have stopped turning.
     }
-  } else { // if(DesiredHeading >= 180)...
+  } else if(DesiredHeading < (360 - EPSILON)) { // and DesiredHeading >= 180)...
     if ((angle < (DesiredHeading - EPSILON)) && (angle > (DesiredHeading - 180)) ) {
       // Spin Right (CW)
       Move(forward, spinValue);
@@ -336,22 +327,35 @@ void DH_Turn(void) {
     } else {  // if ((DesiredHeading - EPSILON) < angle < (DesiredHeading + EPSILON))
       // Stop Spinning
       Move(forward, 0);
+      digitalWrite(yellowPin, LOW); // Say we have stopped turning.
     }
-  }
-}
+  } else { // if DesiredHeading >= (360 - EPSILON)...
+    if ((angle < (DesiredHeading - EPSILON)) && (angle > (DesiredHeading - 180)) ) {
+      // Spin Right (CW)
+      Move(forward, spinValue);
+    } else if ((angle > (DesiredHeading + EPSILON - 360)) && (angle <= (DesiredHeading - 180)) ) {
+      // Spin Left (CCW)
+      Move(forward, -spinValue);
+    } else {  // if ((DesiredHeading - EPSILON) < angle < (DesiredHeading + EPSILON))
+      // Stop Spinning
+      Move(forward, 0);
+      digitalWrite(yellowPin, LOW); // Say we have stopped turning.
+    } // End "else angle"
+  } // End "else DesiredHeading"
+} // End Function
 
-/* Finds necessary speed of wheels to turn at given angle (angledegrees) in given time (TIMER) */
+/* Finds necessary speed of wheels to turn at given angle (angledegrees) in given time (TIMER)
 int FindTurnSpeed(float angledegrees, const int TIMER) {
-  /* Local variables for computation */
+  //Local variables for computation
   int turnspeed;
   float angleradians, holder, timeseconds;
-  /* Computation */
+  //Computation
   angleradians = (angledegrees * pi) / 180;   // Find angle in radians
   timeseconds = TIMER / 1000;                 // Find time in seconds
   holder = (angleradians * WHEELSEPARATION) / (2 * timeseconds); // Calculate the turning speed (mm/s)
   holder = holder + 0.5;                      // Needed for rounding turnspeed value on next line
   turnspeed = (int) holder;                   // Truncate value of buffer to an integer
-  /* Limit the value, so the Roomba doesn't turn too aggresively */
+  //Limit the value, so the Roomba doesn't turn too aggresively
   if (turnspeed > 128) {
     turnspeed = 128;  // Cap value off at 128 mm/s (slightly arbitrary)
   }
@@ -360,18 +364,18 @@ int FindTurnSpeed(float angledegrees, const int TIMER) {
   }
 
   return turnspeed;   // Send back the speed at which to turn.
-}
+}*/
 
-/* Finds necessary time for wheels to turn a given angle (angledegrees) at given speed (SPEED) */
+/* Finds necessary time for wheels to turn a given angle (angledegrees) at given speed (SPEED)
 int FindTurnTime(float angledegrees, const int SPEED) {
-  /* Local variables for computation */
+  //Local variables for computation
   int turntime;
   float holder;
-  /* Computation */
+  //Computation
   holder = (1000 * angledegrees * pi * WHEELSEPARATION) / (360 * SPEED); // Calculate the turning time (ms)
   holder = holder + 0.5;                   // Needed for rounding turntime value on next line
   turntime = (int) holder;                 // Truncate value of holder to an integer
-  /* Determine if wheel direction should be CW or CCW */
+  //Determine if wheel direction should be CW or CCW
   if (turntime < 0) {
     WheelDir = -1;      // Set wheels to turn CW
     turntime = turntime * -1; // Negate time value
@@ -380,7 +384,7 @@ int FindTurnTime(float angledegrees, const int SPEED) {
   }
 
   return turntime;      // Send back the speed at which to turn.
-}
+}*/
 
 /* General Wheel Motor command function.
     X = common wheel speed (mm/s); Y = differential wheel speed;

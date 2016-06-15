@@ -183,6 +183,7 @@ void DH_Turn(void) {
   float thresh2 = 5;  // Second threshold value
   holder = angle - DesiredHeading;
   holder = abs(holder);   // absolute difference of where I am (angle) and where I want to be (DesiredHeading)
+  // Determine spin speed based on Thresholds
   if (holder > thresh1 && holder < (360 - thresh1)) {
     spinValue = 100;   // Move faster
   } else if (holder > thresh2 && holder < (360 - thresh2)) { // and <= thresh1
@@ -190,6 +191,7 @@ void DH_Turn(void) {
   } else { // if (holder <= thresh2)
     spinValue = 15;   // Move slow (keeps down oscillations due to main loop execution rate)
   }
+  // Determine direction of spin
   if(DesiredHeading < EPSILON) {
     if(angle > (DesiredHeading + EPSILON) && angle < (DesiredHeading + 180) ) {
       // Spin Left (CCW)
@@ -233,9 +235,9 @@ void DH_Turn(void) {
     } else {  // if ((DesiredHeading - EPSILON) < angle < (DesiredHeading + EPSILON))
       // Stop Spinning
       Move(forward, 0);
-    }
-  }
-}
+    } // End "else angle"
+  } // End "else DesiredHeading"
+} // End Function
 
 /* General Wheel Motor command function.
     X = common wheel speed (mm/s); Y = differential wheel speed;
