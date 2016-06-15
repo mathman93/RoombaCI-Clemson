@@ -92,7 +92,7 @@ void compass_offset_calibration(int select){
   // ***************************************************************************************** 
   if (select == 1 | select == 3){ // User input in the function
  // Configuring the Control register for Positive Bais mode
-  Serial.println("Calibrating the Magnetometer ....... Gain");
+  Serial.println("Calibrating the Magnetometer Gain");
   Wire.beginTransmission(compass_address);
   Wire.write(0x00);
   Wire.write(0b01110001); // bit configuration = 0 A A DO2 DO1 DO0 MS1 MS2
@@ -195,8 +195,8 @@ void compass_offset_calibration(int select){
   // Offset estimation
   // *****************************************************************************************
    if (select == 2 | select == 3){// User input in the function
-   Serial.println("Calibrating the Magnetometer ....... Offset");
-    Serial.println("Please rotate the magnetometer 2 or 3 times in complete circules with in one minute ............. ");
+   Serial.println("Calibrating the Magnetometer Offset");
+    Serial.println("Please rotate the magnetometer 2 or 3 times in complete circles within one minute.");
     
     for(byte i=0;i<10;i++){   // Disregarding first few data
          compass_read_XYZdata();

@@ -1,7 +1,9 @@
 /*  Heading Synchronization Code
-    Bases the global counter on the clock speed of the Arduino Uno (millis() function).
-    Eliminates use of the delay() function to improve synchronization between robots.
-    Updated getHeading() subroutine to give correct heading direction.
+    Based the global counter on the clock speed of the Arduino Uno (millis() function).
+        Eliminates use of the delay() function to improve synchronization between robots.
+    Created Calculate_Heading() subroutine to give correct heading direction.
+    Improved Roomba turning and achieving of desired heading.
+    Added reset pulse after 5 minutes to ensure global counter synchronization.
 
     Last Updated: 6/15/2016
 */
@@ -24,28 +26,20 @@ const int transmit_pin = 12;    // Communication links to RF transmitter/receive
 const int receive_pin = 2;
 
 /* Global variables for transmission and receiving */
-char pulse[2] = {'a'};
-char palse[2] = {'b'};
-//int i = 0; // buffer element
-//float t;
 uint8_t buf[VW_MAX_MESSAGE_LEN];
 uint8_t buflen = VW_MAX_MESSAGE_LEN;
 
 /* Global variables needed to implement turn functions */
 float angle;                      // Heading of Roomba (found from digital compass)
-float d_angle;                    // change in angle that Roomba will turn (updates each cycle)
+float counter;                    // Global counter for Roomba (works with angle to compute "phase")
+float d_angle;                    // Change in angle that Roomba will turn (updates each cycle)
 float DesiredHeading;             // Heading set point of Roomba;
-int forward = 0;                  // Speed in mm/s that Roomba wheels turn to move forward - must be in range [-128,128]
-int turn;                         // Speed in mm/s that Roomba wheels turn to rotate a given d_angle - must be in range [-128,128]
-int WheelDir = 1;                 // Determines direction of rotation for FindTurnTime() function (1 = CCW; -1 = CW)
-const float pi = 3.1415926;       // pi to 7 decimal places
+int forward = 0;                  // Speed in mm/s that Roomba wheels turn to move forward - must be in range [-400,400]
+const float pi = 3.1415926;       // PI to 7 decimal places
 
 /* Adjustable Synchronization Parameters */
-const float RATIO = 0.35;         // Ratio for amount to turn - must be in range (0 1]
-int TIMER = 1025;                 // Amount of time in milliseconds that the Roomba spends turning (can be adjusted)
-// TIMER = 2.0507 seconds results in approximately 1 degree of spin per 1 mm/s turn speed.
-const float EPSILON = 2.0;        // (ideally) Smallest resolution of digital compass (used in PRC function) - 5.0
-const int SPEED = 40;             // Amount of speed in mm/s that the wheels will spin when the Roomba turns (can be adjusted)
+const float RATIO = 0.7;         // Ratio for amount to turn - must be in range (0 1]
+const float EPSILON = 1.0;        // (ideally) Smallest resolution of digital compass (used in PRC function) - 5.0
 
 /* Roomba parameters */
 const int WHEELDIAMETER = 72;     // 72 millimeter wheel diameter
@@ -58,16 +52,14 @@ unsigned long millisCounter;                // Base time for Counter difference 
 const float counterspeed = 30;                  // Number of times per second that the counter increments - range (0,1000]
 const float millisRatio = counterspeed / 1000;  // Counter increments per millisecond
 const float millisAdjust = 360000 / counterspeed; // Amount of counter adjustment per firing
-const unsigned long counterAdjust = (unsigned long) millisAdjust; // Truncate to unsigned long
+const unsigned long counterAdjust = (unsigned long) millisAdjust; // Truncate to unsigned long   
 
-/* Turn Counter Setup */
-unsigned long turnCounter = 0;   // Base time for Turn Timer difference calculation
-
-/* Copied from original 'heading_leader' file; */
+/* Roomba Serial Setup */
 SoftwareSerial Roomba(rxPin, txPin); // Set up communnication with Roomba
 
 /* Data Point Collector Setup */
 unsigned long deltime;
+unsigned long resettime;
 long sno = 0;
 
 /* Start up Roomba */
@@ -82,18 +74,10 @@ void setup() {
   Roomba.begin(115200);         // Declare Roomba communication baud rate.
   digitalWrite(greenPin, HIGH); // say we're alive
 
-  // wake up the robot (Is this needed, since we are reseting the roomba 9 lines later? See page 7 of Roomba manual.)
-  digitalWrite(ddPin, HIGH);
-  delay(100);
-  digitalWrite(ddPin, LOW);
-  delay(500);
-  digitalWrite(ddPin, HIGH);
-  delay(2000);
-
   // set up ROI to receive commands
   Roomba.write(byte(7));  // RESTART
   delay(10000);
-  Serial.print("STARTING ROOMBA");
+  Serial.print("STARTING ROOMBA.");
   Roomba.write(byte(128));  // START
   delay(50);
   Roomba.write(byte(131));  // CONTROL
@@ -135,7 +119,7 @@ void setup() {
 
   //Receiver Setup
   delay(1000);
-  Serial.print("Receiver setup");
+  Serial.print(" Setup");
 
   vw_rx_start();       // Start the receiver PLL running
 
@@ -155,64 +139,52 @@ void setup() {
   /* Wait for command to initialize synchronization */
   digitalWrite(greenPin, LOW);  // say we've finished setup
   delay(1000);
-  
+  angle = Calculate_Heading();  // Throw away first calculation
+  delay(200);
   /* Initialize synchronization */
   angle = Calculate_Heading();  // Determine initial heading information
-  DesiredHeading = angle;       // Set initial heading value
-  sendPalse();                  // Reset counters for all online robots
-  millisCounter = millis();     // Set base value for counter
-  deltime = millis();           // Set base value for data output
-  sno = 0;                      // Reset data point counter
-  Print_Heading_Data();         // Display initial heading information 
+  sendPalse();                  // Send reset Palse
+  resetCounters();              // Reset counter values
 }
 
 void loop() { // Swarm "Heading Synchronizaiton" Code
   /* Read angle from compass */
   angle = Calculate_Heading();        // Set angle from the compass reading
+  counter = millisRatio * (long)(millis() - millisCounter);
 
   /* Send a pulse signal */
-  if (angle + millisRatio * (long)(millis() - millisCounter) >= 360) { // If my "phase" reaches 360 degrees...
+  if (angle + counter >= 360) { // If my "phase" reaches 360 degrees...
     sendPulse();                                    // Fire pulse
     millisCounter = millisCounter + counterAdjust;  // Adjust base counter.
   } // Ignore if the angle and counter are less than 360 degrees.
 
   /* Receive a pulse signal */
   if (vw_get_message(buf, &buflen)) {  // If I receive a pulse signal (a high bit)... (perhaps something stored in a buffer?)
-    Serial.print((char)buf[0]);
+    //Serial.print((char)buf[0]);    // Include for debugging
     if (buf[0] == 'b') {          // Charater of palse signal
-      Serial.println(" Reset Palse.");
+      //Serial.println(" Reset Palse.");    // Include for debugging
       digitalWrite(redPin, HIGH);   // Notify that we received palse
       digitalWrite(greenPin, HIGH);
-      millisCounter = millis();   // Reset base counter (on all robots)
-      deltime = millis();         // Reset base value for data output
-      sno = 0;                    // Reset data point counter
-      DesiredHeading = angle;     // Reset heading set point
-      Print_Heading_Data();       // Display initial heading information
+      resetCounters();
       digitalWrite(redPin, LOW);    // End Notify that we received palse
       digitalWrite(greenPin, LOW);
-    }
-
+    } // End If statement
     else if (buf[0] == 'a') {      // Charater of pulse signal
-      Serial.println(" Sync Pulse.");
+      //Serial.println(" Sync Pulse.");     // Include for debugging
       digitalWrite(yellowPin, HIGH);  // Tell me that the robot is turning
-      PRC_Sync(angle + millisRatio * (long)(millis() - millisCounter)); // Find desired amount of turn based on PRC for synchronization
-      /* Turn by d_angle */           // Now that I have the angle that I want to change, spin by that amount
-      //turn = FindTurnSpeed(d_angle, TIMER);     // Calculate the turn speed for that angle and amount of time
-      //Move(forward, turn);                      // Turn Roomba by d_angle
-      
-      //TIMER = FindTurnTime(d_angle, SPEED);     // Calculate the turn time for that angle at given constant speed
-      //Move(forward, (WheelDir * SPEED));    // Turn Roomba by d_angle
-      //turnCounter = millis();         // Set Turn counter base
-      
-      DesiredHeading += d_angle;        // Set new desired heading set point
+      PRC_Sync(angle + counter); // Find desired amount of turn based on PRC for synchronization
+      /* Turn by d_angle */
+      DesiredHeading = angle + d_angle;        // Set new desired heading set point
       if (DesiredHeading < 0) {         // Normalize the heading value to between 0 and 360
         DesiredHeading += 360;
       } else if (DesiredHeading >= 360) {
         DesiredHeading -= 360;
       }
-    }
+    } // End elseif statement
   } // Ignore if no pulse has been received
-
+  
+  DH_Turn();                // Turn to the DesiredHeading set point
+  
   /* Send to Serial monitor a data point */
   if (millis() - deltime >= 1000) { // If 1 second = 1000 milliseconds have passed...
     deltime += 1000;     // Reset base value for data points
@@ -220,20 +192,19 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
     Serial.println(";");    // End row, start new row of data
     Print_Heading_Data();
   }
-
-  DH_Turn();                        // Turn to the DesiredHeading set point
-  /* Stop turning if TIMER has passed 
-  if ((millis() - turnCounter >= TIMER)) { // If I've been turning long enough
-    Move(forward, 0);               // Stop turning
-    digitalWrite(yellowPin, LOW);   // Tell me that the robot is done turning
+  
+  /* Reset Counters of all Roombas every 5 minutes */
+  if (millis() - resettime >= 300000) { // If it's been 5 minutes...
+    sendPalse();    // Send Reset Palse
+    resetCounters();// Reset Counter values
   }
-*/
 }/* Go back and check everything again. Should be fast */
 
 /* SUBROUTINES */
 /* Sends out a pulse when phase equals 360 degrees */
 void sendPulse() {
-  Serial.println("Sync Pulse Sent.");
+  char pulse[2] = {'a'};
+  //Serial.println("Sync Pulse Sent.");     // Include for debugging
   digitalWrite(greenPin, HIGH); // Tell me that I'm sending a pulse
   vw_send((uint8_t *)pulse, strlen(pulse));
   vw_wait_tx();                 // Wait until the whole message is gone
@@ -242,13 +213,24 @@ void sendPulse() {
 
 /* Sends out a palse when new Roomba finishes setup */
 void sendPalse() {
-  Serial.println("Reset Pulse Sent.");
+  char palse[2] = {'b'};
+  //Serial.println("Reset Pulse Sent.");    // Include for debugging
   digitalWrite(greenPin, HIGH); // Tell me that I'm sending a palse
   digitalWrite(redPin, HIGH);
   vw_send((uint8_t *)palse, strlen(palse));
   vw_wait_tx();                 // Wait until the whole message is gone
   digitalWrite(greenPin, LOW);  // Tell me that I'm done sending a palse
   digitalWrite(redPin, LOW);
+}
+
+/* Reset ALL the counters */
+void resetCounters() {
+  millisCounter = millis();   // Reset base counter (on all robots)
+  deltime = millis();         // Reset base value for data output
+  resettime = millis();       // Reset base value for reset timer
+  sno = 0;                    // Reset data point counter
+  DesiredHeading = angle;     // Reset heading set point
+  Print_Heading_Data();       // Display initial heading information
 }
 
 /* Determines the necessary change in heading of the robot according to the pulse received */
@@ -344,53 +326,11 @@ void DH_Turn(void) {
   } // End "else DesiredHeading"
 } // End Function
 
-/* Finds necessary speed of wheels to turn at given angle (angledegrees) in given time (TIMER)
-int FindTurnSpeed(float angledegrees, const int TIMER) {
-  //Local variables for computation
-  int turnspeed;
-  float angleradians, holder, timeseconds;
-  //Computation
-  angleradians = (angledegrees * pi) / 180;   // Find angle in radians
-  timeseconds = TIMER / 1000;                 // Find time in seconds
-  holder = (angleradians * WHEELSEPARATION) / (2 * timeseconds); // Calculate the turning speed (mm/s)
-  holder = holder + 0.5;                      // Needed for rounding turnspeed value on next line
-  turnspeed = (int) holder;                   // Truncate value of buffer to an integer
-  //Limit the value, so the Roomba doesn't turn too aggresively
-  if (turnspeed > 128) {
-    turnspeed = 128;  // Cap value off at 128 mm/s (slightly arbitrary)
-  }
-  else if (turnspeed < -128) {
-    turnspeed = -128; // Cap value off at -128 mm/s (slightly arbitrary)
-  }
-
-  return turnspeed;   // Send back the speed at which to turn.
-}*/
-
-/* Finds necessary time for wheels to turn a given angle (angledegrees) at given speed (SPEED)
-int FindTurnTime(float angledegrees, const int SPEED) {
-  //Local variables for computation
-  int turntime;
-  float holder;
-  //Computation
-  holder = (1000 * angledegrees * pi * WHEELSEPARATION) / (360 * SPEED); // Calculate the turning time (ms)
-  holder = holder + 0.5;                   // Needed for rounding turntime value on next line
-  turntime = (int) holder;                 // Truncate value of holder to an integer
-  //Determine if wheel direction should be CW or CCW
-  if (turntime < 0) {
-    WheelDir = -1;      // Set wheels to turn CW
-    turntime = turntime * -1; // Negate time value
-  } else {
-    WheelDir = 1;       // Set wheels to turn CCW
-  }
-
-  return turntime;      // Send back the speed at which to turn.
-}*/
-
 /* General Wheel Motor command function.
-    X = common wheel speed (mm/s); Y = differential wheel speed;
+    X = common wheel speed (mm/s); Y = differential wheel speed (mm/s);
     X > 0 -> forward motion; Y > 0 -> CW motion
     This function allows for both turning and forward motion.
-    Error may result if |X|+|Y| > 511 (Max value is 500, so shouldn't be a problem)
+    Error may result if |X|+|Y| > 500 (Max value is 500)
     */
 void Move(int X, int Y) {
   /* Local Variables needed for function */
@@ -424,40 +364,6 @@ void Move(int X, int Y) {
   Roomba.write(byte(X + Y)); // Combine common and differential speeds for left wheel
 }
 
-/* This function gets the data from the magnetometer and returns the heading in degrees
-int getHeading() {
-  //Local variables need for function (already declared as global)
-  //int x, y, z;
-  float t;
-  //Tell the HMC5883 where to begin reading data
-  Wire.beginTransmission(address);
-  Wire.write(0x03); //select register 3, X MSB register
-  Wire.endTransmission();
-
-  //Read data from each axis, 2 registers per axis
-  Wire.requestFrom(address, 6);
-  if (6 <= Wire.available()) {
-    x = Wire.read() << 8; //X msb
-    x |= Wire.read(); //X lsb
-    z = Wire.read() << 8; //Z msb
-    z |= Wire.read(); //Z lsb
-    y = Wire.read() << 8; //Y msb
-    y |= Wire.read(); //Y lsb
-  }
-  
-  // Convert coordinates to an angle for heading
-  // Old Calculation (assumes x is forward)
-  //t = 180 + (atan2(-y, x) * 180 / pi);
-  //if (t >= 360) t = t - 360;
-  // New Calculation (assumes y is forward)
-  t = (atan2(y,x) * (180/pi) - 90);
-  if (t < 0){
-    t = t + 360;
-  }
-
-  return t;
-}
-*/
 float Calculate_Heading(void) {
   float t;
   compass_scalled_reading(); // Get Raw data from the compass
@@ -476,13 +382,15 @@ void Print_Heading_Data(void) {
   Serial.print(", ");
   Serial.print(angle);    // Robot Heading
   Serial.print(", ");
-  Serial.print(millisRatio * (long)(millis() - millisCounter)); // Counter value
+  Serial.print(counter);  // Counter value
   Serial.print(", ");
-  Serial.print(compass_x_scalled);        // Raw X magnetometer value
+  Serial.print(compass_x_scalled);  // Raw X magnetometer value
   Serial.print(", ");
-  Serial.print(compass_y_scalled);        // Raw Y magnetometer value
+  Serial.print(compass_y_scalled);  // Raw Y magnetometer value
   Serial.print(", ");
-  Serial.print(compass_z_scalled);        // Raw Z magnetometer value
+  Serial.print(compass_z_scalled);  // Raw Z magnetometer value
+  Serial.print(", ");
+  Serial.print(DesiredHeading);     // Desired Set point (angle should follow this)
 }
 
 /* Displays the Sketch running on the Arduino. Use at startup on all code. */
