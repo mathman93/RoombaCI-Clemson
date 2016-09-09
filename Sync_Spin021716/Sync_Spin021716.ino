@@ -85,12 +85,12 @@ void setup() {
   //132 - Full mode (Be ready to catch it!)
 
   //Light up the blue dirt detect light (Needs better comments!)
-  Roomba.write(byte(139));
-  Roomba.write(byte(25));
-  Roomba.write(byte(0));
-  Roomba.write(byte(128));
+  Roomba.write(byte(139)); //Begin (power?) LED control
+  Roomba.write(byte(25)); //LED Bits
+  Roomba.write(byte(0)); //LED color, 0 should be green
+  Roomba.write(byte(128)); //Start command, not sure why you have to send this again...
   delay(500);
-  Roomba.write(byte(139));
+  Roomba.write(byte(139)); //Same thing as above, but flash red.
   Roomba.write(byte(25));
   Roomba.write(byte(255));
   Roomba.write(byte(128));
