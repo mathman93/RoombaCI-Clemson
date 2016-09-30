@@ -123,11 +123,11 @@ void setup() {
   delay(1000);
 /* Compass Calibration: */
   //Keep spinning for calibration
-  compass_init(1); // Set Compass Gain
-  Move(0, -100);    // Set roomba spinning to calibrate the compass
-                   // Spins 5 + 1/4 rotations CCW.
-  compass_debug = 1; // Show Debug Code in Serial Monitor (Set to 0 to hide Debug Code)
-  compass_offset_calibration(2); // Find compass axis offsets
+  //compass_init(1); // Set Compass Gain
+  //Move(0, -100);    // Set roomba spinning to calibrate the compass
+  //                 // Spins 5 + 1/4 rotations CCW.
+  //compass_debug = 1; // Show Debug Code in Serial Monitor (Set to 0 to hide Debug Code)
+  //compass_offset_calibration(2); // Find compass axis offsets
   Move(0, 0); // Stop spinning after completing calibration
   /* Wait for command to initialize synchronization */
   
@@ -139,7 +139,7 @@ void setup() {
   Print_Heading_Data(); // Display Initial heading Information
   TIMER = 60000; // Milliseconds
 
-  Move(0,30); // millimeters per second
+  //Move(0,30); // millimeters per second
   turnCounter = millis();  
   deltime = millis();           // Set base value for data output.
   millisCounter = millis();     // Set base value for counter.
@@ -151,14 +151,14 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
   calculate_heading(); // Update heading information
   
   /* Stop turning if TIMER has passed */
-  if ((millis() - turnCounter) >= TIMER && (millis() - turnCounter) < (TIMER + 1000)) { // If I've been turning long enough
+  /*if ((millis() - turnCounter) >= TIMER && (millis() - turnCounter) < (TIMER + 1000)) { // If I've been turning long enough
     Move(0, 0);               // Stop turning
     Serial.println("]");    // For MATLAB matrix form
     digitalWrite(yellowPin, LOW);   // Tell me that the robot is done turning
     delay(2000);
     Serial.print("[");
   }
-
+*/
   /* Send to Serial monitor a data point */
   if (millis() - deltime >= 100) { // If 1 second = 1000 milliseconds have passed...
     deltime = millis();     // Reset base value for data points

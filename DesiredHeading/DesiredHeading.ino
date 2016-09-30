@@ -23,7 +23,7 @@ const int receive_pin = 2;
 /* Global variables needed to implement turn functions */
 float angle;                      // Heading of Roomba (found from digital compass)
 float d_angle;                    // change in angle that Roomba will turn (updates each cycle)
-int forward = 40;                  // Speed in mm/s that Roomba wheels turn to move forward - must be in range [-128,128]
+int forward = 0;                  // Speed in mm/s that Roomba wheels turn to move forward - must be in range [-128,128]
 int turn;                         // Speed in mm/s that Roomba wheels turn to rotate a given d_angle - must be in range [-128,128]
 int WheelDir = 1;                 // Determines direction of rotation for FindTurnTime() function (1 = CCW; -1 = CW)
 const float pi = 3.1415926;       // pi to 7 decimal places
@@ -62,14 +62,6 @@ void setup() {
   pinMode(yellowPin, OUTPUT);
   Roomba.begin(115200);         // Declare Roomba communication baud rate.
   digitalWrite(greenPin, HIGH); // say we're alive
-
-  // wake up the robot (Is this needed, since we are reseting the roomba 9 lines later? See page 7 of Roomba manual.)
-  digitalWrite(ddPin, HIGH);
-  delay(100);
-  digitalWrite(ddPin, LOW);
-  delay(500);
-  digitalWrite(ddPin, HIGH);
-  delay(2000);
 
   // set up ROI to receive commands
   Roomba.write(byte(7));  // RESTART
@@ -127,12 +119,12 @@ void setup() {
 
   /* Compass Calibration: */
   //Keep spinning for calibration
-  compass_init(1); // Set Compass Gain
-  Move(0, -75);    // Set roomba spinning to calibrate the compass
+  //compass_init(1); // Set Compass Gain
+  //Move(0, -75);    // Set roomba spinning to calibrate the compass
                    // Spins ~4 rotations CCW.
-  compass_debug = 1; // Show Debug Code in Serial Monitor (Set to 0 to hide Debug Code)
-  compass_offset_calibration(2); // Find compass axis offsets
-  Move(0, 0); // Stop spinning after completing calibration
+  //compass_debug = 1; // Show Debug Code in Serial Monitor (Set to 0 to hide Debug Code)
+  //compass_offset_calibration(2); // Find compass axis offsets
+  //Move(0, 0); // Stop spinning after completing calibration
   /* Wait for command to initialize synchronization */
   
   digitalWrite(greenPin, LOW);  // say we've finished setup
@@ -159,7 +151,7 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
   }
 
   DH_Turn();
-
+ 
   /* Send to Serial monitor a data point */
   if (millis() - deltime >= 50) { // If 1 second = 1000 milliseconds have passed...
     deltime += 50;     // Reset base value for data points
@@ -243,38 +235,17 @@ void DH_Turn(void) {
     X = common wheel speed (mm/s); Y = differential wheel speed;
     X > 0 -> forward motion; Y > 0 -> CW motion
     This function allows for both turning and forward motion.
-    Error may result if |X|+|Y| > 511 (Max value is 500, so shouldn't be a problem)
+    Updated to use bitshift logic.
+    Error may result if |X|+|Y| > 500 (Max value is 500)
     */
 void Move(int X, int Y) {
-  /* Local Variables needed for function */
-  int RWHigh, LWHigh;
-  /* Determine what the high 8-bits should be for each wheel*/
-  /* Right Wheel High byte */
-  if (X - Y > 255) {          // If the desired right wheel speed is a big positive number
-    RWHigh = 1;       // Positive filler for a 2's complement number
-  } else if (X - Y >= 0) {    // If the desired right wheel speed is a small postive number
-    RWHigh = 0;       // Positive filler for a 2's complement number
-  } else if (X - Y < -255) {  // If the desired right wheel speed is a big negative number
-    RWHigh = 254;     // Negative filler for a 2's complement number
-  } else {                    // If the desired right wheel speed is a small negative number
-    RWHigh = 255;     // Negative filler for a 2's complement number
-  }
-  /* Left Wheel High byte */
-  if (X + Y > 255) {          // If the desired left wheel speed is a big positive number
-    LWHigh = 1;       // Positive filler for a 2's complement number
-  } else if (X + Y >= 0) {    // If the desired left wheel speed is a small positive number
-    LWHigh = 0;       // Positive filler for a 2's complement number
-  } else if (X + Y < -255) {  // If the desired left wheel speed is a big negative number
-    LWHigh = 254;     // Negative filler for a 2's complement number
-  } else {                    // If the desired left wheel speed is a small negative number
-    LWHigh = 255;     // Negative filler for a 2's complement number
-  }
-  /* Roomba Wheel Command */
-  Roomba.write(byte(145));  // Syntax: [145] [RW High 8-bit] [RW Low 8-bit] [LW High 8-bit] [LW Low 8-bit]
-  Roomba.write(byte(RWHigh));
-  Roomba.write(byte(X - Y)); // Combine common and differential speeds for right wheel
-  Roomba.write(byte(LWHigh));
-  Roomba.write(byte(X + Y)); // Combine common and differential speeds for left wheel
+ unsigned int RW = (X - Y);
+ unsigned int LW = (X + Y);
+ Roomba.write(byte(145));
+ Roomba.write(byte((RW & 0xff00) >> 8));
+ Roomba.write(byte(RW & 0xff));
+ Roomba.write(byte((LW & 0xff00) >> 8));
+ Roomba.write(byte(LW & 0xff));
 }
 
 float Calculate_Heading(void) {
