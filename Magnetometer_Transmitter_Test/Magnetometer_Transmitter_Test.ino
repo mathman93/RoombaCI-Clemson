@@ -1,21 +1,31 @@
 #include <VirtualWire.h>
 
 /*
- * October 7, 2017
+ * October 7, 2016
  * Eddie Bear
  * This code will get readings from the magnetometer and send them over RF to a base receiver.
- * If the magnetometer could not be found or started correctly, the yellow and green lights will flash continuously.
+ * If the magnetometer could not be found or started correctly, the yellow and green lights will flash continuously,
+ * otherwise the red LED will light every time data is transmitted.
 */
 #include <Wire.h>
 #include <HMC5883L.h>
+
+
+//Adjust this string based on the name of the robot you are uploading to.
+String message = String("Robot_3 heading is ");
+//////
 
 HMC5883L compass;
 
 float heading, headingDegrees;
 int counter = 0;
-String message = String("Robot_3 heading is ");
 String data;
 char buf[50];
+
+int green = 7;
+int red = 8;
+int yellow = 11;
+
 void setup()
 {
   // Initialize the IO and ISR
@@ -23,22 +33,22 @@ void setup()
   vw_setup(2000); // Bits per sec
   Serial.begin(57600);
 
-  pinMode(11, OUTPUT);
-  pinMode(8, OUTPUT);
-  pinMode(7, OUTPUT);
+  pinMode(yellow, OUTPUT);
+  pinMode(red, OUTPUT);
+  pinMode(green, OUTPUT);
 
   //Test LEDs
-  digitalWrite(11, HIGH);
+  digitalWrite(yellow, HIGH);
   delay(500);
-  digitalWrite(7, HIGH);
+  digitalWrite(green, HIGH);
   delay(500);
-  digitalWrite(8, HIGH);
+  digitalWrite(red, HIGH);
   delay(1000);
-  digitalWrite(11, LOW);
+  digitalWrite(yellow, LOW);
   delay(500);
-  digitalWrite(7, LOW);
+  digitalWrite(green, LOW);
   delay(500);
-  digitalWrite(8, LOW);
+  digitalWrite(red, LOW);
 
   Serial.begin(57600);
 
@@ -47,13 +57,13 @@ void setup()
   while (!compass.begin())
   {
     Serial.println("Could not find a valid HMC5883L sensor, check wiring!");
-    digitalWrite(11, HIGH);
+    digitalWrite(yellow, HIGH);
     delay(500);
-    digitalWrite(7, HIGH);
+    digitalWrite(green, HIGH);
     delay(500);
-    digitalWrite(11, LOW);
+    digitalWrite(yellow, LOW);
     delay(500);
-    digitalWrite(7, LOW);
+    digitalWrite(green, LOW);
     delay(500);
   }
 
@@ -72,7 +82,7 @@ void setup()
   // Set calibration offset. See HMC5883L_calibration.ino
   compass.setOffset(0, 0);
 
-  Serial.println("[Counter], [Heading], [Heading Degrees]");
+  //Serial.println("[Counter], [Heading], [Heading Degrees]");
 }
 void loop()
 {
