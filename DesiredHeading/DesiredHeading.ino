@@ -119,12 +119,12 @@ void setup() {
 
   /* Compass Calibration: */
   //Keep spinning for calibration
-  //compass_init(1); // Set Compass Gain
-  //Move(0, -75);    // Set roomba spinning to calibrate the compass
+  compass_init(1); // Set Compass Gain
+  Move(0, -75);    // Set roomba spinning to calibrate the compass
                    // Spins ~4 rotations CCW.
-  //compass_debug = 1; // Show Debug Code in Serial Monitor (Set to 0 to hide Debug Code)
-  //compass_offset_calibration(2); // Find compass axis offsets
-  //Move(0, 0); // Stop spinning after completing calibration
+  compass_debug = 1; // Show Debug Code in Serial Monitor (Set to 0 to hide Debug Code)
+  compass_offset_calibration(2); // Find compass axis offsets
+  Move(0, 0); // Stop spinning after completing calibration
   /* Wait for command to initialize synchronization */
   
   digitalWrite(greenPin, LOW);  // say we've finished setup
@@ -142,13 +142,13 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
   /* Read angle from compass */
   angle = Calculate_Heading();        // Set angle from the compass reading
 
-  if (millis() - turntime >= 10000) {
-    DesiredHeading += 90;
-    if (DesiredHeading >= 360) {
-      DesiredHeading = 0;
-    }
-    turntime += 10000;
-  }
+  //if (millis() - turntime >= 10000) {
+  //  DesiredHeading += 90;
+  //  if (DesiredHeading >= 360) {
+  //    DesiredHeading = 0;
+  //  }
+  //  turntime += 10000;
+  //}
 
   DH_Turn();
  
