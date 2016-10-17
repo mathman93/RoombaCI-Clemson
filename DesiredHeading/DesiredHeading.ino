@@ -1,6 +1,6 @@
 /*  Acheived Desired Heading through direct command
 
-    Last Updated: 6/13/2016
+    Last Updated: 10/14/2016
 */
 
 #include <SoftwareSerial.h>

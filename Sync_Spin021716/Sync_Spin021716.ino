@@ -327,41 +327,20 @@ void DH_Turn(void) {
 } // End Function
 
 /* General Wheel Motor command function.
-    X = common wheel speed (mm/s); Y = differential wheel speed (mm/s);
+    X = common wheel speed (mm/s); Y = differential wheel speed;
     X > 0 -> forward motion; Y > 0 -> CW motion
     This function allows for both turning and forward motion.
+    Updated to use bitshift logic.
     Error may result if |X|+|Y| > 500 (Max value is 500)
     */
 void Move(int X, int Y) {
-  /* Local Variables needed for function */
-  int RWHigh, LWHigh;
-  /* Determine what the high 8-bits should be for each wheel*/
-  /* Right Wheel High byte */
-  if (X - Y > 255) {          // If the desired right wheel speed is a big positive number
-    RWHigh = 1;       // Positive filler for a 2's complement number
-  } else if (X - Y >= 0) {    // If the desired right wheel speed is a small postive number
-    RWHigh = 0;       // Positive filler for a 2's complement number
-  } else if (X - Y < -255) {  // If the desired right wheel speed is a big negative number
-    RWHigh = 254;     // Negative filler for a 2's complement number
-  } else {                    // If the desired right wheel speed is a small negative number
-    RWHigh = 255;     // Negative filler for a 2's complement number
-  }
-  /* Left Wheel High byte */
-  if (X + Y > 255) {          // If the desired left wheel speed is a big positive number
-    LWHigh = 1;       // Positive filler for a 2's complement number
-  } else if (X + Y >= 0) {    // If the desired left wheel speed is a small positive number
-    LWHigh = 0;       // Positive filler for a 2's complement number
-  } else if (X + Y < -255) {  // If the desired left wheel speed is a big negative number
-    LWHigh = 254;     // Negative filler for a 2's complement number
-  } else {                    // If the desired left wheel speed is a small negative number
-    LWHigh = 255;     // Negative filler for a 2's complement number
-  }
-  /* Roomba Wheel Command */
-  Roomba.write(byte(145));  // Syntax: [145] [RW High 8-bit] [RW Low 8-bit] [LW High 8-bit] [LW Low 8-bit]
-  Roomba.write(byte(RWHigh));
-  Roomba.write(byte(X - Y)); // Combine common and differential speeds for right wheel
-  Roomba.write(byte(LWHigh));
-  Roomba.write(byte(X + Y)); // Combine common and differential speeds for left wheel
+ unsigned int RW = (X - Y);
+ unsigned int LW = (X + Y);
+ Roomba.write(byte(145));
+ Roomba.write(byte((RW & 0xff00) >> 8));
+ Roomba.write(byte(RW & 0xff));
+ Roomba.write(byte((LW & 0xff00) >> 8));
+ Roomba.write(byte(LW & 0xff));
 }
 
 float Calculate_Heading(void) {
