@@ -5,7 +5,7 @@
     Improved Roomba turning and achieving of desired heading.
     Added reset pulse after 5 minutes to ensure global counter synchronization.
 
-    Last Updated: 6/15/2016
+    Last Updated: 10/17/2016
 */
 
 #include <SoftwareSerial.h>
