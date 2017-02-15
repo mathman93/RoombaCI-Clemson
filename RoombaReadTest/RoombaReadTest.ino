@@ -56,7 +56,7 @@ void setup() {
   pinMode(greenPin, OUTPUT);
   pinMode(redPin, OUTPUT);
   pinMode(yellowPin, OUTPUT);
-  Roomba.begin(19200);         // Declare Roomba communication baud rate.
+  Roomba.begin(115200);         // Declare Roomba communication baud rate.
   digitalWrite(greenPin, HIGH); // say we're alive
 
   // set up ROI to receive commands
@@ -67,7 +67,7 @@ void setup() {
   //Roomba.write(byte(7));   // 10 => 57600 Baud; 7 -> 19200
   //Roomba.begin(19200);   // Re-declare Roomba communication baud rate.
   //delay(100);   // Wait before sending more commands
-  Serial.print("STARTING ROOMBA");
+  Serial.print("STARTING ROOMBA\n");
   Roomba.write(byte(128));  // START
   delay(50);
   Roomba.write(byte(131));  // CONTROL
@@ -142,14 +142,13 @@ void loop() { // Read data and send to Serial monitor
     deltime += 500;     // Reset base value for data points
     
     Roomba.write(byte(142));  // Ask for a single data packet from the Roomba
-    Roomba.write(byte(22));    // Ask for Wheel drop and bumper data byte
+    Roomba.write(byte(7));    // Ask for Wheel drop and bumper data byte
     //Roomba.write(byte(22));   // Ask for Roomba battery voltage (2 bytes)
     //Roomba.write(byte(24));   // Ask for Roomba charge capacity (2 bytes)
     
   }
   if (Roomba.available() > 1) {
-    BumperByte = Roomba.read()<<8 | Roomba.read();   // First byte
-    
+    BumperByte = Roomba.read();   // First byte
     Serial.print("Bumpers: ");
     Serial.print(BumperByte);
     Serial.print(" ");
