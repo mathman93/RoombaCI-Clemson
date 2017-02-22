@@ -26,8 +26,9 @@ const int transmit_pin = 12;    // Communication links to RF transmitter/receive
 const int receive_pin = 2;
 
 /* Global variables for transmission and receiving */
-uint8_t buf[VW_MAX_MESSAGE_LEN];
+unsigned char buf[VW_MAX_MESSAGE_LEN];
 uint8_t buflen = VW_MAX_MESSAGE_LEN;
+unsigned char message;
 
 /* Global variables needed to implement turn functions */
 float angle;                      // Heading of Roomba (found from digital compass)
@@ -37,8 +38,10 @@ float DesiredHeading;             // Heading set point of Roomba;
 int forward = 0;                  // Speed in mm/s that Roomba wheels turn to move forward - must be in range [-400,400]
 const float pi = 3.1415926;       // PI to 7 decimal places
 
+/* Spin Testing Variables */
+
 /* Adjustable Synchronization Parameters */
-const float RATIO = 0.7;         // Ratio for amount to turn - must be in range (0 1]
+const float RATIO = 0.3;         // Ratio for amount to turn - must be in range (0 1]
 const float EPSILON = 1.0;        // (ideally) Smallest resolution of digital compass (used in PRC function) - 5.0
 
 /* Roomba parameters */
@@ -64,7 +67,7 @@ long sno = 0;
 
 /* Start up Roomba */
 void setup() {
-  Serial.begin(57600);
+  Serial.begin(115200);
   display_Running_Sketch();     // Show sketch information in the serial monitor at startup
   Serial.println("Loading...");
   pinMode(ddPin,  OUTPUT);      // sets the pins as output
@@ -110,6 +113,16 @@ void setup() {
   Wire.write(0x02); //select mode register
   Wire.write(0x00); //continuous measurement mode
   Wire.endTransmission();
+  
+  /* Compass Calibration: */
+  //Keep spinning for calibration
+  compass_init(1); // Set Compass Gain
+  Move(0, -75);    // Set roomba spinning to calibrate the compass
+                   // Spins ~4 rotations CCW.
+  compass_debug = 1; // Show Debug Code in Serial Monitor (Set to 0 to hide Debug Code)
+  compass_offset_calibration(2); // Find compass axis offsets
+  Move(0, 0); // Stop spinning after completing calibration
+  /* Wait for command to initialize synchronization */
 
   // Initialise the IO and ISR
   vw_set_tx_pin(transmit_pin);
@@ -128,15 +141,6 @@ void setup() {
   delay(500);
   digitalWrite(yellowPin, LOW);
   
-  /* Compass Calibration: */
-  //Keep spinning for calibration
-  compass_init(1); // Set Compass Gain
-  Move(0, -75);    // Set roomba spinning to calibrate the compass
-                   // Spins ~4 rotations CCW.
-  compass_debug = 1; // Show Debug Code in Serial Monitor (Set to 0 to hide Debug Code)
-  compass_offset_calibration(2); // Find compass axis offsets
-  Move(0, 0); // Stop spinning after completing calibration
-  /* Wait for command to initialize synchronization */
   digitalWrite(greenPin, LOW);  // say we've finished setup
   delay(1000);
   angle = Calculate_Heading();  // Throw away first calculation
@@ -152,17 +156,44 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
   angle = Calculate_Heading();        // Set angle from the compass reading
   counter = millisRatio * (long)(millis() - millisCounter);
 
+  //recievePulse();
+  
   /* Send a pulse signal */
   if (angle + counter >= 360) { // If my "phase" reaches 360 degrees...
     sendPulse();                                    // Fire pulse
     millisCounter = millisCounter + counterAdjust;  // Adjust base counter.
   } // Ignore if the angle and counter are less than 360 degrees.
-
+  
+  recievePulse();
+  
+  if (message == 'b') {
+    Serial.println(" Reset Palse.");    // Include for debugging
+    digitalWrite(redPin, HIGH);   // Notify that we received palse
+    digitalWrite(greenPin, HIGH);
+    resetCounters();
+    digitalWrite(redPin, LOW);    // End Notify that we received palse
+    digitalWrite(greenPin, LOW);
+    message = 0; // Clear the message variable
+  } else if (message == 'a') {
+    Serial.println(" Sync Pulse.");     // Include for debugging
+    digitalWrite(yellowPin, HIGH);  // Tell me that the robot is turning
+    PRC_Sync(angle + counter);      // Find desired amount of turn based on PRC for synchronization
+    // Turn by d_angle
+    DesiredHeading = angle + d_angle;        // Set new desired heading set point
+    if (DesiredHeading < 0) {         // Normalize the heading value to between 0 and 360
+      DesiredHeading += 360;
+    } else if (DesiredHeading >= 360) {
+      DesiredHeading -= 360;
+    }
+    message = 0; // Clear the message variable
+  }
+  
   /* Receive a pulse signal */
+  /*
   if (vw_get_message(buf, &buflen)) {  // If I receive a pulse signal (a high bit)... (perhaps something stored in a buffer?)
-    //Serial.print((char)buf[0]);    // Include for debugging
+    Serial.print((char)buf[0]);    // Include for debugging
     if (buf[0] == 'b') {          // Charater of palse signal
-      //Serial.println(" Reset Palse.");    // Include for debugging
+      Serial.println(" Reset Palse.");    // Include for debugging
       digitalWrite(redPin, HIGH);   // Notify that we received palse
       digitalWrite(greenPin, HIGH);
       resetCounters();
@@ -170,10 +201,10 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
       digitalWrite(greenPin, LOW);
     } // End If statement
     else if (buf[0] == 'a') {      // Charater of pulse signal
-      //Serial.println(" Sync Pulse.");     // Include for debugging
+      Serial.println(" Sync Pulse.");     // Include for debugging
       digitalWrite(yellowPin, HIGH);  // Tell me that the robot is turning
       PRC_Sync(angle + counter); // Find desired amount of turn based on PRC for synchronization
-      /* Turn by d_angle */
+      // Turn by d_angle
       DesiredHeading = angle + d_angle;        // Set new desired heading set point
       if (DesiredHeading < 0) {         // Normalize the heading value to between 0 and 360
         DesiredHeading += 360;
@@ -182,10 +213,16 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
       }
     } // End elseif statement
   } // Ignore if no pulse has been received
+*/
+
+  //recievePulse();
   
   DH_Turn();                // Turn to the DesiredHeading set point
+
+  //recievePulse();
   
   /* Send to Serial monitor a data point */
+  
   if (millis() - deltime >= 1000) { // If 1 second = 1000 milliseconds have passed...
     deltime += 1000;     // Reset base value for data points
     sno++; // Increment the data point number
@@ -193,14 +230,26 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
     Print_Heading_Data();
   }
   
+  //recievePulse();
+  
   /* Reset Counters of all Roombas every 5 minutes */
+  /*
   if (millis() - resettime >= 300000) { // If it's been 5 minutes...
     sendPalse();    // Send Reset Palse
     resetCounters();// Reset Counter values
-  }
+  }*/
 }/* Go back and check everything again. Should be fast */
 
 /* SUBROUTINES */
+
+/* Recieve pulse from RF transmitter and save value */
+void recievePulse() {
+  if (vw_get_message(buf, &buflen)) {  // If I receive a pulse ...
+    //if (message == 0){
+      message = buf[0]; // Save pulse to message variable
+    //} // Else, I have a message that I have not responded to yet.
+  }
+}
 /* Sends out a pulse when phase equals 360 degrees */
 void sendPulse() {
   char pulse[2] = {'a'};
