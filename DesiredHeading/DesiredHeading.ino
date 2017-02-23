@@ -142,19 +142,19 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
   /* Read angle from compass */
   angle = Calculate_Heading();        // Set angle from the compass reading
 
-  //if (millis() - turntime >= 10000) {
-  //  DesiredHeading += 90;
-  //  if (DesiredHeading >= 360) {
-  //    DesiredHeading = 0;
-  //  }
-  //  turntime += 10000;
-  //}
+  if (millis() - turntime >= 10000) {
+    DesiredHeading += 90;
+    if (DesiredHeading >= 360) {
+      DesiredHeading = 0;
+    }
+    turntime += 10000;
+  }
 
   DH_Turn();
  
   /* Send to Serial monitor a data point */
-  if (millis() - deltime >= 50) { // If 1 second = 1000 milliseconds have passed...
-    deltime += 50;     // Reset base value for data points
+  if (millis() - deltime >= 1000) { // If 1 second = 1000 milliseconds have passed...
+    deltime += 1000;     // Reset base value for data points
     sno++; // Increment the data point number
     Serial.println(";");
     Print_Heading_Data();

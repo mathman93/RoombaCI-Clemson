@@ -1,3 +1,4 @@
+// TESTING
 /*  Gather Roomba Information and Display to Serial Monitor
 
     Last Updated: 6/16/2016
@@ -41,7 +42,10 @@ SoftwareSerial Roomba(rxPin, txPin); // Set up communnication with Roomba
 unsigned long deltime;
 unsigned long TIMER;
 long sno = 0;
-int BumperByte;
+byte header;
+byte number;
+byte ID;
+byte BumperByte;
 int RoombaVoltage;
 int RoombaCharge;
 byte RoombaDud;
@@ -56,10 +60,15 @@ void setup() {
   pinMode(greenPin, OUTPUT);
   pinMode(redPin, OUTPUT);
   pinMode(yellowPin, OUTPUT);
+<<<<<<< HEAD
   // Usually 115200 EXPERIMENTING
+=======
+ 
+  
+>>>>>>> origin/master
   Roomba.begin(115200);         // Declare Roomba communication baud rate.
   digitalWrite(greenPin, HIGH); // say we're alive
-
+   
   // set up ROI to receive commands
   Roomba.write(byte(7));  // RESTART
   delay(10000);
@@ -143,13 +152,14 @@ void setup() {
     Serial.print((char)Roomba.read());
   }
 
-  /* Initialize Roomba */
+    /* Initialize Roomba */
   deltime = millis();           // Set base value for data output.
   TIMER = millis();
   sno = 0;                      // Reset data point counter
 }
 
 void loop() { // Read data and send to Serial monitor
+<<<<<<< HEAD
   /* DON'T USE #5*/
   /* Send to Serial monitor a data point */
   if (millis() - deltime >= 500) { // If 1 second = 1000 milliseconds have passed...
@@ -157,11 +167,21 @@ void loop() { // Read data and send to Serial monitor
     // OP.CODE 142 - single packet 149 - multiple packets
     Roomba.write(byte(142));  // Ask for a single data packet from the Roomba
     // Roomba.write(byte(1));
+=======
+  
+  /* Send to Serial monitor a data point */
+  if (millis() - deltime >= 500) { // If 1 second = 1000 milliseconds have passed...
+    deltime += 500;     // Reset base value for data points
+
+    Roomba.write(byte(149));  // Ask for a Query from the Roomba
+    Roomba.write(byte(1));    // Ask for one byte
+>>>>>>> origin/master
     Roomba.write(byte(7));    // Ask for Wheel drop and bumper data byte
     //Roomba.write(byte(22));   // Ask for Roomba battery voltage (2 bytes)
     //Roomba.write(byte(24));   // Ask for Roomba charge capacity (2 bytes)
     delay(50);
   }
+<<<<<<< HEAD
  if (Roomba.available()> 0) {
 
     BumperByte = Roomba.read();   // First byte
@@ -170,6 +190,12 @@ void loop() { // Read data and send to Serial monitor
     // if true do the thing below
     // if false check the Roomba again
     
+=======
+  
+  if (Roomba.available() > 0) {
+    //RoombaVoltage = Roomba.read()<<8 | Roomba.read();   // First byte
+    BumperByte = Roomba.read();
+>>>>>>> origin/master
     Serial.print("Bumpers: ");
     Serial.print(BumperByte);
     Serial.print(" ");
