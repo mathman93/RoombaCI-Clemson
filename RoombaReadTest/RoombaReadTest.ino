@@ -7,7 +7,7 @@
 #include <SoftwareSerial.h>
 #include <SPI.h>
 #include "VirtualWire.h"
-  #include "Wire.h"
+#include "Wire.h"
 
 #define address 0x1E //0011110b, I2C 7bit address of HMC5883
 
@@ -53,7 +53,7 @@ boolean gled = LOW;
 
 /* Start up Roomba */
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(57600);
   display_Running_Sketch();     // Show sketch information in the serial monitor at startup
   Serial.println("Loading...");
   pinMode(ddPin, OUTPUT);       // sets the pins as output
@@ -61,38 +61,28 @@ void setup() {
   pinMode(redPin, OUTPUT);
   pinMode(yellowPin, OUTPUT);
 <<<<<<< HEAD
+<<<<<<< HEAD
   // Usually 115200 EXPERIMENTING
 =======
  
   
 >>>>>>> origin/master
+=======
+>>>>>>> parent of ae81ee0... It works now
   Roomba.begin(115200);         // Declare Roomba communication baud rate.
   digitalWrite(greenPin, HIGH); // say we're alive
    
   // set up ROI to receive commands
-  Roomba.write(byte(7));  // RESTART
-  delay(10000);
+  //Roomba.write(byte(7));  // RESTART
+  //delay(10000);
   // Set Baud rate to 19200
   //Roomba.write(byte(129));  // Explicitly set Baud rate
-  // Roomba.write(byte(7));   // 10 => 57600 Baud; 7 -> 19200
+  //Roomba.write(byte(7));   // 10 => 57600 Baud; 7 -> 19200
   //Roomba.begin(19200);   // Re-declare Roomba communication baud rate.
   //delay(100);   // Wait before sending more commands
   Serial.print("STARTING ROOMBA\n");
-  
   Roomba.write(byte(128));  // START
-  delay(50);              // After START wait 50 milliseconds
-  /* Experimenting to change Baud rate (above delay needs to be 2000)
-  digitalWrite(ddPin, HIGH);
-  digitalWrite(ddPin,LOW);
-  delay(275);
-  digitalWrite(ddPin,HIGH);
-  digitalWrite(ddPin,LOW);
-  delay(275);
-  digitalWrite(ddPin,HIGH);
-  digitalWrite(ddPin,LOW);
-  delay(275);
-  // digitalWrite(ddPin,HIGH);
-  // Experimenting end */
+  delay(50);
   Roomba.write(byte(131));  // CONTROL
   //131 - Safe Mode
   //132 - Full mode (Be ready to catch it!)
@@ -160,12 +150,17 @@ void setup() {
 
 void loop() { // Read data and send to Serial monitor
 <<<<<<< HEAD
+<<<<<<< HEAD
   /* DON'T USE #5*/
+=======
+
+>>>>>>> parent of ae81ee0... It works now
   /* Send to Serial monitor a data point */
   if (millis() - deltime >= 500) { // If 1 second = 1000 milliseconds have passed...
     deltime += 500;     // Reset base value for data points
-    // OP.CODE 142 - single packet 149 - multiple packets
+    
     Roomba.write(byte(142));  // Ask for a single data packet from the Roomba
+<<<<<<< HEAD
     // Roomba.write(byte(1));
 =======
   
@@ -176,11 +171,14 @@ void loop() { // Read data and send to Serial monitor
     Roomba.write(byte(149));  // Ask for a Query from the Roomba
     Roomba.write(byte(1));    // Ask for one byte
 >>>>>>> origin/master
+=======
+>>>>>>> parent of ae81ee0... It works now
     Roomba.write(byte(7));    // Ask for Wheel drop and bumper data byte
     //Roomba.write(byte(22));   // Ask for Roomba battery voltage (2 bytes)
     //Roomba.write(byte(24));   // Ask for Roomba charge capacity (2 bytes)
-    delay(50);
+    
   }
+<<<<<<< HEAD
 <<<<<<< HEAD
  if (Roomba.available()> 0) {
 
@@ -196,6 +194,10 @@ void loop() { // Read data and send to Serial monitor
     //RoombaVoltage = Roomba.read()<<8 | Roomba.read();   // First byte
     BumperByte = Roomba.read();
 >>>>>>> origin/master
+=======
+  if (Roomba.available() > 1) {
+    BumperByte = Roomba.read();   // First byte
+>>>>>>> parent of ae81ee0... It works now
     Serial.print("Bumpers: ");
     Serial.print(BumperByte);
     Serial.print(" ");
