@@ -62,11 +62,14 @@ void setup() {
   pinMode(yellowPin, OUTPUT);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   // Usually 115200 EXPERIMENTING
 =======
  
   
 >>>>>>> origin/master
+=======
+>>>>>>> parent of ae81ee0... It works now
 =======
 >>>>>>> parent of ae81ee0... It works now
   Roomba.begin(115200);         // Declare Roomba communication baud rate.
@@ -151,7 +154,11 @@ void setup() {
 void loop() { // Read data and send to Serial monitor
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   /* DON'T USE #5*/
+=======
+
+>>>>>>> parent of ae81ee0... It works now
 =======
 
 >>>>>>> parent of ae81ee0... It works now
@@ -160,6 +167,7 @@ void loop() { // Read data and send to Serial monitor
     deltime += 500;     // Reset base value for data points
     
     Roomba.write(byte(142));  // Ask for a single data packet from the Roomba
+<<<<<<< HEAD
 <<<<<<< HEAD
     // Roomba.write(byte(1));
 =======
@@ -173,11 +181,14 @@ void loop() { // Read data and send to Serial monitor
 >>>>>>> origin/master
 =======
 >>>>>>> parent of ae81ee0... It works now
+=======
+>>>>>>> parent of ae81ee0... It works now
     Roomba.write(byte(7));    // Ask for Wheel drop and bumper data byte
     //Roomba.write(byte(22));   // Ask for Roomba battery voltage (2 bytes)
     //Roomba.write(byte(24));   // Ask for Roomba charge capacity (2 bytes)
     
   }
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
  if (Roomba.available()> 0) {
@@ -194,6 +205,10 @@ void loop() { // Read data and send to Serial monitor
     //RoombaVoltage = Roomba.read()<<8 | Roomba.read();   // First byte
     BumperByte = Roomba.read();
 >>>>>>> origin/master
+=======
+  if (Roomba.available() > 1) {
+    BumperByte = Roomba.read();   // First byte
+>>>>>>> parent of ae81ee0... It works now
 =======
   if (Roomba.available() > 1) {
     BumperByte = Roomba.read();   // First byte
