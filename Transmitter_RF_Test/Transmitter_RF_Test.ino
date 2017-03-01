@@ -10,7 +10,7 @@ const int transmitPin = 12;   // RF Transmitter pin
 const int receivePin = 2;     // RF Receiver pin
 
 void setup() {
-  Serial.begin(57600);         // Begin communication with the Serial Monitor
+  Serial.begin(115200);         // Begin communication with the Serial Monitor
   display_Running_Sketch();    // Show sketch information in the serial monitor at startup
   
   pinMode(yellowPin, OUTPUT);  // LED lights

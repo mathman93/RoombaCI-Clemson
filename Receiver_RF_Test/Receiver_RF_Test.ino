@@ -12,6 +12,7 @@ const int receivePin = 2;     // RF Receiver pin
 /* Variables for transmitting */
 unsigned char buf[VW_MAX_MESSAGE_LEN];
 uint8_t buflen = VW_MAX_MESSAGE_LEN;
+unsigned char message = 0;
 
 /* Variables for Light Blink */
 unsigned long LightBlink = 0;
@@ -19,7 +20,7 @@ boolean gled = LOW;
 int count = 0;
 
 void setup() {
-  Serial.begin(57600);         // Begin communication with the Serial Monitor
+  Serial.begin(115200);         // Begin communication with the Serial Monitor
   display_Running_Sketch();    // Show sketch information in the serial monitor at startup
   
   pinMode(yellowPin, OUTPUT);  // LED lights
@@ -50,6 +51,23 @@ void setup() {
 
 void loop() {
   /* Receive a pulse signal */
+  recievePulse();
+  if (message == 'b') {
+    Serial.print((char)message);
+    Serial.print(" Reset Palse. ");
+    count++;
+    Serial.println(count);
+    message = 0;
+  } else if (message == 'a') {
+    Serial.print((char)message);
+    Serial.print(" Sync Pulse. ");
+    count++;
+    Serial.println(count);
+    message = 0;
+  }
+
+  recievePulse();
+  /*
   if (vw_get_message(buf, &buflen)) {  // If I receive a message
     Serial.print((char)buf[0]);
     if (buf[0] == 'b') {          // Charater of palse signal
@@ -60,15 +78,23 @@ void loop() {
     count++;
     Serial.println(count);
   }
-  
+  */
   if (millis() - LightBlink >= 500) {
     LightBlink = millis();
     gled = !gled;
     digitalWrite(greenPin, gled);
   }
+
+  recievePulse();
 }
 
 /* SUBROUTINES */
+void recievePulse() {
+  if (vw_get_message(buf, &buflen)) {  // If I receive a pulse ...
+    message = buf[0]; // Return pulse character
+  }
+}
+
 /* Displays the Sketch running on the Arduino. Use at startup on all code. */
 void display_Running_Sketch (void) {
   /* Find the necessary informaiton */

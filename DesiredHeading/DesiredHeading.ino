@@ -53,7 +53,7 @@ long sno = 0;
 
 /* Start up Roomba */
 void setup() {
-  Serial.begin(57600);
+  Serial.begin(115200);
   display_Running_Sketch();     // Show sketch information in the serial monitor at startup
   Serial.println("Loading...");
   pinMode(ddPin,  OUTPUT);      // sets the pins as output
