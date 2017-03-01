@@ -5,7 +5,7 @@
     Improved Roomba turning and achieving of desired heading.
     Added reset pulse after 5 minutes to ensure global counter synchronization.
 
-    Last Updated: 10/17/2016
+    Last Updated: 2/22/2017
 */
 
 #include <SoftwareSerial.h>
@@ -28,7 +28,7 @@ const int receive_pin = 2;
 /* Global variables for transmission and receiving */
 unsigned char buf[VW_MAX_MESSAGE_LEN];
 uint8_t buflen = VW_MAX_MESSAGE_LEN;
-unsigned char message;
+unsigned char message = 0;
 
 /* Global variables needed to implement turn functions */
 float angle;                      // Heading of Roomba (found from digital compass)
@@ -38,11 +38,10 @@ float DesiredHeading;             // Heading set point of Roomba;
 int forward = 0;                  // Speed in mm/s that Roomba wheels turn to move forward - must be in range [-400,400]
 const float pi = 3.1415926;       // PI to 7 decimal places
 
-/* Spin Testing Variables */
-
 /* Adjustable Synchronization Parameters */
 const float RATIO = 0.3;         // Ratio for amount to turn - must be in range (0 1]
 const float EPSILON = 1.0;        // (ideally) Smallest resolution of digital compass (used in PRC function) - 5.0
+boolean DHFlag = false;
 
 /* Roomba parameters */
 const int WHEELDIAMETER = 72;     // 72 millimeter wheel diameter
@@ -115,6 +114,7 @@ void setup() {
   Wire.endTransmission();
   
   /* Compass Calibration: */
+  
   //Keep spinning for calibration
   compass_init(1); // Set Compass Gain
   Move(0, -75);    // Set roomba spinning to calibrate the compass
@@ -122,7 +122,6 @@ void setup() {
   compass_debug = 1; // Show Debug Code in Serial Monitor (Set to 0 to hide Debug Code)
   compass_offset_calibration(2); // Find compass axis offsets
   Move(0, 0); // Stop spinning after completing calibration
-  /* Wait for command to initialize synchronization */
 
   // Initialise the IO and ISR
   vw_set_tx_pin(transmit_pin);
@@ -142,6 +141,7 @@ void setup() {
   digitalWrite(yellowPin, LOW);
   
   digitalWrite(greenPin, LOW);  // say we've finished setup
+  /* Wait for command to initialize synchronization */
   delay(1000);
   angle = Calculate_Heading();  // Throw away first calculation
   delay(200);
@@ -156,7 +156,7 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
   angle = Calculate_Heading();        // Set angle from the compass reading
   counter = millisRatio * (long)(millis() - millisCounter);
 
-  //recievePulse();
+  recievePulse();
   
   /* Send a pulse signal */
   if (angle + counter >= 360) { // If my "phase" reaches 360 degrees...
@@ -165,8 +165,7 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
   } // Ignore if the angle and counter are less than 360 degrees.
   
   recievePulse();
-  
-  if (message == 'b') {
+    if (message == 'b') {
     Serial.println(" Reset Palse.");    // Include for debugging
     digitalWrite(redPin, HIGH);   // Notify that we received palse
     digitalWrite(greenPin, HIGH);
@@ -215,12 +214,10 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
   } // Ignore if no pulse has been received
 */
 
-  //recievePulse();
-  
+  recievePulse();
+
   DH_Turn();                // Turn to the DesiredHeading set point
 
-  //recievePulse();
-  
   /* Send to Serial monitor a data point */
   
   if (millis() - deltime >= 1000) { // If 1 second = 1000 milliseconds have passed...
@@ -230,14 +227,12 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
     Print_Heading_Data();
   }
   
-  //recievePulse();
-  
+  recievePulse();
   /* Reset Counters of all Roombas every 5 minutes */
-  /*
   if (millis() - resettime >= 300000) { // If it's been 5 minutes...
     sendPalse();    // Send Reset Palse
     resetCounters();// Reset Counter values
-  }*/
+  }
 }/* Go back and check everything again. Should be fast */
 
 /* SUBROUTINES */
@@ -245,9 +240,7 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
 /* Recieve pulse from RF transmitter and save value */
 void recievePulse() {
   if (vw_get_message(buf, &buflen)) {  // If I receive a pulse ...
-    //if (message == 0){
-      message = buf[0]; // Save pulse to message variable
-    //} // Else, I have a message that I have not responded to yet.
+    message = (char)buf[0]; // Return pulse character
   }
 }
 /* Sends out a pulse when phase equals 360 degrees */
@@ -309,6 +302,17 @@ void DH_Turn(void) {
   // EPSILON is desirably small (probably in range [0.5, 1])
   // Need the amount of spin to be less than (2 * # of cycles through main loop in 1 second)
      // or may need to grade the amount of spin (proportional to amount of heading change)
+  if (angle < (DesiredHeading + EPSILON) && angle > (DesiredHeading - EPSILON) && DHFlag == false) {
+    // If it's not moving, and I'm close enough...
+    return; // Leave function
+  }
+  /*
+   * DHFlag = false if last command was to not spin
+   * DHFlag = true if last command was to spin
+   * if (angle - DesiredHeading < EPSILON && DHFlag == false)
+   *    then return from function (return to loop)
+   */
+  
   int spinValue; // Speed of wheels in mm/s to spin toward DesiredHeading
   float holder;
   float thresh1 = 25; // First threshold value
@@ -323,53 +327,66 @@ void DH_Turn(void) {
   } else { // if (holder <= thresh2)
     spinValue = 15;   // Move slow (keeps down oscillations due to main loop execution rate)
   }
+  
   // Determine direction of spin
   if(DesiredHeading < EPSILON) {
     if(angle > (DesiredHeading + EPSILON) && angle < (DesiredHeading + 180) ) {
       // Spin Left (CCW)
       Move(forward, -spinValue);
+      DHFlag = true;
     } else if ((angle < (360 + DesiredHeading - EPSILON)) && (angle >= (DesiredHeading + 180)) ) {
       // Spin Right (CW)
       Move(forward, spinValue);
+      DHFlag = true;
     } else { // if ((360 + DesiredHeading - EPSILON) < angle < (DesiredHeading + EPSILON))
       // Stop Spinning
       Move(forward, 0);
+      DHFlag = false;
       digitalWrite(yellowPin, LOW); // Say we have stopped turning.
     }
   } else if(DesiredHeading < 180) { // and DesiredHeading >= EPSILON...
     if(angle > (DesiredHeading + EPSILON) && angle < (DesiredHeading + 180) ) {
       // Spin Left (CCW)
       Move(forward, -spinValue);
+      DHFlag = true;
     } else if ((angle < (DesiredHeading - EPSILON)) || (angle >= (DesiredHeading + 180)) ) {
       // Spin Right (CW)
       Move(forward, spinValue);
+      DHFlag = true;
     } else { // if ((DesiredHeading - EPSILON) < angle < (DesiredHeading + EPSILON))
       // Stop Spinning
       Move(forward, 0);
+      DHFlag = false;
       digitalWrite(yellowPin, LOW); // Say we have stopped turning.
     }
   } else if(DesiredHeading < (360 - EPSILON)) { // and DesiredHeading >= 180)...
     if ((angle < (DesiredHeading - EPSILON)) && (angle > (DesiredHeading - 180)) ) {
       // Spin Right (CW)
       Move(forward, spinValue);
+      DHFlag = true;
     } else if ((angle > (DesiredHeading + EPSILON)) || (angle <= (DesiredHeading - 180)) ) {
       // Spin Left (CCW)
       Move(forward, -spinValue);
+      DHFlag = true;
     } else {  // if ((DesiredHeading - EPSILON) < angle < (DesiredHeading + EPSILON))
       // Stop Spinning
       Move(forward, 0);
+      DHFlag = false;
       digitalWrite(yellowPin, LOW); // Say we have stopped turning.
     }
   } else { // if DesiredHeading >= (360 - EPSILON)...
     if ((angle < (DesiredHeading - EPSILON)) && (angle > (DesiredHeading - 180)) ) {
       // Spin Right (CW)
       Move(forward, spinValue);
+      DHFlag = true;
     } else if ((angle > (DesiredHeading + EPSILON - 360)) && (angle <= (DesiredHeading - 180)) ) {
       // Spin Left (CCW)
       Move(forward, -spinValue);
+      DHFlag = true;
     } else {  // if ((DesiredHeading - EPSILON) < angle < (DesiredHeading + EPSILON))
       // Stop Spinning
       Move(forward, 0);
+      DHFlag = false;
       digitalWrite(yellowPin, LOW); // Say we have stopped turning.
     } // End "else angle"
   } // End "else DesiredHeading"
@@ -390,6 +407,7 @@ void Move(int X, int Y) {
  Roomba.write(byte(RW & 0xff));
  Roomba.write(byte((LW & 0xff00) >> 8));
  Roomba.write(byte(LW & 0xff));
+ return;
 }
 
 float Calculate_Heading(void) {
