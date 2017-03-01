@@ -51,33 +51,25 @@ int RoombaCharge;
 byte RoombaDud;
 boolean gled = LOW;
 
+
 /* Start up Roomba */
 void setup() {
-  Serial.begin(57600);
+  
+  //void display_Running_Sketch();
+  
+  Serial.begin(115200);
   display_Running_Sketch();     // Show sketch information in the serial monitor at startup
   Serial.println("Loading...");
   pinMode(ddPin, OUTPUT);       // sets the pins as output
   pinMode(greenPin, OUTPUT);
   pinMode(redPin, OUTPUT);
   pinMode(yellowPin, OUTPUT);
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-  // Usually 115200 EXPERIMENTING
-=======
- 
-  
->>>>>>> origin/master
-=======
->>>>>>> parent of ae81ee0... It works now
-=======
->>>>>>> parent of ae81ee0... It works now
   Roomba.begin(115200);         // Declare Roomba communication baud rate.
   digitalWrite(greenPin, HIGH); // say we're alive
    
   // set up ROI to receive commands
-  //Roomba.write(byte(7));  // RESTART
-  //delay(10000);
+  Roomba.write(byte(7));  // RESTART
+  delay(10000);
   // Set Baud rate to 19200
   //Roomba.write(byte(129));  // Explicitly set Baud rate
   //Roomba.write(byte(7));   // 10 => 57600 Baud; 7 -> 19200
@@ -152,67 +144,35 @@ void setup() {
 }
 
 void loop() { // Read data and send to Serial monitor
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-  /* DON'T USE #5*/
-=======
-
->>>>>>> parent of ae81ee0... It works now
-=======
-
->>>>>>> parent of ae81ee0... It works now
-  /* Send to Serial monitor a data point */
-  if (millis() - deltime >= 500) { // If 1 second = 1000 milliseconds have passed...
-    deltime += 500;     // Reset base value for data points
-    
-    Roomba.write(byte(142));  // Ask for a single data packet from the Roomba
-<<<<<<< HEAD
-<<<<<<< HEAD
-    // Roomba.write(byte(1));
-=======
   
-  /* Send to Serial monitor a data point */
+  // byte byteCheck(byte byteC, int Opcode);
+  
+  /* Send to Serial monitor a data point
   if (millis() - deltime >= 500) { // If 1 second = 1000 milliseconds have passed...
     deltime += 500;     // Reset base value for data points
+    Roomba.write(byte(142));  // Ask for a single data packet from the Roomba
+  }*/
 
-    Roomba.write(byte(149));  // Ask for a Query from the Roomba
-    Roomba.write(byte(1));    // Ask for one byte
->>>>>>> origin/master
-=======
->>>>>>> parent of ae81ee0... It works now
-=======
->>>>>>> parent of ae81ee0... It works now
+  // -------------------------------3-1-2017----------------------------------
+  // 1. Changed deltime to 20, 50, 75 ETC to read data faster
+  // 2. Made byteCheck to filter out errors and check the bytes.
+  // NEXT WEEK: - want to get packet id 41 and 42 (what tim will be sending)
+  // -------------------------------------------------------------------------
+  
+  // Send to Serial monitor a data point 
+  if (millis() - deltime >= 500) { // If 1 second = 1000 milliseconds have passed...
+    deltime += 500;     // Reset base value for data points
+    Roomba.write(byte(142));  // Ask for a Query from the Roomba
+    //Roomba.write(byte(1));    // Ask for one byte
     Roomba.write(byte(7));    // Ask for Wheel drop and bumper data byte
     //Roomba.write(byte(22));   // Ask for Roomba battery voltage (2 bytes)
     //Roomba.write(byte(24));   // Ask for Roomba charge capacity (2 bytes)
-    
   }
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
- if (Roomba.available()> 0) {
-
-    BumperByte = Roomba.read();   // First byte
-
-    // ADD FUNCTION TO SEE IF BumperByte < 15 
-    // if true do the thing below
-    // if false check the Roomba again
-    
-=======
   
   if (Roomba.available() > 0) {
-    //RoombaVoltage = Roomba.read()<<8 | Roomba.read();   // First byte
-    BumperByte = Roomba.read();
->>>>>>> origin/master
-=======
-  if (Roomba.available() > 1) {
     BumperByte = Roomba.read();   // First byte
->>>>>>> parent of ae81ee0... It works now
-=======
-  if (Roomba.available() > 1) {
-    BumperByte = Roomba.read();   // First byte
->>>>>>> parent of ae81ee0... It works now
+    BumperByte = byteCheck(BumperByte,7);
+  
     Serial.print("Bumpers: ");
     Serial.print(BumperByte);
     Serial.print(" ");
@@ -305,4 +265,18 @@ void display_Running_Sketch (void) {
   Serial.print(" at ");
   Serial.print(__TIME__);
   Serial.println("\n");
+}
+
+/* Checks the byte that is recieved by the roomba*/
+byte byteCheck(byte byteC, int Opcode){
+    while(byteC>15){
+        Roomba.write(byte(142));  // Ask for a Query from the Roomba
+        //Roomba.write(byte(1));    // Ask for one byte
+        Roomba.write(byte(Opcode)); //Ask for specific data
+        while(Roomba.available() == 0){
+        }
+        byteC = 0;
+        byteC = Roomba.read();
+    }
+  return byteC;
 }
