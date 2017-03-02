@@ -1,18 +1,19 @@
 /*  Heading Synchronization Code
     Based the global counter on the clock speed of the Arduino Uno (millis() function).
         Eliminates use of the delay() function to improve synchronization between robots.
-    Created Calculate_Heading() subroutine to give correct heading direction.
+    Created Calculate_Heading() subroutine to give correct heading direction. (y-axis forward)
     Improved Roomba turning and achieving of desired heading.
     Added reset pulse after 5 minutes to ensure global counter synchronization.
+    Modified compass.cpp and compass.h (changed to compassCUCI.cpp and compassCUCI.h to make compass calibration faster.
 
-    Last Updated: 2/22/2017
+    Last Updated: 3/2/2017
 */
 
 #include <SoftwareSerial.h>
 #include <SPI.h>
 #include "VirtualWire.h"
 #include "Wire.h"
-#include "compass.h"
+#include "compassCUCI.h"
 
 #define address 0x1E //0011110b, I2C 7bit address of HMC5883
 
@@ -118,7 +119,7 @@ void setup() {
   //Keep spinning for calibration
   compass_init(1); // Set Compass Gain
   Move(0, -75);    // Set roomba spinning to calibrate the compass
-                   // Spins ~4 rotations CCW.
+                   // Spins ~2 rotations CCW.
   compass_debug = 1; // Show Debug Code in Serial Monitor (Set to 0 to hide Debug Code)
   compass_offset_calibration(2); // Find compass axis offsets
   Move(0, 0); // Stop spinning after completing calibration
@@ -164,9 +165,11 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
     millisCounter = millisCounter + counterAdjust;  // Adjust base counter.
   } // Ignore if the angle and counter are less than 360 degrees.
   
+  /* Receive a pulse signal */
   recievePulse();
-    if (message == 'b') {
-    Serial.println(" Reset Palse.");    // Include for debugging
+  
+  if (message == 'b') {
+    //Serial.println(" Reset Palse.");    // Include for debugging
     digitalWrite(redPin, HIGH);   // Notify that we received palse
     digitalWrite(greenPin, HIGH);
     resetCounters();
@@ -174,7 +177,7 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
     digitalWrite(greenPin, LOW);
     message = 0; // Clear the message variable
   } else if (message == 'a') {
-    Serial.println(" Sync Pulse.");     // Include for debugging
+    //Serial.println(" Sync Pulse.");     // Include for debugging
     digitalWrite(yellowPin, HIGH);  // Tell me that the robot is turning
     PRC_Sync(angle + counter);      // Find desired amount of turn based on PRC for synchronization
     // Turn by d_angle
@@ -187,32 +190,7 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
     message = 0; // Clear the message variable
   }
   
-  /* Receive a pulse signal */
-  /*
-  if (vw_get_message(buf, &buflen)) {  // If I receive a pulse signal (a high bit)... (perhaps something stored in a buffer?)
-    Serial.print((char)buf[0]);    // Include for debugging
-    if (buf[0] == 'b') {          // Charater of palse signal
-      Serial.println(" Reset Palse.");    // Include for debugging
-      digitalWrite(redPin, HIGH);   // Notify that we received palse
-      digitalWrite(greenPin, HIGH);
-      resetCounters();
-      digitalWrite(redPin, LOW);    // End Notify that we received palse
-      digitalWrite(greenPin, LOW);
-    } // End If statement
-    else if (buf[0] == 'a') {      // Charater of pulse signal
-      Serial.println(" Sync Pulse.");     // Include for debugging
-      digitalWrite(yellowPin, HIGH);  // Tell me that the robot is turning
-      PRC_Sync(angle + counter); // Find desired amount of turn based on PRC for synchronization
-      // Turn by d_angle
-      DesiredHeading = angle + d_angle;        // Set new desired heading set point
-      if (DesiredHeading < 0) {         // Normalize the heading value to between 0 and 360
-        DesiredHeading += 360;
-      } else if (DesiredHeading >= 360) {
-        DesiredHeading -= 360;
-      }
-    } // End elseif statement
-  } // Ignore if no pulse has been received
-*/
+
 
   recievePulse();
 
@@ -304,6 +282,7 @@ void DH_Turn(void) {
      // or may need to grade the amount of spin (proportional to amount of heading change)
   if (angle < (DesiredHeading + EPSILON) && angle > (DesiredHeading - EPSILON) && DHFlag == false) {
     // If it's not moving, and I'm close enough...
+    digitalWrite(yellowPin, LOW); // Say we have stopped turning.
     return; // Leave function
   }
   /*

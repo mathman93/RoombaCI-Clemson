@@ -4,14 +4,12 @@ Website: http://hobbylogs.me.pn/?p=17
 Location: Pakistan
 Ver: 0.1 beta --- Start
 Ver: 0.2 beta --- Debug feature included
+Modified by: Timothy Anglea (2017-03-02)
 */
 
 #include <Arduino.h>
 #include <Wire.h>
-#include "compass.h"
-
-
-
+#include "compassCUCI.h"
 
 // Definitions ----------------------------------------------------------------
 #define compass_address 0x1E       // The I2C address of the Magnetometer
@@ -30,11 +28,6 @@ float compass_x_offset=0, compass_y_offset=0, compass_z_offset=0,compass_gain_fa
 float compass_x_gainError=1,compass_y_gainError=1,compass_z_gainError=1,bearing=0;
 int compass_x=0,compass_y=0,compass_z=0;
 int compass_debug=0;
-
-
-
-
-
 
 //***************************************************************************
 //***************************************************************************
@@ -57,18 +50,11 @@ void compass_read_XYZdata(){
   Wire.requestFrom(compass_address,6);
 
   if (6 <= Wire.available()){
-
     compass_x = Wire.read()<<8 | Wire.read();
-    
-
     compass_z = Wire.read()<<8 | Wire.read(); 
-    
-
     compass_y = Wire.read()<<8 | Wire.read(); 
-    
-  }
-
-}
+  } // End if
+} // End comass_read_XYZdata()
 
 
 // --------------------------------------------------------------------------
@@ -79,9 +65,9 @@ void compass_read_XYZdata(){
 void compass_offset_calibration(int select){
   // ***********************************************************
   // offset_calibration() function performs two taskes
-  // 1. It calculates the diffrence in the gain of the each axis magnetometer axis, using 
+  // 1. It calculates the difference in the gain of the each axis magnetometer axis, using 
   //    inbuilt self excitation function of HMC5883L (Which is useless if it is used as a compass
-  //    unless you are very unlucy and got a crapy sensor or live at very High or low temperature)
+  //    unless you are very unlucky and got a crappy sensor or live at very high or low temperature)
   // 2. It calculates the mean of each axes magnetic field, when the Magnetometer is rotated 360 degree
   // 3. Do Both
   // ***********************************************************    
@@ -115,7 +101,7 @@ void compass_offset_calibration(int select){
   // Reading the Positive baised Data
   while(compass_x<200 | compass_y<200 | compass_z<200){   // Making sure the data is with Positive baised
      compass_read_XYZdata();
-  }
+  } // End while loop
   
   compass_x_scalled=compass_x*compass_gain_fact;
   compass_y_scalled=compass_y*compass_gain_fact;
@@ -146,23 +132,20 @@ void compass_offset_calibration(int select){
    */
   Wire.endTransmission();
   
-  
   compass_read_XYZdata(); // Disregarding the first data
   // Reading the Negative baised Data
   while(compass_x>-200 | compass_y>-200 | compass_z>-200){   // Making sure the data is with negative baised
      compass_read_XYZdata();
-  }
+  } // End while loop
   
   compass_x_scalled=compass_x*compass_gain_fact;
   compass_y_scalled=compass_y*compass_gain_fact;
   compass_z_scalled=compass_z*compass_gain_fact;
   
-
   // Taking the average of the offsets
   compass_x_gainError = (float)((compass_XY_excitation/abs(compass_x_scalled))+compass_x_gainError)/2;
   compass_y_gainError = (float)((compass_XY_excitation/abs(compass_y_scalled))+compass_y_gainError)/2;
   compass_z_gainError = (float)((compass_Z_excitation/abs(compass_z_scalled))+compass_z_gainError)/2;
-  
   
   Serial.print("x_gain_offset = ");
   Serial.println(compass_x_gainError);
@@ -171,7 +154,7 @@ void compass_offset_calibration(int select){
   Serial.print("z_gain_offset = ");
   Serial.println(compass_z_gainError);
   
-  }
+  } // End if(select == 1 | selece == 3)
   
    // Configuring the Control register for normal mode
   Wire.beginTransmission(compass_address);
@@ -210,13 +193,13 @@ void compass_offset_calibration(int select){
     */
     if (compass_debug == 1){
       Serial.println("Starting Debug data in ");
-      delay(1000);
+      delay(500);
       Serial.println("3");
-      delay(1000);
+      delay(500);
       Serial.println("2");
-      delay(1000);
+      delay(500);
       Serial.println("1");
-      delay(1000);
+      delay(500);
       Serial.println("0");
       Serial.println();
       for(byte i=0;i<10;i++){   
@@ -231,9 +214,8 @@ void compass_offset_calibration(int select){
     }
     // End Debug code
   
-    
     unsigned long t = millis();
-    while(millis()-t <= 30000){
+    while(millis()-t <= 20000){ // Changed from 30,000 milliseconds (to speed up calibration time).
       
       compass_read_XYZdata();
       
@@ -253,13 +235,11 @@ void compass_offset_calibration(int select){
       y_max = max(y_max,compass_y_scalled);
       z_max = max(z_max,compass_z_scalled);
   
-      
       x_min = min(x_min,compass_x_scalled);
       y_min = min(y_min,compass_y_scalled);
       z_min = min(z_min,compass_z_scalled);
    
-  
-    }
+    } // End while loop
     
         /*
     Debug code ------------------------------
@@ -275,13 +255,12 @@ void compass_offset_calibration(int select){
          Serial.print("*");
       }
       Serial.println("*");
-    }
+    } // End if (compass_debug == 1)
     // End Debug code
   
     compass_x_offset = ((x_max-x_min)/2)-x_max;
     compass_y_offset = ((y_max-y_min)/2)-y_max;
     compass_z_offset = ((z_max-z_min)/2)-z_max;
-    
     
     Serial.print("Offset x  = ");
     Serial.print(compass_x_offset);
@@ -291,15 +270,10 @@ void compass_offset_calibration(int select){
     Serial.println(" mG");
     Serial.print("Offset z  = ");
     Serial.print(compass_z_offset);
-    Serial.println(" mG");
-    
-  } 
+    Serial.println(" mG"); 
+  } // End if(select == 2 | select == 3) 
  
-}
-
-
-
-
+} // End compass_calibration function
 
 // --------------------------------------------------------------------------
 // Setting the gain
@@ -353,8 +327,7 @@ void compass_init(int gain){
   
   Serial.print("Gain updated to  = ");
   Serial.print(compass_gain_fact);
-  Serial.println(" mG/bit");
-    
+  Serial.println(" mG/bit");   
 }
 
 void compass_scalled_reading(){
@@ -365,10 +338,9 @@ void compass_scalled_reading(){
   compass_y_scalled=compass_y*compass_gain_fact*compass_y_gainError+compass_y_offset;
   compass_z_scalled=compass_z*compass_gain_fact*compass_z_gainError+compass_z_offset;
 
-
 }
 
-
+/* Useful only if x-axis is facing forward */
 void compass_heading(){
   compass_scalled_reading();
   
@@ -381,7 +353,4 @@ void compass_heading(){
   }else{
     bearing = 0;
   }
-  
-  
-
 }
