@@ -6,7 +6,7 @@
     Added reset pulse after 5 minutes to ensure global counter synchronization.
     Modified compass.cpp and compass.h (changed to compassCUCI.cpp and compassCUCI.h to make compass calibration faster.
 
-    Last Updated: 3/2/2017
+    Last Updated: 3/6/2017
 */
 
 #include <SoftwareSerial.h>
@@ -40,9 +40,9 @@ int forward = 0;                  // Speed in mm/s that Roomba wheels turn to mo
 const float pi = 3.1415926;       // PI to 7 decimal places
 
 /* Adjustable Synchronization Parameters */
-const float RATIO = 0.3;         // Ratio for amount to turn - must be in range (0 1]
+const float RATIO = 0.5;          // Ratio for amount to turn - must be in range (0 1]
 const float EPSILON = 1.0;        // (ideally) Smallest resolution of digital compass (used in PRC function) - 5.0
-boolean DHFlag = false;
+boolean DHFlag = false;           // Desired Heading function indicator (was the last command not to turn?)
 
 /* Roomba parameters */
 const int WHEELDIAMETER = 72;     // 72 millimeter wheel diameter
@@ -50,12 +50,15 @@ const int WHEELSEPARATION = 235;  // 235 millimeters between center of main whee
 const float ENCODER = 508.8;      // 508.8 Counts per wheel revolution
 
 /* Sync Counter Setup */
-unsigned long millisCounter;                // Base time for Counter difference calculation
-/* Adjust this value to vary the speed/frequency of the counter */
-const float counterspeed = 30;                  // Number of times per second that the counter increments - range (0,1000]
+unsigned long millisCounter;                    // Base time for Counter difference calculation
+const float counterspeed = 36;                  // Number of times per second that the counter increments - range (0,1000]
+                                                // Adjust this value to vary the speed/frequency of the counter
 const float millisRatio = counterspeed / 1000;  // Counter increments per millisecond
 const float millisAdjust = 360000 / counterspeed; // Amount of counter adjustment per firing
-const unsigned long counterAdjust = (unsigned long) millisAdjust; // Truncate to unsigned long   
+const unsigned long counterAdjust = (unsigned long) millisAdjust; // Truncate to unsigned long
+
+/* Data Parameters */
+const int dataTIMER = 100;    // Number of milliseconds between each data point
 
 /* Roomba Serial Setup */
 SoftwareSerial Roomba(rxPin, txPin); // Set up communnication with Roomba
@@ -167,7 +170,8 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
   
   /* Receive a pulse signal */
   recievePulse();
-  
+
+  /* If a pulse signal was recieved */
   if (message == 'b') {
     //Serial.println(" Reset Palse.");    // Include for debugging
     digitalWrite(redPin, HIGH);   // Notify that we received palse
@@ -190,22 +194,22 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
     message = 0; // Clear the message variable
   }
   
-
-
+  /* Receive a pulse signal */
   recievePulse();
 
   DH_Turn();                // Turn to the DesiredHeading set point
 
   /* Send to Serial monitor a data point */
-  
-  if (millis() - deltime >= 1000) { // If 1 second = 1000 milliseconds have passed...
-    deltime += 1000;     // Reset base value for data points
+  if (millis() - deltime >= dataTIMER) { // If 1 second = 1000 milliseconds have passed...
+    deltime += dataTIMER;     // Reset base value for data points
     sno++; // Increment the data point number
     Serial.println(";");    // End row, start new row of data
     Print_Heading_Data();
   }
   
+  /* Receive a pulse signal */
   recievePulse();
+  
   /* Reset Counters of all Roombas every 5 minutes */
   if (millis() - resettime >= 300000) { // If it's been 5 minutes...
     sendPalse();    // Send Reset Palse
