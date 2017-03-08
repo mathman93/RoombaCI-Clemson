@@ -254,6 +254,7 @@ void resetCounters() {
   resettime = millis();       // Reset base value for reset timer
   sno = 0;                    // Reset data point counter
   DesiredHeading = angle;     // Reset heading set point
+  Serial.println();           // Print text on next line
   Print_Heading_Data();       // Display initial heading information
 }
 
