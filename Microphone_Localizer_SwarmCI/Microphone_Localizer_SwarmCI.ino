@@ -11,15 +11,17 @@ int sum[3];
 float limits[3];
 int valueHistory[6][3];
 boolean triggered = false;
+boolean change = true;
 
-unsigned long timeStart, timeStop, t1, t2, t3, diff;
+unsigned long t1, t2, t3, d12, d13, d23;
 
 const int NFA = 6; //"Number for Average", the amount of data points to collect before getting the average
 const bool AUTOSTOP = true; //Stop for a certain period when a sound is picked up
 const int RECORDTIME = 60; //time in seconds, default 30 seconds
-const float TOLERANCE = 0.5; //Percent difference as a decimal that a value needs to be to be considered abnormal
+const float TOLERANCE = 0.6; //Percent difference as a decimal that a value needs to be to be considered abnormal
 const int TIMEOUT = 5; //Time to wait in seconds before resuming scan after detecting a beep, ignored if AUTOSTOP is false
 const bool DEBUG = false; //Show verbose information about collected data
+const bool DEBUG_ALLDATA = false; //Show the readings from the microphones at all times
 
 void setup() {
   Serial.begin(57600);
@@ -41,24 +43,31 @@ void setup() {
 
 void loop() {
   // read the value from the sensor:
-  timeStart = millis();
   data1 = abs(analogRead(mic1) - 200);
-  if(data1 > limits[0]) t1 = millis();
-  data2 = abs(analogRead(mic2) - 200);
-  if(data2 > limits[1]) t2 = millis();
-  data3 = abs(analogRead(mic3) - 200);
-  if(data3 > limits[2]) t3 = millis();
-  timeStop = millis();
+  if (data1 > limits[0]) {
+    t1 = millis();
+    change = true;
+  }
 
-  Serial.print("RT_");
-  Serial.print(timeStop - timeStart);
-  Serial.print("_t1:");
-  Serial.print(t1);
-  Serial.print("_t2:");
-  Serial.print(t2);  
-  Serial.print("_t3:");
-  Serial.println(t3);
-  
+  data2 = abs(analogRead(mic2) - 200);
+  if (data2 > limits[1]) {
+    t2 = millis();
+    change = true;
+  }
+
+  data3 = abs(analogRead(mic3) - 200);
+  if (data3 > limits[2]) {
+    t3 = millis();
+    change = true;
+  }
+
+if(change){
+  d23 = abs(t2 - t3);
+  d12 = abs(t1 - t2);
+  d13 = abs(t1 - t3);
+  change = false;
+}
+
   //reset the loop and sum variables
   if (loops >= NFA) {
     loops = 0;
@@ -82,12 +91,13 @@ void loop() {
     limits[MIC] = avg[MIC] * (TOLERANCE + 1);
   }
 
-  if (DEBUG) Serial.print("CURRENT VALUES: ");
-  Serial.print(data1);
-  Serial.print(", ");
-  Serial.print(data2);
-  Serial.print(", ");
-  Serial.print(data3);
+  if (DEBUG_ALLDATA || DEBUG) {
+    Serial.print(data1);
+    Serial.print(", ");
+    Serial.print(data2);
+    Serial.print(", ");
+    Serial.print(data3);
+  }
 
   if (DEBUG) {
     Serial.println("");
@@ -112,12 +122,37 @@ void loop() {
     Serial.print(", ");
     Serial.println(limits[2]);
   }
-  Serial.println("");
+  if (DEBUG_ALLDATA || DEBUG) Serial.println("");
 
   //This if-tree will temporarily stop the reporting of output if the output exceeds the threshold
   //specfied by the user
   if (AUTOSTOP) {
     if ((data1 > limits[0]) || (data2 > limits[1]) || (data3 > limits[2])) {
+
+      if (!DEBUG_ALLDATA) {
+        Serial.print("[ DATA ] ");
+        Serial.print(data1);
+        Serial.print(", ");
+        Serial.print(data2);
+        Serial.print(", ");
+        Serial.println(data3);
+
+        Serial.print("[ TIMINGS ] ");
+        Serial.print("  T1: ");
+        Serial.print(t1);
+        Serial.print("  T2: ");
+        Serial.print(t2);
+        Serial.print("  T3: ");
+        Serial.println(t3);
+
+        Serial.print("[ TIME DIFFS ] ");
+        Serial.print("  D12: ");
+        Serial.print(d12);
+        Serial.print("  D23: ");
+        Serial.print(d23);
+        Serial.print("  D13: ");
+        Serial.println(d13);
+      }
       Serial.println("");
       triggered = false;
 
@@ -182,6 +217,7 @@ void loop() {
         digitalWrite(led3, LOW);
         triggered = true;
       }
+      Serial.println("");
     }
   }
 
@@ -260,4 +296,3 @@ int difference(int largest, int smallest, int middle, boolean LGGAP) {
   }
   return result;
 }
-
