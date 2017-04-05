@@ -51,6 +51,12 @@ SoftwareSerial Roomba(rxPin, txPin); // Set up communnication with Roomba
 unsigned long deltime;
 unsigned long resettime;
 long sno = 0;
+
+/* Global Varibales needed to run DESYNC */
+const int N = 3;  // Number of Roombas being used
+const float ratio1 = 0.5;
+const float ratio2 = 0.5;
+
 void setup() {
   
   Serial.begin(57600);
