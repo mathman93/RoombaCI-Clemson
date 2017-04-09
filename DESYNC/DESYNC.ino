@@ -1,3 +1,8 @@
+/* DESYNC.ino
+ * Desynchronize Roomba Headings using a PRC
+ * Based on SyncSpin_021716.ino
+ */
+
 #include <SoftwareSerial.h>
 #include <SPI.h>
 #include "VirtualWire.h"
@@ -18,6 +23,7 @@ const int receive_pin = 2;
 /* Global variables for transmission and receiving */
 uint8_t buf[VW_MAX_MESSAGE_LEN];
 uint8_t buflen = VW_MAX_MESSAGE_LEN;
+unsigned char message = 0;
 
 /* Global variables needed to implement turn functions */
 float angle;                      // Heading of Roomba (found from digital compass)
@@ -30,6 +36,7 @@ const float pi = 3.1415926;       // PI to 7 decimal places
 /* Adjustable Synchronization Parameters */
 const float RATIO = 0.7;         // Ratio for amount to turn - must be in range (0 1]
 const float EPSILON = 1.0;        // (ideally) Smallest resolution of digital compass (used in PRC function) - 5.0
+boolean DHFlag = false;           // Desired Heading function indicator (was the last command not to turn?)
 
 /* Roomba parameters */
 const int WHEELDIAMETER = 72;     // 72 millimeter wheel diameter
@@ -44,6 +51,9 @@ const float millisRatio = counterspeed / 1000;  // Counter increments per millis
 const float millisAdjust = 360000 / counterspeed; // Amount of counter adjustment per firing
 const unsigned long counterAdjust = (unsigned long) millisAdjust; // Truncate to unsigned long   
 
+/* Data Parameters */
+const int dataTIMER = 1000;    // Number of milliseconds between each data point
+
 /* Roomba Serial Setup */
 SoftwareSerial Roomba(rxPin, txPin); // Set up communnication with Roomba
 
@@ -57,9 +67,9 @@ const int N = 3;  // Number of Roombas being used
 const float ratio1 = 0.5;
 const float ratio2 = 0.5;
 
+/* Start up Roomba */
 void setup() {
-  
-  Serial.begin(57600);
+  Serial.begin(115200);
   display_Running_Sketch();     // Show sketch information in the serial monitor at startup
   Serial.println("Loading...");
   pinMode(ddPin,  OUTPUT);      // sets the pins as output
@@ -105,6 +115,16 @@ void setup() {
   Wire.write(0x02); //select mode register
   Wire.write(0x00); //continuous measurement mode
   Wire.endTransmission();
+  
+  /* Compass Calibration: */
+  
+  //Keep spinning for calibration
+  compass_init(1); // Set Compass Gain
+  Move(0, -75);    // Set roomba spinning to calibrate the compass
+                   // Spins ~2 rotations CCW.
+  compass_debug = 1; // Show Debug Code in Serial Monitor (Set to 0 to hide Debug Code)
+  compass_offset_calibration(2); // Find compass axis offsets
+  Move(0, 0); // Stop spinning after completing calibration
 
   // Initialise the IO and ISR
   vw_set_tx_pin(transmit_pin);
@@ -123,16 +143,8 @@ void setup() {
   delay(500);
   digitalWrite(yellowPin, LOW);
   
-  /* Compass Calibration: */
-  //Keep spinning for calibration
-  compass_init(1); // Set Compass Gain
-  Move(0, -75);    // Set roomba spinning to calibrate the compass
-                   // Spins ~4 rotations CCW.
-  compass_debug = 1; // Show Debug Code in Serial Monitor (Set to 0 to hide Debug Code)
-  compass_offset_calibration(2); // Find compass axis offsets
-  Move(0, 0); // Stop spinning after completing calibration
-  /* Wait for command to initialize synchronization */
   digitalWrite(greenPin, LOW);  // say we've finished setup
+  /* Wait for command to initialize synchronization */
   delay(1000);
   angle = Calculate_Heading();  // Throw away first calculation
   delay(200);
@@ -143,39 +155,73 @@ void setup() {
 }
 
 void loop() {
+  /* Read angle from compass */
+  angle = Calculate_Heading();        // Set angle from the compass reading
+  counter = millisRatio * (long)(millis() - millisCounter);
+
+  recievePulse();
+  
   /* Send a pulse signal */
   if (angle + counter >= 360) { // If my "phase" reaches 360 degrees...
     sendPulse();                                    // Fire pulse
     millisCounter = millisCounter + counterAdjust;  // Adjust base counter.
   } // Ignore if the angle and counter are less than 360 degrees.
-}
+  
   /* Receive a pulse signal */
-  if (vw_get_message(buf, &buflen)) {  // If I receive a pulse signal (a high bit)... (perhaps something stored in a buffer?)
-    //Serial.print((char)buf[0]);    // Include for debugging
-    if (buf[0] == 'b') {          // Charater of palse signal
-      //Serial.println(" Reset Palse.");    // Include for debugging
-      digitalWrite(redPin, HIGH);   // Notify that we received palse
-      digitalWrite(greenPin, HIGH);
-      resetCounters();
-      digitalWrite(redPin, LOW);    // End Notify that we received palse
-      digitalWrite(greenPin, LOW);
-    } // End If statement
-    else if (buf[0] == 'a') {      // Charater of pulse signal
-      //Serial.println(" Sync Pulse.");     // Include for debugging
-      digitalWrite(yellowPin, HIGH);  // Tell me that the robot is turning
-      PRC_DESync(angle + counter); // Find desired amount of turn based on PRC for synchronization
-      /* Turn by d_angle */
-      DesiredHeading = angle + d_angle;        // Set new desired heading set point
-      if (DesiredHeading < 0) {         // Normalize the heading value to between 0 and 360
-        DesiredHeading += 360;
-      } else if (DesiredHeading >= 360) {
-        DesiredHeading -= 360;
-      }
-    } // End elseif statement
-  } // Ignore if no pulse has been received
-}
+  recievePulse();
+
+  /* If a pulse signal was recieved */
+  if (message == 'b') {
+    //Serial.println(" Reset Palse.");    // Include for debugging
+    digitalWrite(redPin, HIGH);   // Notify that we received palse
+    digitalWrite(greenPin, HIGH);
+    resetCounters();
+    digitalWrite(redPin, LOW);    // End Notify that we received palse
+    digitalWrite(greenPin, LOW);
+    message = 0; // Clear the message variable
+  } else if (message == 'a') {
+    //Serial.println(" Sync Pulse.");     // Include for debugging
+    digitalWrite(yellowPin, HIGH);  // Tell me that the robot is turning
+    PRC_DESync(angle + counter); // Find desired amount of turn based on PRC for synchronization
+    /* Turn by d_angle */
+    DesiredHeading = angle + d_angle;        // Set new desired heading set point
+    if (DesiredHeading < 0) {         // Normalize the heading value to between 0 and 360
+      DesiredHeading += 360;
+    } else if (DesiredHeading >= 360) {
+      DesiredHeading -= 360;
+    }
+    message = 0; // Clear the message variable
+  }
+  
+  /* Receive a pulse signal */
+  recievePulse();
+
+  DH_Turn();                // Turn to the DesiredHeading set point
+
+  /* Send to Serial monitor a data point */
+  if (millis() - deltime >= dataTIMER) { // If 1 second = 1000 milliseconds have passed...
+    deltime += dataTIMER;     // Reset base value for data points
+    sno++; // Increment the data point number
+    Serial.println(";");    // End row, start new row of data
+    Print_Heading_Data();
+  }
+  
+  /* Receive a pulse signal */
+  recievePulse();
+  
+  /* Reset Counters of all Roombas every 5 minutes */
+  if (millis() - resettime >= 300000) { // If it's been 5 minutes...
+    sendPalse();    // Send Reset Palse
+    resetCounters();// Reset Counter values
+  }
+}/* Go back and check everything again. Should be fast */
 
 /* SUBROUTINES */
+void recievePulse() {
+  if (vw_get_message(buf, &buflen)) {  // If I receive a pulse ...
+    message = (char)buf[0]; // Return pulse character
+  }
+}
 /* Sends out a pulse when phase equals 360 degrees */
 void sendPulse() {
   char pulse[2] = {'a'};
@@ -198,6 +244,18 @@ void sendPalse() {
   digitalWrite(redPin, LOW);
 }
 
+/* Reset ALL the counters */
+void resetCounters() {
+  millisCounter = millis();   // Reset base counter (on all robots)
+  deltime = millis();         // Reset base value for data output
+  resettime = millis();       // Reset base value for reset timer
+  sno = 0;                    // Reset data point counter
+  DesiredHeading = angle;     // Reset heading set point
+  Serial.println();           // Print text on next line
+  Print_Heading_Data();       // Display initial heading information
+}
+
+/* Determines the necessary change in heading of the robot according to the pulse received */
 void PRC_DESync(float phase) {
   /* Set d_angle, the amount to turn */
   /* Red LED turns on if d_angle is set to 0 */
@@ -218,16 +276,122 @@ void PRC_DESync(float phase) {
   }
 }
 
-/* Reset ALL the counters */
-void resetCounters() {
-  millisCounter = millis();   // Reset base counter (on all robots)
-  deltime = millis();         // Reset base value for data output
-  resettime = millis();       // Reset base value for reset timer
-  sno = 0;                    // Reset data point counter
-  DesiredHeading = angle;     // Reset heading set point
-  Print_Heading_Data();       // Display initial heading information
+/* Set Roomba spin to acheive the value of DesiredHeading */
+void DH_Turn(void) {
+  // DesiredHeading is the set point for the heading
+  // EPSILON is desirably small (probably in range [0.5, 1])
+  // Need the amount of spin to be less than (2 * # of cycles through main loop in 1 second)
+     // or may need to grade the amount of spin (proportional to amount of heading change)
+  if (angle < (DesiredHeading + EPSILON) && angle > (DesiredHeading - EPSILON) && DHFlag == false) {
+    // If it's not moving, and I'm close enough...
+    digitalWrite(yellowPin, LOW); // Say we have stopped turning.
+    return; // Leave function
+  }
+  /*
+   * DHFlag = false if last command was to not spin
+   * DHFlag = true if last command was to spin
+   * if (angle - DesiredHeading < EPSILON && DHFlag == false)
+   *    then return from function (return to loop)
+   */
+  
+  int spinValue; // Speed of wheels in mm/s to spin toward DesiredHeading
+  float holder;
+  float thresh1 = 25; // First threshold value
+  float thresh2 = 5;  // Second threshold value
+  holder = angle - DesiredHeading;
+  holder = abs(holder);   // absolute difference of where I am (angle) and where I want to be (DesiredHeading)
+  // Determine spin speed based on Thresholds
+  if (holder > thresh1 && holder < (360 - thresh1)) {
+    spinValue = 100;   // Move faster
+  } else if (holder > thresh2 && holder < (360 - thresh2)) { // and <= thresh1
+    spinValue = 50;   // Move fast
+  } else { // if (holder <= thresh2)
+    spinValue = 15;   // Move slow (keeps down oscillations due to main loop execution rate)
+  }
+  
+  // Determine direction of spin
+  if(DesiredHeading < EPSILON) {
+    if(angle > (DesiredHeading + EPSILON) && angle < (DesiredHeading + 180) ) {
+      // Spin Left (CCW)
+      Move(forward, -spinValue);
+      DHFlag = true;
+    } else if ((angle < (360 + DesiredHeading - EPSILON)) && (angle >= (DesiredHeading + 180)) ) {
+      // Spin Right (CW)
+      Move(forward, spinValue);
+      DHFlag = true;
+    } else { // if ((360 + DesiredHeading - EPSILON) < angle < (DesiredHeading + EPSILON))
+      // Stop Spinning
+      Move(forward, 0);
+      DHFlag = false;
+      digitalWrite(yellowPin, LOW); // Say we have stopped turning.
+    }
+  } else if(DesiredHeading < 180) { // and DesiredHeading >= EPSILON...
+    if(angle > (DesiredHeading + EPSILON) && angle < (DesiredHeading + 180) ) {
+      // Spin Left (CCW)
+      Move(forward, -spinValue);
+      DHFlag = true;
+    } else if ((angle < (DesiredHeading - EPSILON)) || (angle >= (DesiredHeading + 180)) ) {
+      // Spin Right (CW)
+      Move(forward, spinValue);
+      DHFlag = true;
+    } else { // if ((DesiredHeading - EPSILON) < angle < (DesiredHeading + EPSILON))
+      // Stop Spinning
+      Move(forward, 0);
+      DHFlag = false;
+      digitalWrite(yellowPin, LOW); // Say we have stopped turning.
+    }
+  } else if(DesiredHeading < (360 - EPSILON)) { // and DesiredHeading >= 180)...
+    if ((angle < (DesiredHeading - EPSILON)) && (angle > (DesiredHeading - 180)) ) {
+      // Spin Right (CW)
+      Move(forward, spinValue);
+      DHFlag = true;
+    } else if ((angle > (DesiredHeading + EPSILON)) || (angle <= (DesiredHeading - 180)) ) {
+      // Spin Left (CCW)
+      Move(forward, -spinValue);
+      DHFlag = true;
+    } else {  // if ((DesiredHeading - EPSILON) < angle < (DesiredHeading + EPSILON))
+      // Stop Spinning
+      Move(forward, 0);
+      DHFlag = false;
+      digitalWrite(yellowPin, LOW); // Say we have stopped turning.
+    }
+  } else { // if DesiredHeading >= (360 - EPSILON)...
+    if ((angle < (DesiredHeading - EPSILON)) && (angle > (DesiredHeading - 180)) ) {
+      // Spin Right (CW)
+      Move(forward, spinValue);
+      DHFlag = true;
+    } else if ((angle > (DesiredHeading + EPSILON - 360)) && (angle <= (DesiredHeading - 180)) ) {
+      // Spin Left (CCW)
+      Move(forward, -spinValue);
+      DHFlag = true;
+    } else {  // if ((DesiredHeading - EPSILON) < angle < (DesiredHeading + EPSILON))
+      // Stop Spinning
+      Move(forward, 0);
+      DHFlag = false;
+      digitalWrite(yellowPin, LOW); // Say we have stopped turning.
+    } // End "else angle"
+  } // End "else DesiredHeading"
+} // End Function
 
-  float Calculate_Heading(void) {
+/* General Wheel Motor command function.
+    X = common wheel speed (mm/s); Y = differential wheel speed;
+    X > 0 -> forward motion; Y > 0 -> CW motion
+    This function allows for both turning and forward motion.
+    Updated to use bitshift logic.
+    Error may result if |X|+|Y| > 500 (Max value is 500)
+    */
+void Move(int X, int Y) {
+ unsigned int RW = (X - Y);
+ unsigned int LW = (X + Y);
+ Roomba.write(byte(145));
+ Roomba.write(byte((RW & 0xff00) >> 8));
+ Roomba.write(byte(RW & 0xff));
+ Roomba.write(byte((LW & 0xff00) >> 8));
+ Roomba.write(byte(LW & 0xff));
+ return;
+}
+
+float Calculate_Heading(void) {
   float t;
   compass_scalled_reading(); // Get Raw data from the compass
   /* Heading Calculation (y-axis front) */
@@ -271,3 +435,4 @@ void display_Running_Sketch (void) {
   Serial.print(__TIME__);
   Serial.println("\n");
 }
+
