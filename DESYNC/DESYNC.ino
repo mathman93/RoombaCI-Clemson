@@ -260,19 +260,15 @@ void PRC_DESync(float phase) {
   /* Set d_angle, the amount to turn */
   /* Red LED turns on if d_angle is set to 0 */
   if ((phase) < (360/N + EPSILON)) {          // If the phase is less than 360/N...
-    d_angle = ratio1*360/N - phase; //gt angle to be 360/N
-    digitalWrite(redPin, HIGH); // Indicates received pulse, but no turning.
+      d_angle = ratio1*(360/N - phase); //get angle to be 360/N
+      digitalWrite(redPin, HIGH); // Indicates received pulse, but no turning.
   } else if ((phase) >= 360-360/N+EPSILON) {     //If phase > 360-360/N degrees...
-    /* Increase Heading */
-    d_angle = (360 - 360/N - EPSILON - phase) * ratio2;  // Get angle to be 360-360/N
-    digitalWrite(redPin, LOW); // Indicates the last pulse received caused a turn
-  }// else if ((phase) > EPSILON) {           
-    /* Decrease Heading */
-//    d_angle = -1 * (phase) * RATIO; // Amount I want to change the heading
-//    digitalWrite(redPin, LOW); // Indicates the last pulse received caused a turn
- /* }*/ else {                                  // If the phase is between 360/N & 360-360/N
-    d_angle = 0;  // Don't turn at all.
-    digitalWrite(redPin, HIGH); // Indicates received pulse, but no turning.
+      /* Increase Heading */
+      d_angle = (360 - 360/N - EPSILON - phase) * ratio2;  // Get angle to be 360-360/N
+      digitalWrite(redPin, LOW); // Indicates the last pulse received caused a turn
+  } else {                                  // If the phase is between 360/N & 360-360/N
+      d_angle = 0;  // Don't turn at all.
+      digitalWrite(redPin, HIGH); // Indicates received pulse, but no turning.
   }
 }
 
