@@ -1,9 +1,20 @@
 // TESTING
 /*  Gather Roomba Information and Display to Serial Monitor
 
-    Last Updated: 6/16/2016
-*/
+    Last Updated: 3/29/2017
 
+    HAS TO BE MANUALLY SET TO 19200 BAUD RATE
+
+    Currently works at 19200 Baud rate BUT NOT 115200
+
+    When reading data at 115200 the data we get makes no sense (possible bit shift)
+
+    Currently trying to set the Roomba's baud rate lower DOES NOT WORK ANY OTHER WAY BAUD RATE IS THE PROBLEM
+    Failed Solutions: 
+        setting a function to correct data (works for bumper but nothing else)
+        Setting a bitmask to make sure we are getting the right data (does not work with signed ints)
+*/
+// Testing
 #include <SoftwareSerial.h>
 #include <SPI.h>
 #include "VirtualWire.h"
@@ -46,6 +57,9 @@ byte header;
 byte number;
 byte ID;
 byte BumperByte;
+byte waste;
+int rWheel;
+int lWheel;
 int RoombaVoltage;
 int RoombaCharge;
 byte RoombaDud;
@@ -57,7 +71,7 @@ void setup() {
   
   //void display_Running_Sketch();
   
-  Serial.begin(115200);
+  Serial.begin(19200);
   display_Running_Sketch();     // Show sketch information in the serial monitor at startup
   Serial.println("Loading...");
   pinMode(ddPin, OUTPUT);       // sets the pins as output
@@ -66,15 +80,25 @@ void setup() {
   pinMode(yellowPin, OUTPUT);
   Roomba.begin(115200);         // Declare Roomba communication baud rate.
   digitalWrite(greenPin, HIGH); // say we're alive
-   
+
   // set up ROI to receive commands
   Roomba.write(byte(7));  // RESTART
-  delay(10000);
+  delay(1000);
+  
+/* EXPERIMENTING BAUD RATES
   // Set Baud rate to 19200
-  //Roomba.write(byte(129));  // Explicitly set Baud rate
-  //Roomba.write(byte(7));   // 10 => 57600 Baud; 7 -> 19200
-  //Roomba.begin(19200);   // Re-declare Roomba communication baud rate.
-  //delay(100);   // Wait before sending more commands
+  Roomba.write(byte(129));  // Explicitly set Baud rate
+  Roomba.write(byte(7));    // 10 => 57600 Baud; 7 -> 19200
+  delay(1000);
+  Roomba.flush();
+  delay(2);
+  Roomba.end();           // ends the serial thingyeeee
+  Roomba.begin(19200);   // Re-declare Roomba communication baud rate.
+  delay(100);   // Wait before sending more commands
+  // end of changing baud rate.
+*/
+
+  
   Serial.print("STARTING ROOMBA\n");
   Roomba.write(byte(128));  // START
   delay(50);
@@ -145,34 +169,50 @@ void setup() {
 
 void loop() { // Read data and send to Serial monitor
   
-  // byte byteCheck(byte byteC, int Opcode);
-  
-  /* Send to Serial monitor a data point
-  if (millis() - deltime >= 500) { // If 1 second = 1000 milliseconds have passed...
-    deltime += 500;     // Reset base value for data points
-    Roomba.write(byte(142));  // Ask for a single data packet from the Roomba
-  }*/
-
-  // -------------------------------3-1-2017----------------------------------
-  // 1. Changed deltime to 20, 50, 75 ETC to read data faster
-  // 2. Made byteCheck to filter out errors and check the bytes.
-  // NEXT WEEK: - want to get packet id 41 and 42 (what tim will be sending)
+  // -------------------------------3-29-2017----------------------------------
+  // EVERYTHING WORKS FOR 19200 BAUD RATE
+  // NEXT WEEK: - learn how to change the BAUD RATE
   // -------------------------------------------------------------------------
   
   // Send to Serial monitor a data point 
   if (millis() - deltime >= 500) { // If 1 second = 1000 milliseconds have passed...
     deltime += 500;     // Reset base value for data points
-    Roomba.write(byte(142));  // Ask for a Query from the Roomba
-    //Roomba.write(byte(1));    // Ask for one byte
-    Roomba.write(byte(7));    // Ask for Wheel drop and bumper data byte
-    //Roomba.write(byte(22));   // Ask for Roomba battery voltage (2 bytes)
-    //Roomba.write(byte(24));   // Ask for Roomba charge capacity (2 bytes)
+
+    Move(100,0);
+    
+    Roomba.write(byte(149));    // Ask for a query
+    Roomba.write(byte(3));      // Ask for # of packets
+    Roomba.write(byte(7));      // Ask for Bumper Byte (1 byte)
+    Roomba.write(byte(41));   // Ask for Requested Right velocity (2 bytes)
+    Roomba.write(byte(42));   // Ask for Requested Left velocity (2 bytes)
+    //Roomba.write(byte(22));     // Ask for voltage packet
   }
-  
-  if (Roomba.available() > 0) {
-    BumperByte = Roomba.read();   // First byte
-    BumperByte = byteCheck(BumperByte,7);
-  
+  if (Roomba.available() >= 5) {
+    /* EXPERIMENTAL
+    
+    */
+    BumperByte = Roomba.read();   // First byte (reads Bumper data)
+    
+    rWheel = ((Roomba.read()<<8) | Roomba.read()); // Reads two bytes about rWheel
+    lWheel = ((Roomba.read()<<8) | Roomba.read()); // Reads two bytes about lWheel
+    
+    // erase buffer
+    while(Roomba.available() > 0) {
+      waste = Roomba.read();
+    }
+    
+    /*  Sometimes will give us weird value but most of the time it is accurate
+     * found while testing left wheel right wheel and the bumper TESTED ON ROOMBA 2 + 3
+     */
+    // Print rWheel data
+    Serial.print("rWheel = ");
+    Serial.print(rWheel);
+    Serial.print("\n"); 
+    // Print lWheel data
+    Serial.print("lWheel = ");
+    Serial.print(lWheel);
+    Serial.print("\n");
+    // Print Bumper data (Also shows what bumpers are pressed)  
     Serial.print("Bumpers: ");
     Serial.print(BumperByte);
     Serial.print(" ");
@@ -194,7 +234,7 @@ void loop() { // Read data and send to Serial monitor
         break;
     }
   }
-
+  // Blinks the green light to show that it is going through the loop
   if (millis() - TIMER > 600) {
     TIMER = millis();
     gled = !gled;
@@ -209,38 +249,8 @@ void loop() { // Read data and send to Serial monitor
     This function allows for both turning and forward motion.
     Error may result if |X|+|Y| > 500 (Max value is 500)
     */
-void Move(int X, int Y) {
-  /* Local Variables needed for function */
-  int RWHigh, LWHigh;
-  /* Determine what the high 8-bits should be for each wheel*/
-  /* Right Wheel High byte */
-  if (X - Y > 255) {          // If the desired right wheel speed is a big positive number
-    RWHigh = 1;       // Positive filler for a 2's complement number
-  } else if (X - Y >= 0) {    // If the desired right wheel speed is a small postive number
-    RWHigh = 0;       // Positive filler for a 2's complement number
-  } else if (X - Y < -255) {  // If the desired right wheel speed is a big negative number
-    RWHigh = 254;     // Negative filler for a 2's complement number
-  } else {                    // If the desired right wheel speed is a small negative number
-    RWHigh = 255;     // Negative filler for a 2's complement number
-  }
-  /* Left Wheel High byte */
-  if (X + Y > 255) {          // If the desired left wheel speed is a big positive number
-    LWHigh = 1;       // Positive filler for a 2's complement number
-  } else if (X + Y >= 0) {    // If the desired left wheel speed is a small positive number
-    LWHigh = 0;       // Positive filler for a 2's complement number
-  } else if (X + Y < -255) {  // If the desired left wheel speed is a big negative number
-    LWHigh = 254;     // Negative filler for a 2's complement number
-  } else {                    // If the desired left wheel speed is a small negative number
-    LWHigh = 255;     // Negative filler for a 2's complement number
-  }
-  /* Roomba Wheel Command */
-  Roomba.write(byte(145));  // Syntax: [145] [RW High 8-bit] [RW Low 8-bit] [LW High 8-bit] [LW Low 8-bit]
-  Roomba.write(byte(RWHigh));
-  Roomba.write(byte(X - Y)); // Combine common and differential speeds for right wheel
-  Roomba.write(byte(LWHigh));
-  Roomba.write(byte(X + Y)); // Combine common and differential speeds for left wheel
-}
-void Moove(unsigned int X, unsigned int Y) {
+
+void Move(unsigned int X, unsigned int Y) {
 // Example Code
  unsigned int RW = (X - Y);
  unsigned int LW = (X + Y);
@@ -268,7 +278,7 @@ void display_Running_Sketch (void) {
 }
 
 /* Checks the byte that is recieved by the roomba*/
-byte byteCheck(byte byteC, int Opcode){
+byte byteCheck(byte byteC, int Opcode){   // Add a third variable for byte size
     while(byteC>15){
         Roomba.write(byte(142));  // Ask for a Query from the Roomba
         //Roomba.write(byte(1));    // Ask for one byte
