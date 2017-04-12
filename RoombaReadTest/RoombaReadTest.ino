@@ -22,6 +22,14 @@
 
 #define address 0x1E //0011110b, I2C 7bit address of HMC5883
 
+/*
+ * IDEA!!!
+ * USE PULL UP RESISTOR TO CONNECT DD PIN TO RESET THE BAUD RATE USING 
+ * NPN General Purpose BJT 2N4401: Transistor
+ * high value resistor
+ * use seperate breadboard
+ */
+
 const int rxPin = 3;            // Communication links to Roomba
 const int txPin = 4;
 const int ddPin = 5;
