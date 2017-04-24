@@ -7,7 +7,7 @@
     Modified compass.cpp and compass.h (changed to compassCUCI.cpp and compassCUCI.h to make compass calibration faster.
     Updated to use Xbee communication module
     
-    Last Updated: 3/6/2017
+    Last Updated: 4/24/2017
 */
 
 #include <SoftwareSerial.h>
@@ -60,7 +60,7 @@ const float millisAdjust = 360000 / counterspeed; // Amount of counter adjustmen
 const unsigned long counterAdjust = (unsigned long) millisAdjust; // Truncate to unsigned long
 
 /* Data Parameters */
-const int dataTIMER = 100;    // Number of milliseconds between each data point
+const int dataTIMER = 1000;    // Number of milliseconds between each data point
 
 /* Roomba Serial Setup */
 SoftwareSerial Roomba(rxPin, txPin); // Set up communication with Roomba
@@ -231,7 +231,7 @@ void recievePulse() {
 }
 /* Sends out a pulse when phase equals 360 degrees */
 void sendPulse() {
-  //Serial.println("Sync Pulse Sent.");     // Include for debugging
+  Serial.println("Sync Pulse Sent.");     // Include for debugging
   digitalWrite(greenPin, HIGH); // Tell me that I'm sending a pulse
   XBee.write("a"); // Sync Pulse
   digitalWrite(greenPin, LOW);  // Tell me that I'm done sending a pulse
@@ -239,7 +239,7 @@ void sendPulse() {
 
 /* Sends out a palse when new Roomba finishes setup */
 void sendPalse() {
-  //Serial.println("Reset Pulse Sent.");    // Include for debugging
+  Serial.println("Reset Pulse Sent.");    // Include for debugging
   digitalWrite(greenPin, HIGH); // Tell me that I'm sending a palse
   digitalWrite(redPin, HIGH);
   XBee.write("b"); // Reset Palse
