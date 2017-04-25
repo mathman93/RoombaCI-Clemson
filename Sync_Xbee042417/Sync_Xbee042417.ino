@@ -7,12 +7,11 @@
     Modified compass.cpp and compass.h (changed to compassCUCI.cpp and compassCUCI.h to make compass calibration faster.
     Updated to use Xbee communication module
     
-    Last Updated: 4/24/2017
+    Last Updated: 4/25/2017
 */
 
 #include <SoftwareSerial.h>
 #include <SPI.h>
-//#include "VirtualWire.h"
 #include "Wire.h"
 #include "compassCUCI.h"
 
@@ -21,16 +20,15 @@
 const int rxPin = 3;            // Communication links to Roomba
 const int txPin = 4;
 const int ddPin = 5;
-const int greenPin = 7;         // On when the Roomba sends a pulse. (very fast, may not see)
-const int redPin = 8;           // On when the Roomba is told to turn 0 mm/s.
-const int yellowPin = 11;       // On when the Roomba is turning.
+const int yellowPin = 6;        // On when the Roomba is turning.
+const int redPin = 7;           // On when the Roomba is told to turn 0 mm/s.
+const int greenPin = 8;         // On when the Roomba sends a pulse. (very fast, may not see)
+
 // Communication links to XBee module
-const int transmit_pin = 12;    // to pin 3 of XBee
-const int receive_pin = 2;      // to pin 2 of Xbee
+const int transmit_pin = 11;    // to pin 3 of XBee (TX)
+const int receive_pin = 12;     // to pin 2 of Xbee (RX)
 
 /* Global variables for transmission and receiving */
-//unsigned char buf[VW_MAX_MESSAGE_LEN];
-//uint8_t buflen = VW_MAX_MESSAGE_LEN;
 unsigned char message = 0;
 
 /* Global variables needed to implement turn functions */
@@ -62,7 +60,7 @@ const unsigned long counterAdjust = (unsigned long) millisAdjust; // Truncate to
 /* Data Parameters */
 const int dataTIMER = 1000;    // Number of milliseconds between each data point
 
-/* Roomba Serial Setup */
+/* Roomba and XBee Serial Setup */
 SoftwareSerial Roomba(rxPin, txPin); // Set up communication with Roomba
 SoftwareSerial XBee(receive_pin, transmit_pin); // Set up communication with Xbee
 
@@ -81,7 +79,7 @@ void setup() {
   pinMode(redPin, OUTPUT);
   pinMode(yellowPin, OUTPUT);
   Roomba.begin(115200);         // Declare Roomba communication baud rate.
-  XBee.begin(57600);            // Declare Xbee communication baud rate.
+  XBee.begin(57600);            // Declare XBee communication baud rate.
   digitalWrite(greenPin, HIGH); // say we're alive
 
   // set up ROI to receive commands
@@ -131,24 +129,18 @@ void setup() {
   compass_offset_calibration(2); // Find compass axis offsets
   Move(0, 0); // Stop spinning after completing calibration
 
-  // Initialise the IO and ISR
-  //vw_set_tx_pin(transmit_pin);
-  //vw_set_rx_pin(receive_pin);
-  //vw_set_ptt_inverted(true); // Required for DR3100
-  //vw_setup(2000);       // Bits per sec
-
-  //Receiver Setup
-  delay(1000);
-  Serial.print(" Setup");
-
-  //vw_rx_start();       // Start the receiver PLL running
-
+    //Receiver Setup
+  delay(500); 
+  Serial.println(" Setup complete");
   digitalWrite(yellowPin, HIGH);
-  Serial.println("...complete");
   delay(500);
   digitalWrite(yellowPin, LOW);
-  
   digitalWrite(greenPin, LOW);  // say we've finished setup
+  while(XBee.available()){ // Clear out Xbee buffer
+    message = XBee.read();
+  }
+  message = 0; // Clear message variable
+  
   /* Wait for command to initialize synchronization */
   delay(1000);
   angle = Calculate_Heading();  // Throw away first calculation
@@ -163,8 +155,6 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
   /* Read angle from compass */
   angle = Calculate_Heading();        // Set angle from the compass reading
   counter = millisRatio * (long)(millis() - millisCounter);
-
-  //recievePulse();
   
   /* Send a pulse signal */
   if (angle + counter >= 360) { // If my "phase" reaches 360 degrees...
@@ -197,9 +187,6 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
     }
     message = 0; // Clear the message variable
   }
-  
-  /* Receive a pulse signal */
-  //recievePulse();
 
   DH_Turn();                // Turn to the DesiredHeading set point
 
@@ -210,9 +197,6 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
     Serial.println(";");    // End row, start new row of data
     Print_Heading_Data();
   }
-  
-  /* Receive a pulse signal */
-  //recievePulse();
   
   /* Reset Counters of all Roombas every 5 minutes */
   if (millis() - resettime >= 300000) { // If it's been 5 minutes...
@@ -227,6 +211,8 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
 void recievePulse() {
   if (XBee.available()) {  // If I receive a pulse ...
     message = XBee.read(); // Return pulse character
+    Serial.print("Received: "); // Include for debugging
+    Serial.println(message);
   }
 }
 /* Sends out a pulse when phase equals 360 degrees */
@@ -239,7 +225,7 @@ void sendPulse() {
 
 /* Sends out a palse when new Roomba finishes setup */
 void sendPalse() {
-  Serial.println("Reset Pulse Sent.");    // Include for debugging
+  //Serial.println("Reset Pulse Sent.");    // Include for debugging
   digitalWrite(greenPin, HIGH); // Tell me that I'm sending a palse
   digitalWrite(redPin, HIGH);
   XBee.write("b"); // Reset Palse
