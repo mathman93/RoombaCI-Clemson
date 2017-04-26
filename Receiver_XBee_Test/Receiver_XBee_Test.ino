@@ -46,30 +46,30 @@ void loop() {
   /* Receive a pulse signal */
   recievePulse();
   if (message == 'b') {
+    digitalWrite(redPin, HIGH);
     count++;
     Serial.print(count);
     Serial.print(": ");
     Serial.print((char)message);
     Serial.println(" Palse");
+    digitalWrite(redPin, LOW);
     message = 0;
   } else if (message == 'a') {
+    digitalWrite(greenPin, HIGH);
     count++;
     Serial.print(count);
     Serial.print(": ");
     Serial.print((char)message);
     Serial.println(" Pulse");
+    digitalWrite(greenPin, LOW);
     message = 0;
   }
 
-  recievePulse();
-
-  if (millis() - LightBlink >= 500) {
-    LightBlink = millis();
-    gled = !gled;
-    digitalWrite(greenPin, gled);
-  }
-
-  recievePulse();
+  //if (millis() - LightBlink >= 500) {
+  //  LightBlink = millis();
+  //  gled = !gled;
+  //  digitalWrite(greenPin, gled);
+  //}
 }
 
 /* SUBROUTINES */
