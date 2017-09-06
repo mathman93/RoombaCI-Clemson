@@ -1,13 +1,9 @@
 /*  Heading Synchronization Code
-    Based the global counter on the clock speed of the Arduino Uno (millis() function).
-        Eliminates use of the delay() function to improve synchronization between robots.
-    Created Calculate_Heading() subroutine to give correct heading direction. (y-axis forward)
-    Improved Roomba turning and achieving of desired heading.
-    Added reset pulse after 5 minutes to ensure global counter synchronization.
-    Modified compass.cpp and compass.h (changed to compassCUCI.cpp and compassCUCI.h to make compass calibration faster.
-    Updated to use Xbee communication module
+    Based on Sync_XBee042417
+    Roomba achieves phase change using a constant frequency change.
+    Modification to DH_Turn() function
     
-    Last Updated: 4/25/2017
+    Last Updated: 5/15/2017
 */
 
 #include <SoftwareSerial.h>
@@ -36,6 +32,7 @@ float angle;                      // Heading of Roomba (found from digital compa
 float counter;                    // Global counter for Roomba (works with angle to compute "phase")
 float d_angle;                    // Change in angle that Roomba will turn (updates each cycle)
 float DesiredHeading;             // Heading set point of Roomba;
+int spinValue;                    // Speed of wheels in mm/s to spin toward DesiredHeading
 int forward = 0;                  // Speed in mm/s that Roomba wheels turn to move forward - must be in range [-400,400]
 const float pi = 3.1415926;       // PI to 7 decimal places
 
@@ -43,6 +40,7 @@ const float pi = 3.1415926;       // PI to 7 decimal places
 const float RATIO = 0.5;          // Ratio for amount to turn - must be in range (0 1]
 const float EPSILON = 1.0;        // (ideally) Smallest resolution of digital compass (used in PRC function) - 5.0
 boolean DHFlag = false;           // Desired Heading function indicator (was the last command not to turn?)
+const float omegaA = 0.3;         // Percentage of phase change (constant frequency method)
 
 /* Roomba parameters */
 const int WHEELDIAMETER = 72;     // 72 millimeter wheel diameter
@@ -58,7 +56,7 @@ const float millisAdjust = 360000 / counterspeed; // Amount of counter adjustmen
 const unsigned long counterAdjust = (unsigned long) millisAdjust; // Truncate to unsigned long
 
 /* Data Parameters */
-const int dataTIMER = 1000;    // Number of milliseconds between each data point
+const int dataTIMER = 100;    // Number of milliseconds between each data point
 
 /* Roomba and XBee Serial Setup */
 SoftwareSerial Roomba(rxPin, txPin); // Set up communication with Roomba
@@ -123,28 +121,32 @@ void setup() {
   
   //Keep spinning for calibration
   compass_init(1); // Set Compass Gain
-  Move(0, -75);    // Set roomba spinning to calibrate the compass
+  Move(0, 75);    // Set roomba spinning to calibrate the compass
                    // Spins ~2 rotations CCW.
   compass_debug = 1; // Show Debug Code in Serial Monitor (Set to 0 to hide Debug Code)
   compass_offset_calibration(2); // Find compass axis offsets
   Move(0, 0); // Stop spinning after completing calibration
 
-    //Receiver Setup
-  delay(500); 
+  //Receiver Setup
   Serial.println(" Setup complete");
   digitalWrite(yellowPin, HIGH);
   delay(500);
   digitalWrite(yellowPin, LOW);
   digitalWrite(greenPin, LOW);  // say we've finished setup
+
+  // calculate spin speed value
+  // standard "wheel speed" = counterspeed * pi * (WHEELSEPARATION/2) / (2 * 180);
+  // spinValue = omegaA * standard "wheel speed"
+  //spinValue =(int) ((omegaA*(counterspeed * pi * WHEELSEPARATION) / 360) + 0.5);
+  spinValue = 15; // Approximately omegaA = 0.2; 25 -> 0.34
+  /* Wait for command to initialize synchronization */
+  delay(200);
+  angle = Calculate_Heading();  // Throw away first calculation
+  delay(200);
   while(XBee.available()){ // Clear out Xbee buffer
     message = XBee.read();
   }
-  message = 0; // Clear message variable
-  
-  /* Wait for command to initialize synchronization */
-  delay(1000);
-  angle = Calculate_Heading();  // Throw away first calculation
-  delay(200);
+  message = 0; // Clear message
   /* Initialize synchronization */
   angle = Calculate_Heading();  // Determine initial heading information
   sendPalse();                  // Send reset Palse
@@ -184,7 +186,7 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
       DesiredHeading += 360;
     } else if (DesiredHeading >= 360) {
       DesiredHeading -= 360;
-    }
+    }    
     message = 0; // Clear the message variable
   }
 
@@ -211,13 +213,13 @@ void loop() { // Swarm "Heading Synchronizaiton" Code
 void recievePulse() {
   if (XBee.available()) {  // If I receive a pulse ...
     message = XBee.read(); // Return pulse character
-    Serial.print("Received: "); // Include for debugging
-    Serial.println((char)message);
+    //Serial.print("Received: "); // Include for debugging
+    //Serial.println((char)message);
   }
 }
 /* Sends out a pulse when phase equals 360 degrees */
 void sendPulse() {
-  Serial.println("Sync Pulse Sent.");     // Include for debugging
+  //Serial.println("Sync Pulse Sent.");     // Include for debugging
   digitalWrite(greenPin, HIGH); // Tell me that I'm sending a pulse
   XBee.write("a"); // Sync Pulse
   digitalWrite(greenPin, LOW);  // Tell me that I'm done sending a pulse
@@ -240,6 +242,7 @@ void resetCounters() {
   resettime = millis();       // Reset base value for reset timer
   sno = 0;                    // Reset data point counter
   DesiredHeading = angle;     // Reset heading set point
+  counter = 0;                // Reset counter value
   Serial.println();           // Print text on next line
   Print_Heading_Data();       // Display initial heading information
 }
@@ -282,22 +285,7 @@ void DH_Turn(void) {
    * if (angle - DesiredHeading < EPSILON && DHFlag == false)
    *    then return from function (return to loop)
    */
-  
-  int spinValue; // Speed of wheels in mm/s to spin toward DesiredHeading
-  float holder;
-  float thresh1 = 25; // First threshold value
-  float thresh2 = 5;  // Second threshold value
-  holder = angle - DesiredHeading;
-  holder = abs(holder);   // absolute difference of where I am (angle) and where I want to be (DesiredHeading)
-  // Determine spin speed based on Thresholds
-  if (holder > thresh1 && holder < (360 - thresh1)) {
-    spinValue = 100;   // Move faster
-  } else if (holder > thresh2 && holder < (360 - thresh2)) { // and <= thresh1
-    spinValue = 50;   // Move fast
-  } else { // if (holder <= thresh2)
-    spinValue = 15;   // Move slow (keeps down oscillations due to main loop execution rate)
-  }
-  
+  // spinValue is determined beforehand
   // Determine direction of spin
   if(DesiredHeading < EPSILON) {
     if(angle > (DesiredHeading + EPSILON) && angle < (DesiredHeading + 180) ) {
