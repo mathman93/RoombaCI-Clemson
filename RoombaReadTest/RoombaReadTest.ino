@@ -22,14 +22,6 @@
 
 #define address 0x1E //0011110b, I2C 7bit address of HMC5883
 
-/*
- * IDEA!!!
- * USE PULL UP RESISTOR TO CONNECT DD PIN TO RESET THE BAUD RATE USING 
- * NPN General Purpose BJT 2N4401: Transistor
- * high value resistor
- * use seperate breadboard
- */
-
 const int rxPin = 3;            // Communication links to Roomba
 const int txPin = 4;
 const int ddPin = 5;
@@ -93,7 +85,7 @@ void setup() {
   Roomba.write(byte(7));  // RESTART
   delay(1000);
   
-/* EXPERIMENTING BAUD RATES
+/*EXPERIMENTING BAUD RATES
   // Set Baud rate to 19200
   Roomba.write(byte(129));  // Explicitly set Baud rate
   Roomba.write(byte(7));    // 10 => 57600 Baud; 7 -> 19200
@@ -104,7 +96,8 @@ void setup() {
   Roomba.begin(19200);   // Re-declare Roomba communication baud rate.
   delay(100);   // Wait before sending more commands
   // end of changing baud rate.
-*/
+  */
+
 
   
   Serial.print("STARTING ROOMBA\n");
@@ -179,7 +172,7 @@ void loop() { // Read data and send to Serial monitor
   
   // -------------------------------3-29-2017----------------------------------
   // EVERYTHING WORKS FOR 19200 BAUD RATE
-  // NEXT WEEK: - learn how to change the BAUD RATE
+  // NEXT YEAR: - learn how to change the BAUD RATE
   // -------------------------------------------------------------------------
   
   // Send to Serial monitor a data point 
@@ -285,7 +278,8 @@ void display_Running_Sketch (void) {
   Serial.println("\n");
 }
 
-/* Checks the byte that is recieved by the roomba*/
+/*
+// Checks the byte that is recieved by the roomba
 byte byteCheck(byte byteC, int Opcode){   // Add a third variable for byte size
     while(byteC>15){
         Roomba.write(byte(142));  // Ask for a Query from the Roomba
@@ -298,3 +292,5 @@ byte byteCheck(byte byteC, int Opcode){   // Add a third variable for byte size
     }
   return byteC;
 }
+*/
+
