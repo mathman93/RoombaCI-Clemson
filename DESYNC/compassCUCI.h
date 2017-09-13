@@ -4,12 +4,13 @@ Website: http://hobbylogs.me.pn/?p=17
 Location: Pakistan
 Ver: 0.1 beta --- Start
 Ver: 0.2 beta --- Debug feature included
+Modified by: Timothy Anglea (2017-03-02)
 */
 
-#ifndef compass.h
-  #define compass.h
+#ifndef compassCUCI.h
+  #define compassCUCI.h
   
-  #include "compass.h"
+  #include "compassCUCI.h"
   
   extern float bearing;
   extern float compass_x_scalled;

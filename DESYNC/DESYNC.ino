@@ -1,28 +1,28 @@
 /* DESYNC.ino
  * Desynchronize Roomba Headings using a PRC
  * Based on SyncSpin_021716.ino
+ * Updated to use XBee modules for communication
  */
 
 #include <SoftwareSerial.h>
 #include <SPI.h>
-#include "VirtualWire.h"
 #include "Wire.h"
-#include "compass.h"
+#include "compassCUCI.h"
 
 #define address 0x1E //0011110b, I2C 7bit address of HMC5883
 
 const int rxPin = 3;            // Communication links to Roomba
 const int txPin = 4;
 const int ddPin = 5;
-const int greenPin = 7;         // On when the Roomba sends a pulse. (very fast, may not see)
-const int redPin = 8;           // On when the Roomba is told to turn 0 mm/s.
-const int yellowPin = 11;       // On when the Roomba is turning.
-const int transmit_pin = 12;    // Communication links to RF transmitter/receiver
-const int receive_pin = 2;
+const int yellowPin = 6;        // On when the Roomba is turning.
+const int redPin = 7;           // On when the Roomba is told to turn 0 mm/s.
+const int greenPin = 8;         // On when the Roomba sends a pulse. (very fast, may not see)
+
+// Communication links to XBee module
+const int transmit_pin = 11;    // to pin 3 of XBee (TX)
+const int receive_pin = 12;     // to pin 2 of Xbee (RX)
 
 /* Global variables for transmission and receiving */
-uint8_t buf[VW_MAX_MESSAGE_LEN];
-uint8_t buflen = VW_MAX_MESSAGE_LEN;
 unsigned char message = 0;
 
 /* Global variables needed to implement turn functions */
@@ -56,6 +56,7 @@ const int dataTIMER = 1000;    // Number of milliseconds between each data point
 
 /* Roomba Serial Setup */
 SoftwareSerial Roomba(rxPin, txPin); // Set up communnication with Roomba
+SoftwareSerial XBee(receive_pin, transmit_pin); // Set up communication with Xbee
 
 /* Data Point Collector Setup */
 unsigned long deltime;
@@ -77,6 +78,7 @@ void setup() {
   pinMode(redPin, OUTPUT);
   pinMode(yellowPin, OUTPUT);
   Roomba.begin(115200);         // Declare Roomba communication baud rate.
+  XBee.begin(57600);            // Declare XBee communication baud rate
   digitalWrite(greenPin, HIGH); // say we're alive
 
   // set up ROI to receive commands
@@ -126,28 +128,21 @@ void setup() {
   compass_offset_calibration(2); // Find compass axis offsets
   Move(0, 0); // Stop spinning after completing calibration
 
-  // Initialise the IO and ISR
-  vw_set_tx_pin(transmit_pin);
-  vw_set_rx_pin(receive_pin);
-  vw_set_ptt_inverted(true); // Required for DR3100
-  vw_setup(2000);       // Bits per sec
-
   //Receiver Setup
-  delay(1000);
-  Serial.print(" Setup");
-
-  vw_rx_start();       // Start the receiver PLL running
-
+   Serial.println(" Setup complete");
   digitalWrite(yellowPin, HIGH);
-  Serial.println("...complete");
   delay(500);
   digitalWrite(yellowPin, LOW);
-  
   digitalWrite(greenPin, LOW);  // say we've finished setup
+  
   /* Wait for command to initialize synchronization */
-  delay(1000);
+  delay(200);
   angle = Calculate_Heading();  // Throw away first calculation
   delay(200);
+  while(XBee.available()){ // Clear out Xbee buffer
+    message = XBee.read();
+  }
+  message = 0; // Clear message variable
   /* Initialize synchronization */
   angle = Calculate_Heading();  // Determine initial heading information
   sendPalse();                  // Send reset Palse
@@ -218,28 +213,26 @@ void loop() {
 
 /* SUBROUTINES */
 void recievePulse() {
-  if (vw_get_message(buf, &buflen)) {  // If I receive a pulse ...
-    message = (char)buf[0]; // Return pulse character
+  if (XBee.available()) {  // If I receive a pulse ...
+    message = XBee.read(); // Record pulse character
+    //Serial.print("Received: "); // Include for debugging
+    //Serial.println((char)message);
   }
 }
 /* Sends out a pulse when phase equals 360 degrees */
 void sendPulse() {
-  char pulse[2] = {'a'};
   //Serial.println("Sync Pulse Sent.");     // Include for debugging
   digitalWrite(greenPin, HIGH); // Tell me that I'm sending a pulse
-  vw_send((uint8_t *)pulse, strlen(pulse));
-  vw_wait_tx();                 // Wait until the whole message is gone
+  XBee.write("a"); // Sync Pulse
   digitalWrite(greenPin, LOW);  // Tell me that I'm done sending a pulse
 }
 
 /* Sends out a palse when new Roomba finishes setup */
 void sendPalse() {
-  char palse[2] = {'b'};
   //Serial.println("Reset Pulse Sent.");    // Include for debugging
   digitalWrite(greenPin, HIGH); // Tell me that I'm sending a palse
   digitalWrite(redPin, HIGH);
-  vw_send((uint8_t *)palse, strlen(palse));
-  vw_wait_tx();                 // Wait until the whole message is gone
+  XBee.write("b"); // Reset Palse
   digitalWrite(greenPin, LOW);  // Tell me that I'm done sending a palse
   digitalWrite(redPin, LOW);
 }
