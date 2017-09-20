@@ -1,18 +1,9 @@
 // TESTING
 /*  Gather Roomba Information and Display to Serial Monitor
 
-    Last Updated: 3/29/2017
+    Last Updated: 9/20/2017
 
-    HAS TO BE MANUALLY SET TO 19200 BAUD RATE
-
-    Currently works at 19200 Baud rate BUT NOT 115200
-
-    When reading data at 115200 the data we get makes no sense (possible bit shift)
-
-    Currently trying to set the Roomba's baud rate lower DOES NOT WORK ANY OTHER WAY BAUD RATE IS THE PROBLEM
-    Failed Solutions: 
-        setting a function to correct data (works for bumper but nothing else)
-        Setting a bitmask to make sure we are getting the right data (does not work with signed ints)
+    Currently works at baud 115200
 */
 // Testing
 #include <SoftwareSerial.h>
@@ -25,21 +16,13 @@
 const int rxPin = 3;            // Communication links to Roomba
 const int txPin = 4;
 const int ddPin = 5;
-const int greenPin = 7;         // On when the Roomba sends a pulse. (very fast, may not see)
-const int redPin = 8;           // On when the Roomba is told to turn 0 mm/s.
-const int yellowPin = 11;       // On when the Roomba is turning.
-const int transmit_pin = 12;    // Communication links to RF transmitter/receiver
-const int receive_pin = 2;
+const int yellowPin = 6;        // On when the Roomba is turning.
+const int redPin = 7;           // On when the Roomba is told to turn 0 mm/s.
+const int greenPin = 8;         // On when the Roomba sends a pulse. (very fast, may not see)
 
-/* Global variables needed to implement turn functions */
-float angle;                      // Heading of Roomba (found from digital compass)
-float d_angle;                    // change in angle that Roomba will turn (updates each cycle)
-int forward = 40;                  // Speed in mm/s that Roomba wheels turn to move forward - must be in range [-128,128]
-const float pi = 3.1415926;       // pi to 7 decimal places
-
-/* Adjustable Synchronization Parameters */
-const float RATIO = 0.35;         // Ratio for amount to turn - must be in range (0 1]
-const float EPSILON = 1.0;        // (ideally) Smallest resolution of digital compass (used in PRC function) - 5.0
+// Communication links to XBee module
+const int transmit_pin = 11;    // to pin 3 of XBee (TX)
+const int receive_pin = 12;     // to pin 2 of Xbee (RX)
 
 /* Roomba parameters */
 const int WHEELDIAMETER = 72;     // 72 millimeter wheel diameter
@@ -50,28 +33,23 @@ const float ENCODER = 508.8;      // 508.8 Counts per wheel revolution
 SoftwareSerial Roomba(rxPin, txPin); // Set up communnication with Roomba
 
 /* Data Point Collector Setup */
-unsigned long deltime;
-unsigned long TIMER;
-long sno = 0;
-byte header;
-byte number;
-byte ID;
+unsigned long deltime;  // Base time for sending query command
+unsigned long TIMER;    // Base time for blinking green LED
+long sno = 0;           // Data point number
 byte BumperByte;
 byte waste;
 int rWheel;
 int lWheel;
 int RoombaVoltage;
 int RoombaCharge;
-byte RoombaDud;
 boolean gled = LOW;
-
 
 /* Start up Roomba */
 void setup() {
   
   //void display_Running_Sketch();
   
-  Serial.begin(19200);
+  Serial.begin(115200);
   display_Running_Sketch();     // Show sketch information in the serial monitor at startup
   Serial.println("Loading...");
   pinMode(ddPin, OUTPUT);       // sets the pins as output
@@ -83,7 +61,7 @@ void setup() {
 
   // set up ROI to receive commands
   Roomba.write(byte(7));  // RESTART
-  delay(1000);
+  delay(10000);
   
 /*EXPERIMENTING BAUD RATES
   // Set Baud rate to 19200
@@ -130,25 +108,18 @@ void setup() {
   
   //Transmitter Setup
   //Initialize Serial and I2C communications
-  Wire.begin();
+  //Wire.begin();
 
   //Put the HMC5883 IC into the correct operating mode
-  Wire.beginTransmission(address); //open communication with HMC5883
-  Wire.write(0x02); //select mode register
-  Wire.write(0x00); //continuous measurement mode
-  Wire.endTransmission();
-
-  // Initialise the IO and ISR
-  vw_set_tx_pin(transmit_pin);
-  vw_set_rx_pin(receive_pin);
-  vw_set_ptt_inverted(true); // Required for DR3100
-  vw_setup(2000);       // Bits per sec
+  //Wire.beginTransmission(address); //open communication with HMC5883
+  //Wire.write(0x02); //select mode register
+  //Wire.write(0x00); //continuous measurement mode
+  //Wire.endTransmission();
 
   //Receiver Setup
   delay(1000);
   Serial.print("Receiver setup");
 
-  vw_rx_start();       // Start the receiver PLL running
 
   digitalWrite(yellowPin, HIGH);
   Serial.println("...complete");
@@ -170,9 +141,8 @@ void setup() {
 
 void loop() { // Read data and send to Serial monitor
   
-  // -------------------------------3-29-2017----------------------------------
-  // EVERYTHING WORKS FOR 19200 BAUD RATE
-  // NEXT YEAR: - learn how to change the BAUD RATE
+  // -------------------------------9-20-2017----------------------------------
+  // EVERYTHING WORKS FOR 115200 BAUD RATE
   // -------------------------------------------------------------------------
   
   // Send to Serial monitor a data point 
@@ -180,15 +150,20 @@ void loop() { // Read data and send to Serial monitor
     deltime += 500;     // Reset base value for data points
 
     Move(100,0);
+
+    //Roomba.write(byte(142)); // want one packet
+    //Roomba.write(byte(7));    //
     
     Roomba.write(byte(149));    // Ask for a query
     Roomba.write(byte(3));      // Ask for # of packets
     Roomba.write(byte(7));      // Ask for Bumper Byte (1 byte)
-    Roomba.write(byte(41));   // Ask for Requested Right velocity (2 bytes)
-    Roomba.write(byte(42));   // Ask for Requested Left velocity (2 bytes)
+    Roomba.write(byte(43));   // Ask for Requested Right velocity (2 bytes)
+    Roomba.write(byte(44));   // Ask for Requested Left velocity (2 bytes)
     //Roomba.write(byte(22));     // Ask for voltage packet
+
+    //delay(100);
   }
-  if (Roomba.available() >= 5) {
+  if (Roomba.available() > 4) {
     /* EXPERIMENTAL
     
     */
@@ -235,10 +210,11 @@ void loop() { // Read data and send to Serial monitor
         break;
     }
   }
+  
   // Blinks the green light to show that it is going through the loop
   if (millis() - TIMER > 600) {
     TIMER = millis();
-    gled = !gled;
+    gled = !gled; // switch state of the green LED
     digitalWrite(greenPin, gled);
   }
 }/* Go back and check everything again. Should be fast */
