@@ -65,11 +65,11 @@ void loop() {
     message = 0;
   }
 
-  //if (millis() - LightBlink >= 500) {
-  //  LightBlink = millis();
-  //  gled = !gled;
-  //  digitalWrite(greenPin, gled);
-  //}
+  if (millis() - LightBlink >= 500) {
+    LightBlink = millis();
+    gled = !gled;
+    digitalWrite(greenPin, gled);
+  }
 }
 
 /* SUBROUTINES */

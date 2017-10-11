@@ -34,13 +34,13 @@ void setup() {
 
 void loop() {
   sendPulse();
-  delay(100);
+  delay(1000);
   sendPulse();
-  delay(50);
+  delay(500);
   sendPalse();
-  delay(100);
+  delay(1000);
   sendPalse();
-  delay(50);
+  delay(500);
 }
 
 /* SUBROUTINES */
