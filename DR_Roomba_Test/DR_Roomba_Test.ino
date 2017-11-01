@@ -142,7 +142,7 @@ void setup() {
   /* Initialize Roomba */
   turntime = millis();          // Set base value for turning
   
-  DesiredHeading = 0;           // Start heading to zero degrees
+  DesiredHeading = 70;           // Start heading at specified degrees
 
   /* Get Roomba to face Desired Heading before continuing. */
   while(millis() - turntime <= 4000) {
@@ -160,7 +160,7 @@ void setup() {
   deltime = millis();           // Set base value for data output.
   datatime = millis();          // Set base value for Roomba query
   TIMER = millis();             // Set base value for green LED blink
-  forward = 75; // Change forward speed of Roomba
+  forward = 150; // Change forward speed of Roomba
   Move(forward, 0);
 }
 
