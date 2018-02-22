@@ -1,0 +1,3 @@
+https://github.com/sparkfun/SparkFun_LSM9DS1_Arduino_Library
+
+https://teslabs.com/articles/magnetometer-calibration/
