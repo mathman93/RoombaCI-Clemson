@@ -1,6 +1,7 @@
 ''' 
-Roomba_Spin_Test.py
+Roomba_Read_Test.py
 Purpose: Testing communication between Roomba and RPi
+	Testing communication between Xbee modules on separate RPi
 	Form basis of Roomba code for other tests.
 Last Modified: 3/30/2018
 '''
@@ -95,31 +96,17 @@ time.sleep(0.1)
 BlinkCleanLight() # Blink the Clean light on Roomba
 
 # Main Code #
-Xbee.write('Hello World!') # Send test message
+message = 0 # variable to stick message
 x = 0
-# Move Roomba
 while True:
-	Move_forward() # move forward
-	time.sleep(2)
-	Move_turn_right() # Turn right
-	time.sleep(2)
-	# Send message in each loop.
-	Xbee.write(str(x))
-	# Update counter
-	x = x + 1
-	if x == 3:
+	try:
+		if Xbee.inWaiting() > 0: # If there is something in the receive buffer
+			message = Xbee.read(Xbee.inWaiting()) # Read all data in
+			print(message) # Display message to screen
+		#time.sleep(0.2)
+	except KeyboardInterrupt:
+		print('')
 		break
-
-Move_stop() # Stop moving
-time.sleep(0.1)
-
-# SMB Theme song.
-Roomba.write('\x8c\x00\x0b\x4c\x08\x4c\x08\x1d\x08\x4c\x08\x1d\x08\x48\x08\x4c\x08\x1d\x08\x4f\x08\x1d\x18\x43\x08')
-time.sleep(0.05)
-
-# Play the song we just programmed.
-Roomba.write('\x8d\x00') # Play song #0
-time.sleep(2) # wait for the song to complete
 
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
