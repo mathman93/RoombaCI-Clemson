@@ -121,11 +121,11 @@ time.sleep(0.1)
 
 BlinkCleanLight() # Blink the Clean light on Roomba
 
-# Main Code #
 if Roomba.inWaiting() > 0:
 	x = Roomba.read(Roomba.inWaiting()) # Clear out Roomba boot-up info
 	#print(x) # Include for debugging
 
+# Main Code #
 query_time = time.time() # Set base time for query
 query_time_offset = 0.1 # Set time offset for query
 data_counter = 0 # Initialize data counter
