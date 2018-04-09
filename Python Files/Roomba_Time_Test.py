@@ -1,7 +1,8 @@
 ''' 
 Roomba_Time_Test.py
-Purpose: Testing communication between Roomba and RPi
+Purpose: Testing timing loops
 	Form basis of Roomba code for other tests.
+IMPORTANT: Must be run using Python 3 (python3)
 Last Modified: 4/6/2018
 '''
 ## Import libraries ##
@@ -97,7 +98,7 @@ def Play_SMB():
 ## -- Code Starts Here -- ##
 # Setup Code #
 GPIO.setmode(GPIO.BCM) # Use BCM pin numbering for GPIO
-# Display Running Sketch Info
+# Display Running Sketch Info (?)
 
 # LED Pin setup
 GPIO.setup(yled, GPIO.OUT, initial=GPIO.LOW)
@@ -132,10 +133,10 @@ basetime_2_offset = 0.6
 while True:
 	try:
 		if (time.time() - basetime_1) > basetime_1_offset: # If enough time has passed.
-			if GPIO.input(gled) == True:  # If the LED is on...
-				GPIO.output(gled, GPIO.LOW)  # turn it off.
+			if GPIO.input(rled) == True:  # If the LED is on...
+				GPIO.output(rled, GPIO.LOW)  # turn it off.
 			else:
-				GPIO.output(gled, GPIO.HIGH) # otherwise, turn it on.
+				GPIO.output(rled, GPIO.HIGH) # otherwise, turn it on.
 			basetime_1 += basetime_1_offset  # set the next base time
 			
 		if (time.time() - basetime_2) > basetime_2_offset: # If enough time has passed.

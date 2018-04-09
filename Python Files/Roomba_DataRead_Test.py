@@ -3,7 +3,7 @@ Roomba_DataRead_Test.py
 Purpose: Testing communication between Roomba and RPi
 	Form basis of Roomba code for other tests.
 IMPORTANT: Must be run using Python 3 (python3)
-Last Modified: 4/6/2018
+Last Modified: 4/9/2018
 '''
 ## Import libraries ##
 import serial
@@ -16,9 +16,9 @@ global Xbee # Specifies connection to Xbee
 Roomba = serial.Serial('/dev/ttyS0', 115200) # Baud rate should be 115200
 Xbee = serial.Serial('/dev/ttyUSB0', 57600) # Baud rate should be 57600
 # LED pin numbers
-yled = 17
-rled = 27
-gled = 22
+yled = 5
+rled = 6
+gled = 13
 ## Roomba DD pin
 ddPin = 23
 
@@ -127,7 +127,8 @@ if Roomba.inWaiting() > 0:
 
 # Main Code #
 query_time = time.time() # Set base time for query
-query_time_offset = 0.1 # Set time offset for query
+query_time_offset = 5*(0.015) # Set time offset for query
+# smallest time offset for query is 15 ms.
 data_counter = 0 # Initialize data counter
 
 Move(0,-100) # Start Roomba moving
@@ -141,6 +142,7 @@ while True:
 			Roomba.write(itb(7))   # Bumper byte packet (1 byte)
 			Roomba.write(itb(43))  # Right Wheel encoder counts
 			Roomba.write(itb(44))  # Left Wheel encoder counts
+			#Roomba.write(itb(45))  # Light bumpers
 			query_time += query_time_offset # offset query time for next query
 			# May potentially replace this with "Query Stream"
 		# Recieve data from Roomba
@@ -148,6 +150,7 @@ while True:
 			bumper_byte = int.from_bytes(Roomba.read(1), byteorder='big') # Read in one byte
 			r_wheel = int.from_bytes(Roomba.read(2), byteorder='big') # Read in two bytes
 			l_wheel = int.from_bytes(Roomba.read(2), byteorder='big') # Read in two bytes
+			#light_bumper = int.from_bytes(Roomba.read(1), byteorder='big') # Read in one byte
 			# Print data to screen (MATLAB format)
 			print(data_counter, bumper_byte, r_wheel, l_wheel, sep=', ', end=';\n')
 			data_counter += 1 #Increment counter for the next data sample
