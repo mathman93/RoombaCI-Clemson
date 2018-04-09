@@ -123,13 +123,21 @@ BlinkCleanLight() # Blink the Clean light on Roomba
 
 # Main Code #
 #message = 0 # variable to stick message
-
+basetime = time.time()
+basetime_offset = 0.5
 while True:
 	try:
 		if Xbee.inWaiting() > 0: # If there is something in the receive buffer
-			message = Xbee.read(Xbee.inWaiting()) # Read all data in
+			message = Xbee.read(Xbee.inWaiting()).decode() # Read all data in
 			print(message) # Display message to screen
-		#time.sleep(0.2)
+		
+		if (time.time() - basetime) > basetime_offset: # If enough time has passed.
+			if GPIO.input(gled) == True:  # If the LED is on...
+				GPIO.output(gled, GPIO.LOW)  # turn it off.
+			else:
+				GPIO.output(gled, GPIO.HIGH) # otherwise, turn it on.
+			basetime += basetime_offset  # set the next base time
+		
 	except KeyboardInterrupt:
 		print('')
 		break

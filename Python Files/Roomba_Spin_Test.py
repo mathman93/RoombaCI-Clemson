@@ -122,18 +122,19 @@ time.sleep(0.1)
 BlinkCleanLight() # Blink the Clean light on Roomba
 
 # Main Code #
-Xbee.write('Hello World!') # Send test message
+message = "Hello World!"
+Xbee.write(message.encode()) # Send test message
 x = 0
 # Move Roomba
 while True:
 	Move(100,0) # move forward
 	time.sleep(2)
-	Move(100,100) # Turn right
+	Move(0,100) # Turn right
 	time.sleep(2)
-	# Send message in each loop.
-	Xbee.write(itb(x))
 	# Update counter
 	x += 1
+	# Send message in each loop.
+	Xbee.write(str(x).encode())
 	if x == 3:
 		break
 
