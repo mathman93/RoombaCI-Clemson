@@ -64,20 +64,10 @@ lib.lsm9ds1_calcAccel.restype = c_float
 lib.lsm9ds1_calcMag.argtypes = [c_void_p, c_float]
 lib.lsm9ds1_calcMag.restype = c_float
 
-if __name__ == "__main__":
-    imu = lib.lsm9ds1_create()
-    mag = Magnetometer()
-    lib.lsm9ds1_begin(imu)
-    if lib.lsm9ds1_begin(imu) == 0:
-        print("Failed to communicate with LSM9DS1.")
-        quit()
-    lib.lsm9ds1_calibrate(imu)
 
-
-
-
-
-
+x = 0
+y = 0
+z = 0
 
 
 
@@ -138,7 +128,7 @@ class Magnetometer(object):
             s = []
             n = 0
             while True:
-                s.append(self.read(self,imu))
+                s.append(self.read(imu))
                 n += 1
                 sys.stdout.write('\rTotal: %d' % n)
                 sys.stdout.flush()
@@ -220,6 +210,20 @@ class Magnetometer(object):
         return M, n, d
 
 
+
+
+
+if __name__ == "__main__":
+    imu = lib.lsm9ds1_create()
+    mag = Magnetometer()
+    lib.lsm9ds1_begin(imu)
+    if lib.lsm9ds1_begin(imu) == 0:
+        print("Failed to communicate with LSM9DS1.")
+        quit()
+    lib.lsm9ds1_calibrate(imu)
+
+    mag.calibrate(imu)
+    
 
 
 
