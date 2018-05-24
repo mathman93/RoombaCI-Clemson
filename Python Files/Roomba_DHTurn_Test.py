@@ -1,4 +1,4 @@
-''' Roomba_Sync_Spin_041218.py
+''' Roomba_DHTurn_Test.py
 Purpose: Synchronize heading of Roomba network using PCO model
 	Based off Arduino code from previous semester
 	INCOMPLETE: Needs magnetometer reading code
@@ -25,34 +25,19 @@ gled = 13
 ## Roomba DD pin
 ddPin = 23
 
-# Pulse definitions
-reset_pulse = "b" # Rest pulse character
-sync_pulse = "a" # Sync pulse character
-
 # Timing Counter Parameters
 global counter_base
 global data_base
-data_timer = 1.0
+data_timer = 0.2
 global reset_base
-reset_timer = 300
-
-# Counter Parameters
-cycle_threshold = 360.0 # Threshold for phase of PCO
-cycle_time = 10.0 # Length of PCO cycle in seconds
-
-# Counter Constants
-counter_adjust = cycle_time # Amount of counter adjustment per cycle
-counter_ratio = (cycle_threshold)/(cycle_time) # Fraction of phase cycle completed in one second
+reset_timer = 10
 
 # Synchronization Parameters
 global angle # Heading of Roomba (found from magnetometer)
-global counter # Counter of Roomba (works with angle to compute "phase")
-coupling_ratio = 0.5 # Ratio for amount to turn - in range (0, 1]
 epsilon = 1.0 # (Ideally) smallest resolution of magnetometer
 DH_flag = False # DHTurn() boolean (was the last command to turn?)
+data_counter = 0 # Data number counter
 global desired_heading  # Heading set point for Roomba
-
-refr_period = 0.0*cycle_threshold # Refractory period for PRC 
 
 ## Functions and Definitions ##
 ''' Converts integers into bytes (Ints To Bytes)
@@ -72,7 +57,7 @@ def WakeUp(control):
 	Roomba.write(itb(control)) # Control command
 	# 131 = Safe Mode; 132 = Full Mode (Be ready to catch it!)
 	time.sleep(0.1)
-
+	
 ''' Blinks the clean button on Roomba during startup
 	Helps determine that RPi -> Roomba communication is working'''
 def BlinkCleanLight():
@@ -143,39 +128,6 @@ def PlaySMB():
 	Roomba.write(itb(0))
 	time.sleep(2) # Wait for song to play
 
-''' Sends sync_pulse to Xbee
-	Used to signal when phase equals 360 degrees '''
-def SendSyncPulse():
-	global sync_pulse
-	global gled
-	#print("Sync Pulse Sent") # Include for debugging
-	GPIO.output(gled, GPIO.HIGH) # Tells me I'm sending a pulse
-	Xbee.write(sync_pulse.encode()) # Send pulse over Xbee
-	GPIO.output(gled, GPIO.LOW)  # Tells me I'm done sending a pulse
-
-''' Sends reset_pulse to Xbee
-	Used to signal when to new node joins network '''
-def SendResetPulse():
-	global reset_pulse
-	global gled
-	global rled
-	#print("Reset Pulse Sent") # Include for debugging
-	GPIO.output(gled, GPIO.HIGH) # Tells me I'm sending a pulse
-	GPIO.output(rled, GPIO.HIGH)
-	Xbee.write(reset_pulse.encode()) # Send pulse over Xbee
-	GPIO.output(gled, GPIO.LOW)  # Tells me I'm done sending a pulse
-	GPIO.output(rled, GPIO.LOW)
-
-''' Receives pulse from Xbee and returns the value
-	'''
-def ReceivePulse():
-	if Xbee.inWaiting() > 0:
-		message = Xbee.read(1).decode() # Read in one data
-		#print("Received:", message) # Include for debugging
-		return message # Return the data read.
-	else:
-		return '' # Return empty string
-
 ''' Reset all of the time-based counters
 	Used when restarting synchronization'''
 def ResetCounters():
@@ -185,39 +137,12 @@ def ResetCounters():
 	global counter
 	global data_counter
 	global angle
-	global desired_heading
 	counter_base = time.time() # Initialize counter
 	data_base = time.time() # Initialize data timer
 	reset_base = time.time() # Initialize reset timer
 	counter = 0 # Reset phase counter
 	data_counter = 0 # Reset data point counter
-	angle = imu.CalculateHeading() # Reset initial angle value
-	desired_heading = angle # Set to initial angle value
-
-''' Returns necessary change in heading when a sync_pulse is received
-	For standard delay-advance phase response function with refractory period
-	'''
-def PRCSync(phase):
-	global cycle_threshold
-	global refr_period
-	global rled
-	global epsilon
-	if phase > refr_period: # If phase is greater than the refractory period...
-		if phase > (cycle_threshold - epsilon):
-			angle_change = 0 # No change in heading
-			GPIO.output(rled, GPIO.HIGH) # Indicate sync pulse received, but no turning
-		elif phase > 0.5*(cycle_threshold):
-			angle_change = (cycle_threshold - phase) # Increase heading
-			GPIO.output(rled, GPIO.LOW) # Indicate sync pulse received caused turn
-		elif phase > epsilon:
-			angle_change = (-1) * phase # Decrease heading
-			GPIO.output(rled, GPIO.LOW) # Indicate sync pulse received caused turn
-		else:
-			angle_change = 0 # No change in heading
-			GPIO.output(rled, GPIO.HIGH) # Indicate sync pulse received, but no turning
-	else:
-		angle_change = 0 # No change in heading
-	return angle_change
+	angle = initial_angle # Reset initial angle value
 
 ''' Prints global variables to monitor
 	Increments data_counter
@@ -340,11 +265,11 @@ Move(0,75) # Start Roomba spinning
 imu.CalibrateMag() # Calculate magnetometer offset values
 Move(0,0) # Stop Roomba spinning
 time.sleep(0.5)
-#imu.CalibrateAccelGyro() # Calculate accelerometer and gyroscope offset values
+imu.CalibrateAccelGyro() # Calculate accelerometer and gyroscope offset values
 # Display offset values
 print("mx_offset = %f; my_offset = %f; mz_offset = %f"%(imu.mx_offset, imu.my_offset, imu.mz_offset))
-#print("ax_offset = %f; ay_offset = %f; az_offset = %f"%(imu.ax_offset, imu.ay_offset, imu.az_offset))
-#print("gx_offset = %f; gy_offset = %f; gz_offset = %f"%(imu.gx_offset, imu.gy_offset, imu.gz_offset))
+print("ax_offset = %f; ay_offset = %f; az_offset = %f"%(imu.ax_offset, imu.ay_offset, imu.az_offset))
+print("gx_offset = %f; gy_offset = %f; gz_offset = %f"%(imu.gx_offset, imu.gy_offset, imu.gz_offset))
 time.sleep(1) # Gives time to read offset values before continuing
 print(" IMU Setup Complete")
 
@@ -352,75 +277,48 @@ if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 	x = Xbee.read(Xbee.inWaiting()).decode() # Clear out Xbee input buffer
 	#print(x) # Include for debugging
 
+GPIO.output(yled, GPIO.LOW) # Indicate setup sequence complete
+
 # Main Code #
 
 # Initialize Synchronization
 angle = imu.CalculateHeading() # Get initial heading information
-SendResetPulse() # Send reset pulse
-ResetCounters() # Reset counter values
+
+desired_heading = 0
 
 while True:		
 	try:
 		# Get heading of Roomba
-		angle = CalculateHeading()
-		# Set counter value
-		counter = (time.time() - counter_base)*counter_ratio
-		# Send sync_pulse
-		if (angle + counter) > cycle_threshold: # If (angle + counter) is greater than 360 degrees...
-			SendSyncPulse()
-			counter_base += counter_adjust
-			
-		# Receive pulse
-		message = ReceivePulse()
-		
-		if message == reset_pulse: 
-			print("Reset Pulse Received.") # Include for debugging
-			GPIO.output(gled, GPIO.HIGH) # Notify that reset_pulse received
-			GPIO.output(rled, GPIO.HIGH)
-			ResetCounters() # Reset counters
-			GPIO.output(gled, GPIO.LOW)  # End notify that reset_pulse received
-			GPIO.output(rled, GPIO.LOW)
-			# maybe clear out message variable?
-		elif message == sync_pulse:
-			print("Sync Pulse Received.") # Include for debugging
-			GPIO.output(yled, GPIO.HIGH) # Says we have received sync_pulse
-			# Stays on until Roomba stops turning
-			
-			d_angle = PRCSync(angle + counter) # Calculate desired change in heading
-			desired_heading = angle + (d_angle * coupling_ratio) # Update desired heading
-			# Normalize desired_heading to range [0,360)
-			if desired_heading < 0: # If negative,
-				desired_heading += cycle_threshold # add 360 degrees
-			elif deisred_heading >= cycle_threshold: # If greater than 360 degrees,
-				desired_heading -= cycle_threshold # subtract 360 degrees
-			# maybe clear out message variable?
+		angle = imu.CalculateHeading()
 		
 		DHTurn() # Turn to desired heading point
 		
-		# Request data packets from Roomba (May use Query Stream)
+		if (time.time() - reset_base) > reset_timer:
+			desired_heading += 90
+			if desired_heading >= 360:
+				desired_heading -= 360
 		
-		# Receive data from Roomba
-		#if Roomba.inWaiting() > 0: # If packets are received
-			
 		# Print heading data to monitor every second
 		if (time.time() - data_base) > data_timer: # After one second
-			PrintData()
+			[mx,my,mz] = imu.ReadMag() # Read magnetometer component values
+			angle = imu.CalculateHeading() # Calculate heading
+			# Note: angle may not correspond to mx, my, mz
+			#[ax,ay,az] = imu.ReadAccel() # Read accelerometer component values
+			#[gx,gy,gz] = imu.ReadGyro() # Read gyroscope component values
+			
+			print("%f, %f, %f, %f;"%(angle,mx,my,mz))
+			#PrintData(angle, mx, my, mz)
 			data_base += data_timer
-		
-		# Reset counters of all Roombas after 5 minutes
-		if (time.time() - reset_base) >= reset_timer: # After 5 minutes
-			SendResetPulse() # Send reset_pulse
-			# Reset all counters
-			ResetCounters()
-		
+				
 	except KeyboardInterrupt:
 		print('') # print new line
 		break # exit while loop
 
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
-Move(0,0) # Stop Roomba
-PlaySMB()
+Move(0,0)
+#Play_SMB()
+GPIO.output(gled, GPIO.LOW) # Turn off green LED
 
 Roomba.write(itb(128)) # Send Roomba to Passive Mode
 Roomba.write(itb(174)) # STOP Roomba OI

@@ -1,6 +1,6 @@
 ''' Roomba_lib.py
 Purpose: Python Library with Roomba specific functions
-Import this file into main Python file to access functions
+Import this file in main Python file to access functions
 Last Modified: 5/23/2018
 '''
 
@@ -10,6 +10,19 @@ Last Modified: 5/23/2018
 def itb(num):
 	return (num).to_bytes(1, byteorder='big', signed=False)
 
+''' Roomba Wake-up Sequence
+	Parameters: control = Control Command
+		# 131 = Safe Mode; 132 = Full Mode (Be ready to catch it!) '''
+def WakeUp(control)
+	print(" Starting ROOMBA... ")
+	Roomba.write(itb(7)) # Restart Roomba
+	time.sleep(8) # wait 8 seconds before continuing
+	Roomba.write(itb(128)) # START command
+	time.sleep(1)
+	Roomba.write(itb(control)) # Control command
+	# 131 = Safe Mode; 132 = Full Mode (Be ready to catch it!)
+	time.sleep(0.1)
+	
 ''' Blinks the clean button on Roomba during startup
 	Helps determine that RPi -> Roomba communication is working'''
 def BlinkCleanLight():
