@@ -1,12 +1,13 @@
 ''' IMU_lib.py
 Purpose: Python Library with LSM9DS1 class and specific functions
 Import this file in main Python file to access functions
-Last Modified: 5/24/2018
+Last Modified: 5/25/2018
 '''
+## Import Libraries ##
 from ctypes import *
 import time
 import math
-
+## LSM9DS1 IMU Class ##
 class LSM9DS1_IMU:
 	''' Initialization stuff for the IMU
 		'''
@@ -64,7 +65,7 @@ class LSM9DS1_IMU:
 			print("Failed to communicate with LSM9DS1.") # Something went wrong
 			quit()
 		self.lib.lsm9ds1_calibrate(self.imu)
-		# Calibration variables
+		# Calibration offset variables
 		self.mx_offset = 0.0
 		self.my_offset = 0.0
 		self.mz_offset = 0.0
@@ -74,9 +75,13 @@ class LSM9DS1_IMU:
 		self.gx_offset = 0.0
 		self.gy_offset = 0.0
 		self.gz_offset = 0.0
-
-	''' Read X, Y, and Z components of Magnetometer
-		Returns the raw magnetometer values '''
+	
+	# IMU Functions/Methods #
+	''' Read X, Y, and Z components of magnetometer
+		Returns:
+			cmx = float; x-value of magnetometer (Gauss)
+			cmy = float; y-value of magnetometer (Gauss)
+			cmz = float; z-value of magnetometer (Gauss) '''
 	def ReadMagRaw(self):
 		while self.lib.lsm9ds1_magAvailable(self.imu) == 0:
 			pass # Wait for a value to be read from the magnetometer
@@ -93,8 +98,8 @@ class LSM9DS1_IMU:
 		return [cmx,cmy,cmz]
 	
 	''' Determines offset parameters for magnetometer
-		Roomba/IMU should be spinning when this is called
-		Make sure Roomba/IMU spins 2-3 times during calibration '''
+		Roomba/IMU should be spinning when this function is called.
+		Make sure Roomba/IMU spins 2-3 times during calibration. '''
 	def CalibrateMag(self):
 		# Initial max and min values
 		x_min = 10.0
@@ -126,7 +131,10 @@ class LSM9DS1_IMU:
 		self.mz_offset = (z_min + z_max)/2
 	
 	''' Read X, Y, and Z components of Magnetometer
-		Returns the corrected magnetometer values after calibration '''
+		Returns:
+			cmx - self.mx_offset = float; corrected x-value of magnetometer (Gauss)
+			cmy - self.my_offset = float; corrected y-value of magnetometer (Gauss)
+			cmz - self.mz_offset = float; corrected z-value of magnetometer (Gauss) '''
 	def ReadMag(self):
 		while self.lib.lsm9ds1_magAvailable(self.imu) == 0:
 			pass # Wait for a value to be read from the magnetometer
@@ -143,18 +151,23 @@ class LSM9DS1_IMU:
 		return [(cmx - self.mx_offset), (cmy - self.my_offset), (cmz - self.mz_offset)]
 	
 	''' Calculates cardinal heading in degrees from Magnetometer data
-		Important that you calibrate the magnetometer first '''
+		Returns:
+			yaw = float; cardinal direction from magnetic North (degrees)
+				(i.e., North = 0 (360); East = 90; South = 180; West = 270
+		Important that you calibrate the magnetometer first. '''
 	def CalculateHeading(self):
 		[mx,my,mz] = self.ReadMag() # Get magnetometer x and y values (don't uses z values)
 		yaw = (math.degrees(math.atan2(my,mx))) # Calculate heading
-		#yaw = (math.degrees(math.atan2(mx,-my))) - 90 # Alternate
-		# North = 0 (360); East = 90; South = 180; West = 270
+		#yaw = (math.degrees(math.atan2(mx,-my))) - 90 # Alternate?
 		if yaw < 0: # Normalize heading value to [0,360)
 			yaw += 360
 		return yaw
 	
 	''' Read X, Y, and Z components of accelerometer
-		Returns the raw accelerometer values '''
+		Returns:
+			cax = float; x-value of accelerometer (g)
+			cay = float; y-value of accelerometer (g)
+			caz = float; z-value of accelerometer (g) '''
 	def ReadAccelRaw(self):
 		while self.lib.lsm9ds1_accelAvailable(self.imu) == 0:
 			pass # Wait for a value to be read from the accelerometer
@@ -171,7 +184,10 @@ class LSM9DS1_IMU:
 		return [cax,cay,caz]
 	
 	''' Read X, Y, and Z components of gyroscope
-		Returns the raw gyroscope values '''
+		Returns:
+			cgx = float; x-value of gyroscope (degrees per second)
+			cgy = float; y-value of gyroscope (degrees per second)
+			cgz = float; z-value of gyroscope (degrees per second) '''
 	def ReadGyroRaw(self):
 		while self.lib.lsm9ds1_gyroAvailable(self.imu) == 0:
 			pass # Wait for a value to be read from the gyroscope
@@ -197,7 +213,7 @@ class LSM9DS1_IMU:
 		gx_avg = 0
 		gy_avg = 0
 		gz_avg = 0
-		for i in range(0,500) # Average 500 readings
+		for i in range(0,1000) # Average 1000 readings
 			[cax,cay,caz] = self.ReadAccelRaw() # Read in uncorrected accelerometer data
 			ax_avg = (cax + (i * ax_avg))/(i+1)
 			ay_avg = (cay + (i * ay_avg))/(i+1)
@@ -209,13 +225,16 @@ class LSM9DS1_IMU:
 		# Average value over many data points is the offset value
 		self.ax_offset = ax_avg
 		self.ay_offset = ay_avg
-		self.az_offset = (az_avg - 1)
+		self.az_offset = (az_avg - 1) # Assumes z-axis is up
 		self.gx_offset = gx_avg
 		self.gy_offset = gy_avg
 		self.gz_offset = gz_avg
 	
 	''' Read X, Y, and Z components of accelerometer
-		Returns the corrected accelerometer values '''
+		Returns:
+			cax - self.ax_offset = float; corrected x-value of accelerometer (g)
+			cay - self.ay_offset = float; corrected y-value of accelerometer (g)
+			caz - self.az_offset = float; corrected z-value of accelerometer (g) '''
 	def ReadAccel(self):
 		while self.lib.lsm9ds1_accelAvailable(self.imu) == 0:
 			pass # Wait for a value to be read from the accelerometer
@@ -232,7 +251,10 @@ class LSM9DS1_IMU:
 		return [(cax - self.ax_offset), (cay - self.ay_offset), (caz - self.az_offset)]
 	
 	''' Read X, Y, and Z components of gyroscope
-		Returns the corrected gyroscope values '''
+		Returns:
+			cgx - self.gx_offset = float; corrected x-value of gyroscope (degrees per second)
+			cgy - self.gy_offset = float; corrected y-value of gyroscope (degrees per second)
+			cgz - self.gz_offset = float; corrected z-value of gyroscope (degrees per second) '''
 	def ReadGyro(self):
 		while self.lib.lsm9ds1_gyroAvailable(self.imu) == 0:
 			pass # Wait for a value to be read from the gyroscope

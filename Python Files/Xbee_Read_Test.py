@@ -1,8 +1,7 @@
-''' 
-Xbee_Read_Test.py
+''' Xbee_Read_Test.py
 Purpose: Testing communication between Xbee modules on separate RPi
 IMPORTANT: Must be run using Python 3 (python3)
-Last Modified: 5/15/2018
+Last Modified: 5/31/2018
 '''
 ## Import libraries ##
 import serial
@@ -11,7 +10,7 @@ import RPi.GPIO as GPIO
 
 ## Variables and Constants ##
 global Xbee # Specifies connection to Xbee
-Xbee = serial.Serial('/dev/ttyUSB0', 57600) # Baud rate should be 57600
+Xbee = serial.Serial('/dev/ttyUSB0', 115200) # Baud rate should be 115200
 # LED pin numbers
 yled = 5
 rled = 6
@@ -25,10 +24,10 @@ def DisplayDateTime():
 	date_time = time.strftime("%B %d, %Y, %H:%M:%S", time.gmtime())
 	print("Program run: ", date_time)
 
-
 ## -- Code Starts Here -- ##
 # Setup Code #
 GPIO.setmode(GPIO.BCM) # Use BCM pin numbering for GPIO
+DisplayDateTime()
 
 # LED Pin setup
 GPIO.setup(yled, GPIO.OUT, initial=GPIO.LOW)
@@ -37,13 +36,12 @@ GPIO.setup(gled, GPIO.OUT, initial=GPIO.LOW)
 
 
 # Main Code #
-DisplayDateTime()
-time.sleep(0.2)
 
 sendtime = time.time()
 sendtime_offset = 1.0
 basetime = time.time()
 basetime_offset = 0.5
+
 while True:
 	try:
 		if (time.time() - sendtime) > sendtime_offset:

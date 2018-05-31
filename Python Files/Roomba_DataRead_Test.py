@@ -3,126 +3,78 @@ Roomba_DataRead_Test.py
 Purpose: Testing communication between Roomba and RPi
 	Form basis of Roomba code for other tests.
 IMPORTANT: Must be run using Python 3 (python3)
-Last Modified: 4/9/2018
+Last Modified: 5/31/2018
 '''
 ## Import libraries ##
 import serial
 import time
 import RPi.GPIO as GPIO
 
+import Roomba_lib
+import IMU_lib
 ## Variables and Constants ##
-global Roomba # Specifies connection to Roomba
 global Xbee # Specifies connection to Xbee
-Roomba = serial.Serial('/dev/ttyS0', 115200) # Baud rate should be 115200
-Xbee = serial.Serial('/dev/ttyUSB0', 57600) # Baud rate should be 57600
+Xbee = serial.Serial('/dev/ttyUSB0', 115200) # Baud rate should be 115200
 # LED pin numbers
 yled = 5
 rled = 6
 gled = 13
-## Roomba DD pin
-ddPin = 23
 
 ## Functions and Definitions ##
-# Converts integers into bytes (Ints To Bytes)
-# Only does integers in range [0, 255]
-def itb(num):
-	return (num).to_bytes(1, byteorder='big', signed=False)
-
-# Blinks the clean button on Roomba during startup
-def BlinkCleanLight():
-	#Syntax: [139] [LED code] [LED color] [LED Intesnity]
-	# Turn on Dirt Detect light and Green Clean button
-	Roomba.write(itb(139))
-	Roomba.write(itb(25))
-	Roomba.write(itb(0))
-	Roomba.write(itb(128))
-	time.sleep(0.5)
-	# Change green to red
-	Roomba.write(itb(139))
-	Roomba.write(itb(25))
-	Roomba.write(itb(255))
-	Roomba.write(itb(128))
-	time.sleep(0.5)
-	# Turn off Clean button
-	Roomba.write(itb(139))
-	Roomba.write(itb(25))
-	Roomba.write(itb(255))
-	Roomba.write(itb(0))
-	time.sleep(0.05)
-
-# Send command to Roomba to move
-# x is common wheel speed (mm/s); y is diffential wheel speed (mm/s)
-# x > 0 -> forward motion; y > 0 -> CW motion
-# Error may result if |x| + |y| > 500.
-def Move(x,y):
-	RW = x - y # Right wheel speed
-	LW = x + y # Left wheel speed
-	Roomba.write(itb(145)) # Send command to Roomba to set wheel speeds
-	Roomba.write((RW).to_bytes(2, byteorder='big', signed=True))
-	Roomba.write((LW).to_bytes(2, byteorder='big', signed=True))
-
-def Play_SMB():
-	#Define SMB Theme song
-	Roomba.write(itb(140))
-	Roomba.write(itb(0))
-	Roomba.write(itb(11))
-	Roomba.write(itb(76))
-	Roomba.write(itb(8))
-	Roomba.write(itb(76))
-	Roomba.write(itb(8))
-	Roomba.write(itb(30))
-	Roomba.write(itb(8))
-	Roomba.write(itb(76))
-	Roomba.write(itb(8))
-	Roomba.write(itb(30))
-	Roomba.write(itb(8))
-	Roomba.write(itb(72))
-	Roomba.write(itb(8))
-	Roomba.write(itb(76))
-	Roomba.write(itb(8))
-	Roomba.write(itb(30))
-	Roomba.write(itb(8))
-	Roomba.write(itb(79))
-	Roomba.write(itb(8))
-	Roomba.write(itb(30))
-	Roomba.write(itb(24))
-	Roomba.write(itb(67))
-	Roomba.write(itb(8))
-	
-	time.sleep(0.05)
-	#Play song
-	Roomba.write(itb(141))
-	Roomba.write(itb(0))
-	time.sleep(2) # Wait for song to play
+''' Displays current date and time to the screen
+	'''
+def DisplayDateTime():
+	# Month day, Year, Hour:Minute:Seconds
+	date_time = time.strftime("%B %d, %Y, %H:%M:%S", time.gmtime())
+	print("Program run: ", date_time)
 
 ## -- Code Starts Here -- ##
 # Setup Code #
 GPIO.setmode(GPIO.BCM) # Use BCM pin numbering for GPIO
-# Display Running Sketch Info (?)
+DisplayDateTime() # Display current date and time
 
 # LED Pin setup
 GPIO.setup(yled, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(rled, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(gled, GPIO.OUT, initial=GPIO.LOW)
-GPIO.setup(ddPin, GPIO.OUT, initial=GPIO.LOW)
 
 # Wake Up Roomba Sequence
-Roomba.write(itb(7)) # Restart Roomba
-time.sleep(8) # wait 8 seconds before continuing
-
 GPIO.output(gled, GPIO.HIGH) # Turn on green LED to say we are alive
-print(" STARTING ROOMBA... ")
-Roomba.write(itb(128)) # START command
-time.sleep(1)
-Roomba.write(itb(131)) # Control command
-# 131 = Safe Mode
-# 132 = Full Mode (Be ready to catch it!)
-time.sleep(0.1)
+print(" Starting ROOMBA... ")
+Roomba = Roomba_lib.Create_2("/dev/ttyS0", 115200)
+Roomba.ddPin = 23 # Set Roomba dd pin number
+GPIO.setup(Roomba.ddPin, GPIO.OUT, initial=GPIO.LOW)
+Roomba.WakeUp(131) # Start up Roomba in Safe Mode
+# 131 = Safe Mode; 132 = Full Mode (Be ready to catch it!)
+Roomba.BlinkCleanLight() # Blink the Clean light on Roomba
 
-BlinkCleanLight() # Blink the Clean light on Roomba
+if Roomba.Available() > 0: # If anything is in the Roomba receive buffer
+	x = Roomba.DirectRead(Roomba.Available()) # Clear out Roomba boot-up info
+	#print(x) # Include for debugging
 
-if Roomba.inWaiting() > 0:
-	x = Roomba.read(Roomba.inWaiting()) # Clear out Roomba boot-up info
+print(" ROOMBA Setup Complete")
+GPIO.output(yled, GPIO.HIGH) # Indicate within setup sequence
+# Initialize IMU
+print(" Starting IMU...")
+imu = IMU_lib.LSM9DS1_IMU() # Initialize IMU
+time.sleep(0.5)
+# Calibrate IMU
+print(" Calibrating IMU...")
+Roomba.Move(0,75) # Start Roomba spinning
+imu.CalibrateMag() # Calculate magnetometer offset values
+Roomba.Move(0,0) # Stop Roomba spinning
+time.sleep(0.5)
+imu.CalibrateAccelGyro() # Calculate accelerometer and gyroscope offset values
+# Display offset values
+print("mx_offset = {:f}; my_offset = {:f}; mz_offset = {:f}".format(imu.mx_offset, imu.my_offset, imu.mz_offset))
+print("ax_offset = {:f}; ay_offset = {:f}; az_offset = {:f}".format(imu.ax_offset, imu.ay_offset, imu.az_offset))
+print("gx_offset = {:f}; gy_offset = {:f}; gz_offset = {:f}".format(imu.gx_offset, imu.gy_offset, imu.gz_offset))
+print(" IMU Setup Complete")
+time.sleep(1) # Gives time to read offset values before continuing
+GPIO.output(yled, GPIO.LOW) # Indicate setup sequence is complete
+
+if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
+	x = Xbee.read(Xbee.inWaiting()).decode() # Clear out Xbee input buffer
 	#print(x) # Include for debugging
 
 # Main Code #
@@ -131,45 +83,44 @@ query_time_offset = 5*(0.015) # Set time offset for query
 # smallest time offset for query is 15 ms.
 data_counter = 0 # Initialize data counter
 
-Move(0,-100) # Start Roomba moving
-while True:
+Roomba.Move(0,0) # Start Roomba moving
+
+Roomba.StartQueryStream(7, 43, 44, 45, 41, 42) # Start query stream with specific sensor packets
+
+while data_counter < 1001: # stop after 1000 data points
 	try:
-		# Request data packets from Roomba
+		# Request data packet from Roomba (QuerySingle)
 		if (time.time() - query_time) > query_time_offset: # If enough time has passed
-			#Roomba.write(itb(142)) # Ask for a single packet (142)
-			Roomba.write(itb(149)) # Ask for a query (149)
-			Roomba.write(itb(3))   # Ask for # of packets
-			Roomba.write(itb(7))   # Bumper byte packet (1 byte)
-			Roomba.write(itb(43))  # Right Wheel encoder counts
-			Roomba.write(itb(44))  # Left Wheel encoder counts
-			#Roomba.write(itb(45))  # Light bumpers
+			bumper_byte = Roomba.QuerySingle(7) # Ask for Bumper byte packet (1 byte)
+			print(bumper_byte)
 			query_time += query_time_offset # offset query time for next query
-			# May potentially replace this with "Query Stream"
-		# Recieve data from Roomba
-		if Roomba.inWaiting() > 4: # If packets are received
-			bumper_byte = int.from_bytes(Roomba.read(1), byteorder='big') # Read in one byte
-			r_wheel = int.from_bytes(Roomba.read(2), byteorder='big') # Read in two bytes
-			l_wheel = int.from_bytes(Roomba.read(2), byteorder='big') # Read in two bytes
-			#light_bumper = int.from_bytes(Roomba.read(1), byteorder='big') # Read in one byte
+		
+		# Request data packets from Roomba (Query)
+		if (time.time() - query_time) > query_time_offset: # If enough time has passed
+			bumper_byte, l_wheel, r_wheel, light_bumper = Roomba.Query(7, 43, 44, 45) # Ask for specific sensor packets
 			# Print data to screen (MATLAB format)
-			print(data_counter, bumper_byte, r_wheel, l_wheel, sep=', ', end=';\n')
-			data_counter += 1 #Increment counter for the next data sample
+			print("{0}, {1:0>8b}, {2}, {3}, {4:0>8b};".format(data_counter, bumper_byte, l_wheel, r_wheel, light_bumper))
+			data_counter += 1 # Increment counter for the next data sample
+			query_time += query_time_offset # offset query time for next query
+				
+		# Read query stream for specific packets (ReadQueryStream)
+		if Roomba.Available() > 0:
+			bumper_byte, l_counts, r_counts, light_bumper, r_speed, l_speed = Roomba.ReadQueryStream(7, 43, 44, 45, 41, 42)
+			print("{0}, {1:0>8b}, {2}, {3}, {4:0>8b}, {5}, {6};".format(data_counter, bumper_byte, l_counts, r_counts, light_bumper, l_speed, r_speed))
+			data_counter += 1 # Increment counter for the next data sample
 		
 	except KeyboardInterrupt:
 		print('') # print new line
 		break # exit while loop
 
-Move(0,0) # Stop Roomba
-# SMB Theme song.
-Play_SMB()
-
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
+Roomba.PauseQueryStream() # Pause Query Stream before ending program
+Roomba.Move(0,0) # Stop Roomba movement
+x = Roomba.DirectRead(Roomba.Available()) # Clear buffer
+#Roomba.PlaySMB()
 GPIO.output(gled, GPIO.LOW) # Turn off green LED
 
-Roomba.write(itb(128)) # Send Roomba to Passive Mode
-Roomba.write(itb(174)) # STOP Roomba OI
-time.sleep(0.05)
-Roomba.close() # Close the Roomba serial port.
+Roomba.ShutDown() # Shutdown Roomba serial connection
 Xbee.close()
 GPIO.cleanup() # Reset GPIO pins for next program
