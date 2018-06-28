@@ -2,15 +2,15 @@
 Purpose: Synchronize heading of Roomba network using PCO model
 	Based off Arduino code from previous semester
 IMPORTANT: Must be run using Python 3 (python3)
-Last Modified: 5/31/2018
+Last Modified: 6/28/2018
 '''
 ## Import libraries ##
 import serial
 import time
 import RPi.GPIO as GPIO
 
-import Roomba_lib # Make sure this file is in the same directory
-import IMU_lib # Make sure this file is in the same directory
+import RoombaCI_lib # Make sure this file is in the same directory
+from RoombaCI_lib import DHTurn
 
 ## Variables and Constants ##
 global Xbee # Specifies connection to Xbee
@@ -122,56 +122,6 @@ def PRCSync(phase):
 		angle_change = 0 # No change in heading
 	return angle_change
 
-''' Sets Roomba spin to achieve desired heading set point
-	'''
-def DHTurn():
-	global angle
-	global desired_heading
-	global epsilon
-		
-	thresh_1 = 25 # First threshold value (degrees)
-	thresh_2 = 5  # Second threshold value (degrees)
-	
-	diff = abs(angle - desired_heading)
-	# Determine spin speed based on thresholds
-	if (diff > thresh_1 and diff < (360 - thresh_1)):
-		spin_value = 100 # Move faster when farther away from the set point
-	elif (diff > thresh_2 and diff < (360 - thresh_2)):
-		spin_value = 50 # Move slower when closer to the set point
-	else:
-		spin_value = 15 # Move very slow when very close to the set point
-		# Reduces oscillations due to magnetometer variation and loop execution rate
-	
-	# Determine direction of spin
-	if desired_heading < epsilon: # if 0 <= desired_heading < epsilon 
-		if (angle > (desired_heading + epsilon) and angle < (desired_heading + 180)):
-			return -spin_value # Spin Left (CCW)
-		elif (angle < (360 + desired_heading - epsilon)): # and angle >= (desired_heading + 180) 
-			return spin_value # Spin Right (CW)
-		else: # if (360 + desired_heading - epsilon) < angle < (desired_heading + epsilon)
-			return 0 # Stop Spinning
-	elif desired_heading < 180: # and desired_heading >= epsilon...
-		if (angle > (desired_heading + epsilon) and angle < (desired_heading + 180)):
-			return -spin_value # Spin Left (CCW)
-		elif (angle < (desired_heading - epsilon) or angle >= (desired_heading + 180)):
-			return spin_value # Spin Right (CW)
-		else: # if (desired_heading - epsilon) < angle < (desired_heading + epsilon)
-			return 0 # Stop Spinning
-	elif desired_heading < (360 - epsilon):
-		if (angle < (desired_heading - epsilon) and angle > (desired_heading - 180)):
-			return spin_value # Spin Right (CW)
-		elif (angle > (desired_heading + epsilon) or angle <= (desired_heading - 180)):
-			return -spin_value # Spin Left (CCW)
-		else: # if (desired_heading - epsilon) < angle < (desired_heading + epsilon) 
-			return 0 # Stop Spinning
-	else: # if desired_heading >= (360 - epsilon)
-		if (angle < (desired_heading - epsilon) and angle > (desired_heading - 180)):
-			return spin_value # Spin Right (CW)
-		elif (angle > (desired_heading + epsilon - 360)): # and (angle <= (desired_heading - 180))
-			return -spin_value # Spin Left (CCW)
-		else: # if (angle > (desired_heading - epsilon) or angle < (desired_heading + epsilon - 360))
-			return 0 # Stop Spinning
-
 ''' Displays current date and time to the screen
 	'''
 def DisplayDateTime():
@@ -192,7 +142,7 @@ GPIO.setup(gled, GPIO.OUT, initial=GPIO.LOW)
 # Wake Up Roomba Sequence
 GPIO.output(gled, GPIO.HIGH) # Turn on green LED to say we are alive
 print(" Starting ROOMBA... ")
-Roomba = Roomba_lib.Create_2("/dev/ttyS0", 115200)
+Roomba = RoombaCI_lib.Create_2("/dev/ttyS0", 115200)
 Roomba.ddPin = 23 # Set Roomba dd pin number
 GPIO.setup(Roomba.ddPin, GPIO.OUT, initial=GPIO.LOW)
 Roomba.WakeUp(131) # Start up Roomba in Safe Mode
@@ -207,7 +157,7 @@ print(" ROOMBA Setup Complete")
 GPIO.output(yled, GPIO.HIGH) # Indicate within setup sequence
 # Initialize IMU
 print(" Starting IMU...")
-imu = IMU_lib.LSM9DS1_IMU() # Initialize IMU
+imu = RoombaCI_lib.LSM9DS1_IMU() # Initialize IMU
 time.sleep(0.5)
 # Calibrate IMU
 print(" Calibrating IMU...")
@@ -230,6 +180,7 @@ if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 
 # Main Code #
 
+forward = 0
 # Initialize Synchronization
 angle = imu.CalculateHeading() # Get initial heading information
 SendResetPulse() # Send reset pulse
@@ -240,7 +191,7 @@ Roomba.StartQueryStream(7, 43, 44, 45, 41, 42) # Start query stream with specifi
 while True:		
 	try:
 		# Get heading of Roomba
-		angle = Roomba.CalculateHeading()
+		angle = imu.CalculateHeading()
 		# Set counter value
 		counter = (time.time() - counter_base)*counter_ratio
 		# Send sync_pulse
@@ -263,12 +214,10 @@ while True:
 			d_angle = PRCSync(angle + counter) # Calculate desired change in heading
 			desired_heading = angle + (d_angle * coupling_ratio) # Update desired heading
 			# Normalize desired_heading to range [0,360)
-			if desired_heading < 0: # If negative,
-				desired_heading += cycle_threshold # add 360 degrees
-			elif deisred_heading >= cycle_threshold: # If greater than 360 degrees,
-				desired_heading -= cycle_threshold # subtract 360 degrees
+			if desired_heading >= cycle_threshold or desired_heading < 0:
+				desired_heading = (desired_heading % cycle_threshold)
 		
-		spin = DHTurn() # Value needed to turn to desired heading point
+		spin = DHTurn(angle, desired_heading, epsilon) # Value needed to turn to desired heading point
 		Roomba.Move(forward, spin) # Move Roomba to desired heading point
 		
 		if spin == 0:
@@ -278,7 +227,7 @@ while True:
 		
 		# Read query stream for specific packets (ReadQueryStream)
 		if Roomba.Available() > 0:
-			bumper_byte, l_counts, r_counts, light_bumper, r_speed, l_speed = Roomba.ReadQueryStream(7, 43, 44, 45, 41, 42)
+			bumper_byte, l_counts, r_counts, light_bumper, r_speed, l_speed = Roomba.ReadQueryStream(7,43,44,45,41,42)
 		
 		# Print heading data to monitor every second
 		if (time.time() - data_base) > data_timer: # After one second
@@ -296,11 +245,14 @@ while True:
 		print('') # print new line
 		break # exit while loop
 
+Roomba.Move(0,0) # Stop Roomba movement
+Roomba.PauseQueryStream()
+if Roomba.Available() > 0:
+	x = Roomba.DirectRead(Roomba.Available()) # Clear out residual Roomba data
+	#print(x) # Include for debugging purposes
+
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
-Roomba.PauseQueryStream() # Pause Query Stream before ending program
-Roomba.Move(0,0) # Stop Roomba movement
-x = Roomba.DirectRead(Roomba.Available()) # Clear buffer
 #Roomba.PlaySMB()
 GPIO.output(gled, GPIO.LOW) # Turn off green LED
 

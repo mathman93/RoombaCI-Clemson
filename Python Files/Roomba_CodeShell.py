@@ -1,15 +1,15 @@
-''' Roomba_IMU_Test.py
-Purpose: Testing communication between Roomba and LSM9DS1 IMU
-	Form basis of Roomba code for other tests.
+''' Roomba_CodeShell.py
+Purpose: Basic code for running Roomba, Xbee, and IMU
+	Sets up Roomba, Xbee, and IMU and calibrates;
 IMPORTANT: Must be run using Python 3 (python3)
-Last Modified: 6/28/2018
+Last Modified: 6/6/2018
 '''
 ## Import libraries ##
 import serial
 import time
 import RPi.GPIO as GPIO
 
-import RoombaCI_lib	
+import RoombaCI_lib
 
 ## Variables and Constants ##
 global Xbee # Specifies connection to Xbee
@@ -18,8 +18,6 @@ Xbee = serial.Serial('/dev/ttyUSB0', 115200) # Baud rate should be 115200
 yled = 5
 rled = 6
 gled = 13
-
-data_counter = 0 # Initialize data_counter
 
 ## Functions and Definitions ##
 ''' Displays current date and time to the screen
@@ -80,31 +78,9 @@ if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 
 # Main Code #
 
-basetime = time.time()
-basetime_offset = 0.1
-Roomba.Move(0,0)
-
-while True:
-	try:
-		if (time.time() - basetime) > basetime_offset:
-			[mx,my,mz] = imu.ReadMag() # Read magnetometer component values
-			angle = imu.CalculateHeading() # Calculate heading
-			# Note: angle may not correspond to mx, my, mz
-			[ax,ay,az] = imu.ReadAccel() # Read accelerometer component values
-			[gx,gy,gz] = imu.ReadGyro() # Read gyroscope component values
-			
-			print("{:f}, {:f}, {:f}, {:f}, {:f}, {:f}, {:f}, {:f}, {:f}, {:f};".format(angle,mx,my,mz,ax,ay,az,gx,gy,gz))
-			basetime += basetime_offset
-		
-	except KeyboardInterrupt: # When commanded to stop program (Ctrl + C)...
-		print('') # Print new line
-		break # Exit while loop
 
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
-Roomba.Move(0,0) # Stop Roomba movement
-#Roomba.PlaySMB()
-GPIO.output(gled, GPIO.LOW) # Turn off green LED
 
 Roomba.ShutDown() # Shutdown Roomba serial connection
 Xbee.close()
