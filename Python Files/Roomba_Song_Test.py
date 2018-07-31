@@ -43,29 +43,126 @@ print(" ROOMBA Setup Complete")
 
 
 # Program the song onto the Roomba
+
+# Zelda Theme (10 notes)
 Roomba.DirectWrite(140) # Header Opcode
 Roomba.DirectWrite(0)   # Song number (0-3)
-Roomba.DirectWrite(5)   # Length of song (0-15)
-
-Roomba.DirectWrite(67)  # Note 1
-Roomba.DirectWrite(16)	# Note 1 duration (in 1/64 of a second)
+Roomba.DirectWrite(10)  # Length of song (0-15)
+Roomba.DirectWrite(72)  # Note 1
+Roomba.DirectWrite(24)	# Note 1 duration (in 1/64 of a second)
+Roomba.DirectWrite(30)
+Roomba.DirectWrite(8)
+Roomba.DirectWrite(67)
+Roomba.DirectWrite(48)
+Roomba.DirectWrite(30)
+Roomba.DirectWrite(8)
 Roomba.DirectWrite(72)
-Roomba.DirectWrite(24)
+Roomba.DirectWrite(8)
+Roomba.DirectWrite(72)
+Roomba.DirectWrite(8)
 Roomba.DirectWrite(74)
 Roomba.DirectWrite(8)
 Roomba.DirectWrite(76)
-Roomba.DirectWrite(16)
+Roomba.DirectWrite(8)
+Roomba.DirectWrite(77)
+Roomba.DirectWrite(8)
 Roomba.DirectWrite(79)
-Roomba.DirectWrite(32)
+Roomba.DirectWrite(64)
 
 time.sleep(0.05) # Wait
 
-# Play the song on the Roomba
+# SuperStar Theme (16 notes)
+Roomba.DirectWrite(140) # Header Opcode
+Roomba.DirectWrite(1)   # Song number (0-3)
+Roomba.DirectWrite(16)   # Length of song (0-15)
+Roomba.DirectWrite(77)  # Note 1
+Roomba.DirectWrite(12)	# Note 1 duration (in 1/64 of a second)
+Roomba.DirectWrite(77)
+Roomba.DirectWrite(12)
+Roomba.DirectWrite(77)
+Roomba.DirectWrite(18)
+Roomba.DirectWrite(77)
+Roomba.DirectWrite(12)
+Roomba.DirectWrite(77)
+Roomba.DirectWrite(12)
+Roomba.DirectWrite(77)
+Roomba.DirectWrite(6)
+Roomba.DirectWrite(77)
+Roomba.DirectWrite(12)
+Roomba.DirectWrite(77)
+Roomba.DirectWrite(12)
+Roomba.DirectWrite(76)
+Roomba.DirectWrite(12)
+Roomba.DirectWrite(76)
+Roomba.DirectWrite(12)
+Roomba.DirectWrite(76)
+Roomba.DirectWrite(18)
+Roomba.DirectWrite(76)
+Roomba.DirectWrite(12)
+Roomba.DirectWrite(76)
+Roomba.DirectWrite(12)
+Roomba.DirectWrite(76)
+Roomba.DirectWrite(6)
+Roomba.DirectWrite(76)
+Roomba.DirectWrite(12)
+Roomba.DirectWrite(76)
+Roomba.DirectWrite(12)
+
+time.sleep(0.05) # Wait
+
+# SMG Theme (13 notes)
+Roomba.DirectWrite(140) # Header Opcode
+Roomba.DirectWrite(2)   # Song number (0-3)
+Roomba.DirectWrite(13)  # Length of song (0-15)
+Roomba.DirectWrite(79)
+Roomba.DirectWrite(20)
+Roomba.DirectWrite(80)
+Roomba.DirectWrite(4)
+Roomba.DirectWrite(81)
+Roomba.DirectWrite(4)
+Roomba.DirectWrite(82)
+Roomba.DirectWrite(4)
+Roomba.DirectWrite(83)
+Roomba.DirectWrite(4)
+Roomba.DirectWrite(84)
+Roomba.DirectWrite(24)
+Roomba.DirectWrite(30)
+Roomba.DirectWrite(8)
+Roomba.DirectWrite(67)
+Roomba.DirectWrite(32)
+Roomba.DirectWrite(72)
+Roomba.DirectWrite(32)
+Roomba.DirectWrite(79)
+Roomba.DirectWrite(32)
+Roomba.DirectWrite(78)
+Roomba.DirectWrite(16)
+Roomba.DirectWrite(74)
+Roomba.DirectWrite(16)
+Roomba.DirectWrite(76)
+Roomba.DirectWrite(64)
+
+time.sleep(0.05) # Wait
+
+# Play Zelda
 Roomba.DirectWrite(141) # Header Opcode
 Roomba.DirectWrite(0)   # Song number (0-3)
+time.sleep(4) # Wait for the song to play
 
-time.sleep(1.6) # Wait for the song to play
-
+while True:
+	try:
+		# Play SuperStar
+		Roomba.DirectWrite(141) # Header Opcode
+		Roomba.DirectWrite(1)   # Song number (0-3)
+		
+		time.sleep(3.02) # Wait for the song to play
+		
+	except KeyboardInterrupt:
+		time.sleep(3)
+		# Play SMG
+		Roomba.DirectWrite(141) # Header Opcode
+		Roomba.DirectWrite(2)   # Song number (0-3)
+		time.sleep(4) # Wait for the song to playbreak
+		break
 
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly

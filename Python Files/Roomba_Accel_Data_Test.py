@@ -1,11 +1,7 @@
-''' Roomba_Encoder_Test4.py
-Purpose: Uses Roomba wheel encoders to determine angle and distance
-	Moves to user input x and y coordinates
-	Uses only one "while" loop and uses bump sensors to avoid obstacles
-	Writes all data into a text file for data retrieval
-	Uses Roomba Query Stream to retrieve data
+''' Roomba_Accel_Data_Test.py
+Purpose: Get Acceleration data as Roomba moves a set distance
 IMPORTANT: Must be run using Python 3 (python3)
-Last Modified: 6/26/2018
+Last Modified: 6/29/2018
 '''
 ## Import libraries ##
 import serial
@@ -14,10 +10,8 @@ import RPi.GPIO as GPIO
 
 import RoombaCI_lib
 from RoombaCI_lib import DHTurn
-from RoombaCI_lib import DDSpeed
 
 import math
-import random
 
 ## Variables and Constants ##
 global Xbee # Specifies connection to Xbee
@@ -94,21 +88,8 @@ if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 	#print(x) # Include for debugging
 
 # Main Code #
-print("Hello, and welcome to Roomba_Encoder_Test4.")
-print("In this program, you get to specify the x,y coordinates you want the Roomba to move to.")
-print("The Roomba navigates around any obstacles in its path.")
-#print("Any data generated in the run will be stored in a text file.")
-'''# Create text file for data storage
-data_name = input("File name for data? ")
-data_name_string = data_name + ".txt" # Add the ".txt" to the end
-datafile = open(data_name_string, "w") # Open a text file for storing data
-# Write data header for the data file; includes name of each column
-datafile.write("Time Stamp, Total Distance Traveled, Distance to Desired Point, Current Angle, Desired Heading, Left Wheel Encoders, Right Wheel Encoders, Left Wheel Speed, Right Wheel Speed, Y-Position, X-position, Bumper Byte, Light Bumper Byte\n")
-'''
 # Get initial angle from IMU
 angle = imu.CalculateHeading()
-#angle = 0
-
 #input the speed
 spnspd = 100
 speed_step = 20
@@ -118,13 +99,7 @@ spinTime = (WHEEL_SEPARATION * math.pi) / (4 * spnspd)
 backTime = 0.5
 #initializes timers
 moveHelper = (time.time() - (spinTime + backTime))
-
-# Initial conditions
-distance = 0.0 # total distance travelled (millimeters)
-x_pos = 0.0 # initial x-direction position (millimeters)
-y_pos = 0.0 # initial y-direction position (millimeters)
-forward_value = 0 # initial forward speed value (mm/s)
-spin_value = 0 # initial spin speed value (mm/s)
+query_timer = 0.015625 # Time base for Roomba query
 
 # Read in initial wheel count values from Roomba
 Roomba.SendQuery(7,43,44,42,41,45)
@@ -134,29 +109,41 @@ bumper_byte, l_counts_current, r_counts_current, l_speed, r_speed, light_bumper 
 
 while True:
 	try:
+		distance = 0.0 # initial distance travelled (millimeters)
+		x_pos = 0.0 # initial x-direction position (millimeters)
+		y_pos = 0.0 # initial y-direction position (millimeters)
+		forward_value = 0 # Initial forward speed (millimeters/second)
 		# Print current angle of Roomba
-		print("Current Location: ({0:.3f}, {1:.3f})".format(x_pos, y_pos))
+		print("Angle: {:f}".format(angle))
 		# Request for the desired angle to turn to
-		x_new = float(input("Desired x-coordinate? "))
-		y_new = float(input("Desired y-coordinate? "))
-		desired_heading = (math.degrees(math.atan2((y_new - y_pos),(x_new - x_pos))) % 360)
-		desired_distance = math.sqrt(pow((y_new - y_pos),2) + pow((x_new - x_pos),2))
+		desired_heading = float(input("Angle? "))
 		
 		data_time = 0.0 # 0 seconds initial
-		# Print out initial data point
-		#datafile.write("{0:.5f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f}, {5}, {6}, {7}, {8}, {9:.3f}, {10:.3f}, {11:0>8b}, {12:0>8b}\n".format(data_time, distance, desired_distance, angle, desired_heading, l_counts_current, r_counts_current, l_speed, r_speed, y_pos, x_pos, bumper_byte, light_bumper))
 		# Start Query Data Stream
-		Roomba.StartQueryStream(7,43,44,42,41,45)
+		#Roomba.StartQueryStream(7,43,44,42,41,45)
+		
+		# Determine initial spin speed value for Roomba
+		spin_value = DHTurn(angle, desired_heading, epsilon)
 		# Restart base timers
 		base = time.time()
+		query_base = time.time()
 		
-		while desired_distance > 2: # Until we have reached the location...
+		while spin_value != 0: # If the Roomba needs to turn...
 			try:
+				if (time.time() - query_base) > query_timer:
+					Roomba.SendQuery(7,43,44,42,41,45)
+					query_base += query_timer
+				
 				if Roomba.Available() > 0:
-					bumper_byte, l_counts, r_counts, l_speed, r_speed, light_bumper = Roomba.ReadQueryStream(7,43,44,42,41,45) # Read new wheel counts
-					
 					# Record the current time since the beginning of loop
 					data_time = time.time() - base
+					
+					bumper_byte, l_counts, r_counts, l_speed, r_speed, light_bumper = Roomba.ReadQuery(7,43,44,42,41,45) # Read new wheel counts
+					[mx,my,mz] = imu.ReadMag() # Read magnetometer component values
+					#imu_angle = imu.CalculateHeading() # Calculate heading
+					# Note: imu_angle may not correspond to mx, my, mz
+					[ax,ay,az] = imu.ReadAccel() # Read accelerometer component values
+					[gx,gy,gz] = imu.ReadGyro() # Read gyroscope component values
 					
 					# Calculate the count differences and correct for overflow
 					delta_l_count = (l_counts - l_counts_current)
@@ -183,46 +170,96 @@ while True:
 					x_pos += delta_x_pos
 					y_pos += delta_y_pos
 					
-					# The direction from the current position to the desired position
-					desired_heading = (math.degrees(math.atan2((y_new - y_pos),(x_new - x_pos))) % 360)
-					# The distance from the current position to the desired position
-					desired_distance = math.sqrt(pow((y_new - y_pos),2) + pow((x_new - x_pos),2))
+					spin_value = DHTurn(angle, desired_heading, epsilon) # Determine the spin speed to turn toward the desired heading
 					
-					# If the bumper is pressed...
-					if (bumper_byte % 4) > 0:
-						moveHelper = time.time() # Reset the timer
-						# Determine spin speed for right bumper press
-						if (bumper_byte % 4) == 1:
-							spin = -spnspd # Spin left
-						# Determine spin speed for left bumper press
-						elif (bumper_byte % 4) == 2:
-							spin = spnspd # Spin right
-						# Deteremine spin speed for both bumpers pressed
-						# Uses random int to help get out of corners
-						else: # (bumper_byte % 4) == 3
-							flip = random.randint(0, 1)
-							spin = random.randint(spnspd - 50, spnspd + 50)
-							if flip == 0:
-								spin *= (-1) # Make it negative 50% of the time
-						
-					# Timer for the backward movement, then the spin
-					if (time.time() - moveHelper) < backTime: # Backward movement stuff
-						set_forward_value = -100 
-						set_spin_value = 0
-					elif (time.time() - moveHelper) < (backTime + spinTime): # Spin movement stuff
-						set_forward_value = 0
-						set_spin_value = spin # Determined above when bumped
-					else: # Normal movement stuff
-						set_spin_value = DHTurn(angle, desired_heading, epsilon) # Determine the spin speed to turn toward the desired heading
-						set_forward_value = DDSpeed(angle, desired_heading, desired_distance)
-						
-						# If the light sensors detect something, then slow down
-						if light_bumper > 0:
-							# Cut the speed in half
-							set_forward_value = set_forward_value // 2 
-							set_spin_value = set_spin_value // 2
+					'''# Increment spin movement speed toward the set speed
+					if spin_value < set_spin_value: # If it is less than the set speed...
+						spin_value += speed_step # Increment the speed by a step
+						if spin_value > set_spin_value: # If the speed went to far...
+							spin_value = set_spin_value # Set it to the set speed
+					if spin_value > set_spin_value: # If it is more than the set speed...
+						spin_value -= speed_step # Decrement the speed by a step
+						if spin_value < set_spin_value: # If the speed went to far...
+							spin_value = set_spin_value # Set it to the set speed
+					'''
+					# Print out pertinent data values
+					#print("{0:.5f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f}, {5:0>8b}, {6:0>8b}, {7}, {8};".format(data_time,desired_heading,angle,y_pos,x_pos,bumper_byte,light_bumper,l_counts,r_counts))
+					print("{0:.5f}, {1:.5f}, {2:.5f}, {3:.5f}, {4:.5f}, {5:.5f}, {6:.5f}, {7:.5f}, {8:.5f}, {9:.5f};".format(data_time,mx,my,mz,ax,ay,az,gx,gy,gz))
 					
-					# Increment forward movement speed toward the set speed
+					Roomba.Move(forward_value, spin_value) # Spin the Roomba toward the desired heading
+					
+					# Update current wheel encoder counts
+					l_counts_current = l_counts
+					r_counts_current = r_counts
+				
+			except KeyboardInterrupt:
+				break
+			
+		forward_value = 0 # initial forward speed value (mm/s)
+		spin_value = 0 # initial spin speed value (mm/s)
+		Roomba.Move(forward_value, spin_value) # Stop Roomba movement
+		'''Roomba.PauseQueryStream()
+		if Roomba.Available() > 0:
+			x = Roomba.DirectRead(Roomba.Available()) # Clear out residual Roomba data
+			#print(x) # Include for debugging purposes
+		'''
+		distance = 0.0 # reset initial distance travelled
+		# Request amount of distance to travel
+		desired_distance = float(input("Distance? ")) # in millimeters
+		# Request amount of speed to travel
+		forward_value = int(input("Speed? ")) # in millimeters per second
+		
+		#Roomba.ResumeQueryStream()
+		# Restart base timers
+		base = time.time()
+		query_base = time.time()
+		
+		while distance < desired_distance: # Until we have reached the desired_distance...
+			try:
+				#print("Testing 2nd Loop")
+				if (time.time() - query_base) > query_timer:
+					Roomba.SendQuery(7,43,44,42,41,45)
+					query_base += query_timer
+				
+				if Roomba.Available() > 0:
+					# Record the current time since the beginning of loop
+					data_time = time.time() - base
+					
+					bumper_byte, l_counts, r_counts, l_speed, r_speed, light_bumper = Roomba.ReadQuery(7,43,44,42,41,45) # Read new wheel counts
+					[mx,my,mz] = imu.ReadMag() # Read magnetometer component values
+					#imu_angle = imu.CalculateHeading() # Calculate heading
+					# Note: imu_angle may not correspond to mx, my, mz
+					[ax,ay,az] = imu.ReadAccel() # Read accelerometer component values
+					[gx,gy,gz] = imu.ReadGyro() # Read gyroscope component values
+					
+					# Calculate the count differences and correct for overflow
+					delta_l_count = (l_counts - l_counts_current)
+					if delta_l_count > pow(2,15): # 2^15 is somewhat arbitrary
+						delta_l_count -= pow(2,16)
+					if delta_l_count < -pow(2,15): # 2^15 is somewhat arbitrary
+						delta_l_count += pow(2,16)
+					delta_r_count = (r_counts - r_counts_current)
+					if delta_r_count > pow(2,15): # 2^15 is somewhat arbitrary
+						delta_r_count -= pow(2,16)
+					if delta_r_count < -pow(2,15): # 2^15 is somewhat arbitrary
+						delta_r_count += pow(2,16)
+					# Calculated the forward distance traveled since the last counts
+					distance_change = DISTANCE_CONSTANT * (delta_l_count + delta_r_count) * 0.5
+					# Calculated the turn angle change since the last counts
+					angle_change = TURN_CONSTANT * (delta_l_count - delta_r_count)
+					distance += distance_change # Updated distance of Roomba
+					angle += angle_change # Update angle of Roomba and correct for overflow
+					if angle >= 360 or angle < 0:
+						angle = (angle % 360) # Normalize the angle value from [0,360)
+					# Calculate position data
+					delta_x_pos = distance_change * math.cos(math.radians(angle))
+					delta_y_pos = distance_change * math.sin(math.radians(angle))
+					x_pos += delta_x_pos
+					y_pos += delta_y_pos
+					
+					spin_value = DHTurn(angle, desired_heading, epsilon) # Determine the spin speed to turn toward the desired heading
+					
+					'''# Increment forward movement speed toward the set speed
 					if forward_value < set_forward_value: # If it is less than the set speed...
 						forward_value += speed_step # Increment the speed by a step
 						if forward_value > set_forward_value: # If the speed went to far...
@@ -240,11 +277,10 @@ while True:
 						spin_value -= speed_step # Decrement the speed by a step
 						if spin_value < set_spin_value: # If the speed went to far...
 							spin_value = set_spin_value # Set it to the set speed
-					
+					'''
 					# Print out pertinent data values
-					print("{0:.5f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f}, {5:0>8b}, {6:0>8b}, {7}, {8};".format(data_time, desired_distance, angle, y_pos, x_pos, bumper_byte, light_bumper, l_counts, r_counts))
-					# Write data values to a text file
-					#datafile.write("{0:.5f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f}, {5}, {6}, {7}, {8}, {9:.3f}, {10:.3f}, {11:0>8b}, {12:0>8b}\n".format(data_time, distance, desired_distance, angle, desired_heading, l_counts, r_counts, l_speed, r_speed, y_pos, x_pos, bumper_byte, light_bumper))
+					#print("{0:.5f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f}, {5:0>8b}, {6:0>8b}, {7}, {8};".format(data_time,desired_heading,angle,y_pos,x_pos,bumper_byte,light_bumper,l_counts,r_counts))
+					print("{0:.5f}, {1:.5f}, {2:.5f}, {3:.5f}, {4:.5f}, {5:.5f}, {6:.5f}, {7:.5f}, {8:.5f}, {9:.5f};".format(data_time,mx,my,mz,ax,ay,az,gx,gy,gz))
 					
 					Roomba.Move(forward_value, spin_value) # Spin the Roomba toward the desired heading
 					
@@ -253,25 +289,24 @@ while True:
 					r_counts_current = r_counts
 				
 			except KeyboardInterrupt: 
-				break # Break out of the loop early if something wrong happens
+				break # Break out of the loop early
 			
 		forward_value = 0 # initial forward speed value (mm/s)
 		spin_value = 0 # initial spin speed value (mm/s)
 		Roomba.Move(forward_value, spin_value) # Stop Roomba movement
-		Roomba.PauseQueryStream()
+		'''Roomba.PauseQueryStream()
 		if Roomba.Available() > 0:
 			x = Roomba.DirectRead(Roomba.Available()) # Clear out residual Roomba data
 			#print(x) # Include for debugging purposes
-		
+		'''
 	except KeyboardInterrupt:
 		print("") # Move cursor down a line
-		break # End the program loop
+		break # End the loop
 
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
 GPIO.output(gled, GPIO.LOW) # Turn off green LED
-#datafile.close()
 
 Roomba.ShutDown() # Shutdown Roomba serial connection
-Xbee.close() # Close Xbee serial connection
+Xbee.close()
 GPIO.cleanup() # Reset GPIO pins for next program

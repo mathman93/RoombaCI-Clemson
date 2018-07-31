@@ -1,14 +1,15 @@
-''' Roomba_Sync_Spin_041218.py
+''' Roomba_PRCSync.py
 Purpose: Synchronize heading of Roomba network using PCO model
-	Based off Arduino code from previous semester
+	Uses PRC function to synchronize (from Energy-Efficient Sync, Wang, 2012)
+	Uses Roomba wheel encoders to update heading value over time.
 IMPORTANT: Must be run using Python 3 (python3)
-Last Modified: 7/10/2018
+Last Modified: 7/12/2018
 '''
 ## Import libraries ##
 import serial
 import time
 import RPi.GPIO as GPIO
-
+import math
 import RoombaCI_lib # Make sure this file is in the same directory
 from RoombaCI_lib import DHTurn
 
@@ -25,7 +26,7 @@ reset_pulse = "b" # Rest pulse character
 sync_pulse = "a" # Sync pulse character
 
 # Timing Counter Parameters
-data_timer = 0.1
+data_timer = 0.05
 reset_timer = 300
 
 # Counter Parameters
@@ -40,10 +41,17 @@ counter_ratio = (cycle_threshold)/(cycle_time) # Fraction of phase cycle complet
 global angle # Heading of Roomba (found from magnetometer)
 global counter # Counter of Roomba (works with angle to compute "phase")
 coupling_ratio = 0.5 # Ratio for amount to turn - in range (0, 1]
-epsilon = 1.0 # (Ideally) smallest resolution of magnetometer
+epsilon = 0.5 # (Ideally) smallest resolution of magnetometer
 global desired_heading  # Heading set point for Roomba
 
-refr_period = 0.0*cycle_threshold # Refractory period for PRC 
+refr_period = 0.0*cycle_threshold # Refractory period for PRC
+
+# Roomba Navigation Constants
+WHEEL_DIAMETER = 72 # millimeters
+WHEEL_SEPARATION = 235 # millimeters
+WHEEL_COUNTS = 508.8 # counts per revolution
+DISTANCE_CONSTANT = (WHEEL_DIAMETER * math.pi)/(WHEEL_COUNTS) # millimeters/count
+TURN_CONSTANT = (WHEEL_DIAMETER * 180)/(WHEEL_COUNTS * WHEEL_SEPARATION) # degrees/count
 
 ## Functions and Definitions ##
 ''' Sends sync_pulse to Xbee
@@ -139,6 +147,12 @@ GPIO.setup(yled, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(rled, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(gled, GPIO.OUT, initial=GPIO.LOW)
 
+# Open a text file for data retrieval
+file_name = input("Name for data file: ")
+file_name += ".txt"
+datafile = open(file_name, "w") # Open a text file for storing data
+	# Will overwrite anything that was in the text file previously
+
 # Wake Up Roomba Sequence
 GPIO.output(gled, GPIO.HIGH) # Turn on green LED to say we are alive
 print(" Starting ROOMBA... ")
@@ -151,7 +165,7 @@ Roomba.BlinkCleanLight() # Blink the Clean light on Roomba
 
 if Roomba.Available() > 0: # If anything is in the Roomba receive buffer
 	x = Roomba.DirectRead(Roomba.Available()) # Clear out Roomba boot-up info
-	#print(x) # Include for debugging
+	print(x) # Include for debugging
 
 print(" ROOMBA Setup Complete")
 GPIO.output(yled, GPIO.HIGH) # Indicate within setup sequence
@@ -181,8 +195,17 @@ if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 # Main Code #
 
 forward = 0
+# Read in initial wheel count values from Roomba
+bumper_byte, l_counts_current, r_counts_current, light_bumper = Roomba.Query(7,43,44,45) # Read new wheel counts
 # Initialize Synchronization
 angle = imu.CalculateHeading() # Get initial heading information
+
+# Print out data header values
+print("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts;")
+# Write data values to a text file
+datafile.write("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts;\n")
+
+# Ready to begin PRCSync Loop
 SendResetPulse() # Send reset pulse
 ResetCounters() # Reset counter values
 # Request data packets from Roomba (Stream)
@@ -190,52 +213,94 @@ Roomba.StartQueryStream(7,43,44,45) # Start query stream with specific sensor pa
 
 while True:
 	try:
-		# Get heading of Roomba
-		angle = imu.CalculateHeading()
-		# Set counter value
-		counter = (time.time() - counter_base)*counter_ratio
-		# Send sync_pulse
-		if (angle + counter) > cycle_threshold: # If (angle + counter) is greater than 360 degrees...
-			SendSyncPulse()
-			counter_base += counter_adjust
-			
-		# Receive pulse
-		message = ReceivePulse()
-		
-		if message == reset_pulse: 
-			print("Reset Pulse Received.") # Include for debugging
-			GPIO.output(gled, GPIO.HIGH) # Notify that reset_pulse received
-			GPIO.output(rled, GPIO.HIGH)
-			ResetCounters() # Reset counters
-			GPIO.output(gled, GPIO.LOW)  # End notify that reset_pulse received
-			GPIO.output(rled, GPIO.LOW)
-		elif message == sync_pulse:
-			print("Sync Pulse Received.") # Include for debugging
-			d_angle = PRCSync(angle + counter) # Calculate desired change in heading
-			desired_heading = angle + (d_angle * coupling_ratio) # Update desired heading
-			# Normalize desired_heading to range [0,360)
-			if desired_heading >= cycle_threshold or desired_heading < 0:
-				desired_heading = (desired_heading % cycle_threshold)
-		
-		spin = DHTurn(angle, desired_heading, epsilon) # Value needed to turn to desired heading point
-		Roomba.Move(forward, spin) # Move Roomba to desired heading point
-		
-		if spin == 0:
-			GPIO.output(yled, GPIO.LOW) # Indicate Roomba is not turning
-		else:
-			GPIO.output(yled, GPIO.HIGH) # Indicate Roomba is turning
-		
 		# Read query stream for specific packets (ReadQueryStream)
-		if Roomba.Available() > 0:
+		if Roomba.Available() > 0: # If data has come in from the Roomba...
+			data_time = time.time() - reset_base
+			# Read in the data from the Stream
 			bumper_byte, l_counts, r_counts, light_bumper = Roomba.ReadQueryStream(7,43,44,45)
+			
+			# Get needed data using the encoder counts (copied from "Roomba_Encoder_Test4.py")
+			# Calculate the count differences and correct for overflow
+			delta_l_count = (l_counts - l_counts_current)
+			if delta_l_count > pow(2,15): # 2^15 is somewhat arbitrary
+				delta_l_count -= pow(2,16)
+			if delta_l_count < -pow(2,15): # 2^15 is somewhat arbitrary
+				delta_l_count += pow(2,16)
+			delta_r_count = (r_counts - r_counts_current)
+			if delta_r_count > pow(2,15): # 2^15 is somewhat arbitrary
+				delta_r_count -= pow(2,16)
+			if delta_r_count < -pow(2,15): # 2^15 is somewhat arbitrary
+				delta_r_count += pow(2,16)
+			# Calculate the turn angle change since the last counts
+			angle_change = TURN_CONSTANT * (delta_l_count - delta_r_count)
+			angle += angle_change # Update angle of Roomba and correct for overflow
+			if angle >= cycle_threshold:
+				angle -= cycle_threshold
+				counter_base -= counter_adjust
+			elif angle < 0:
+				angle += cycle_threshold
+				counter_base += counter_adjust
+			
+			# Print data to monitor
+			print("{0}, {1:.6f}, {2:.3f}, {3:.3f}, {4}, {5};".format(data_counter, data_time, angle, counter, l_counts, r_counts))
+			# Write data values to a text file
+			datafile.write("{0}, {1:.6f}, {2:.3f}, {3:.3f}, {4}, {5};\n".format(data_counter, data_time, angle, counter, l_counts, r_counts))
+			
+			data_counter += 1 # Increment counter for the next data sample
+			
+			# Update current wheel encoder counts
+			l_counts_current = l_counts
+			r_counts_current = r_counts
+			
+			# Set counter value
+			counter = (time.time() - counter_base)*counter_ratio
+			# Send sync_pulse
+			if (angle + counter) > cycle_threshold: # If (angle + counter) is greater than 360 degrees...
+				SendSyncPulse()
+				counter_base += counter_adjust
+			
+			# Receive pulse
+			message = ReceivePulse()
+			
+			if message == reset_pulse: 
+				#print("Reset Pulse Received.") # Include for debugging
+				GPIO.output(gled, GPIO.HIGH) # Notify that reset_pulse received
+				GPIO.output(rled, GPIO.HIGH)
+				datafile.close() # Close the file to reset the data in it.
+				ResetCounters() # Reset counters
+				datafile = open(file_name, "w") # Open a text file for storing data
+					# Will overwrite anything that was in the text file previously
+				# Write data values to a text file
+				datafile.write("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts;\n")
+				GPIO.output(gled, GPIO.LOW)  # End notify that reset_pulse received
+				GPIO.output(rled, GPIO.LOW)
+			elif message == sync_pulse:
+				#print("Sync Pulse Received.") # Include for debugging
+				d_angle = PRCSync(angle + counter) # Calculate desired change in heading
+				desired_heading = angle + (d_angle * coupling_ratio) # Update desired heading
+				# Normalize desired_heading to range [0,360)
+				if desired_heading >= cycle_threshold or desired_heading < 0:
+					desired_heading = (desired_heading % cycle_threshold)
+			if Roomba.Available() > 0: # If anything is in the Roomba receive buffer
+				x = Roomba.DirectRead(Roomba.Available()) # Clear out Roomba boot-up info
+				#print(x) # Include for debugging
+			
+			spin = DHTurn(angle, desired_heading, epsilon) # Value needed to turn to desired heading point
+			Roomba.Move(forward, spin) # Move Roomba to desired heading point
+			
+			if spin == 0:
+				GPIO.output(yled, GPIO.LOW) # Indicate Roomba is not turning
+			else:
+				GPIO.output(yled, GPIO.HIGH) # Indicate Roomba is turning
 		
-		# Print heading data to monitor every second
+		# End "if Roomba.Available() > 0:
+		'''# Print heading data to monitor every second
 		if (time.time() - data_base) > data_timer: # After one second
 			# Print data counter, angle, counter, l_counts, r_counts,
-			print("{0}, {1}, {2}, {3}, {4};".format(data_counter, angle, counter, l_counts, r_counts))
+			print("{0}, {1:.3f}, {2:.3f}, {3}, {4};".format(data_counter, angle, counter, l_counts, r_counts))
 			data_counter += 1 # Increment counter for the next data sample
 			data_base += data_timer
-		
+		'''
 		# Reset counters of all Roombas after 5 minutes
 		if (time.time() - reset_base) >= reset_timer: # After 5 minutes
 			SendResetPulse() # Send reset_pulse
@@ -243,18 +308,20 @@ while True:
 			ResetCounters()
 		
 	except KeyboardInterrupt:
-		print('') # print new line
-		break # exit while loop
+		print('') # Print new line
+		break # Exit while loop
 
-Roomba.Move(0,0) # Stop Roomba movement
 Roomba.PauseQueryStream()
+time.sleep(0.1)
 if Roomba.Available() > 0:
 	x = Roomba.DirectRead(Roomba.Available()) # Clear out residual Roomba data
 	#print(x) # Include for debugging purposes
+Roomba.Move(0,0) # Stop Roomba movement
 
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
-#Roomba.PlaySMB()
+Roomba.PlaySMB()
+datafile.close()
 GPIO.output(gled, GPIO.LOW) # Turn off green LED
 
 Roomba.ShutDown() # Shutdown Roomba serial connection

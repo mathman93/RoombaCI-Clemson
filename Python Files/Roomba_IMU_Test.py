@@ -81,19 +81,22 @@ if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 # Main Code #
 
 basetime = time.time()
-basetime_offset = 0.1
+basetime_offset = 0.015625
 Roomba.Move(0,0)
 
 while True:
 	try:
 		if (time.time() - basetime) > basetime_offset:
+			start_time1 = time.time()
 			[mx,my,mz] = imu.ReadMag() # Read magnetometer component values
-			angle = imu.CalculateHeading() # Calculate heading
+			#angle = imu.CalculateHeading() # Calculate heading
 			# Note: angle may not correspond to mx, my, mz
 			[ax,ay,az] = imu.ReadAccel() # Read accelerometer component values
 			[gx,gy,gz] = imu.ReadGyro() # Read gyroscope component values
-			
-			print("{:f}, {:f}, {:f}, {:f}, {:f}, {:f}, {:f}, {:f}, {:f}, {:f};".format(angle,mx,my,mz,ax,ay,az,gx,gy,gz))
+			stop_time1 = time.time()
+			#print(stop_time1 - start_time1)
+			print("{:f}, {:f}, {:f};".format(mx,my,mz))
+			#print("{:f}, {:f}, {:f}, {:f}, {:f}, {:f}, {:f}, {:f}, {:f}, {:f};".format(angle,mx,my,mz,ax,ay,az,gx,gy,gz))
 			basetime += basetime_offset
 		
 	except KeyboardInterrupt: # When commanded to stop program (Ctrl + C)...

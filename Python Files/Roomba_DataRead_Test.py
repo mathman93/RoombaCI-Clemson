@@ -3,7 +3,7 @@ Roomba_DataRead_Test.py
 Purpose: Testing communication between Roomba and RPi
 	Form basis of Roomba code for other tests.
 IMPORTANT: Must be run using Python 3 (python3)
-Last Modified: 6/28/2018
+Last Modified: 7/11/2018
 '''
 ## Import libraries ##
 import serial
@@ -88,6 +88,8 @@ Roomba.Move(0,0) # Start Roomba moving
 Roomba.StartQueryStream(7, 43, 44, 45, 41, 42) # Start query stream with specific sensor packets
 #datafile = open("data_test.txt", "w") # Open a text file for storing data
 	# Will overwrite anything that was in the text file previously
+time_base = time.time()
+
 while data_counter < 1001: # stop after 1000 data points
 	try:
 		'''# Request data packet from Roomba (QuerySingle)
@@ -106,10 +108,11 @@ while data_counter < 1001: # stop after 1000 data points
 			'''	
 		# Read query stream for specific packets (ReadQueryStream)
 		if Roomba.Available() > 0:
+			data_time = time.time() - time_base
 			bumper_byte, l_counts, r_counts, light_bumper, r_speed, l_speed = Roomba.ReadQueryStream(7, 43, 44, 45, 41, 42)
 			angle = imu.CalculateHeading()
 			# Print data values out to the monitor
-			print("{0}, {1:0>8b}, {2}, {3}, {4:0>8b}, {5}, {6}, {7:.4f};".format(data_counter, bumper_byte, l_counts, r_counts, light_bumper, l_speed, r_speed, angle))
+			print("{0}, {1:.6f}, {2:0>8b}, {3}, {4}, {5:0>8b}, {6}, {7}, {8:.4f};".format(data_counter, data_time, bumper_byte, l_counts, r_counts, light_bumper, l_speed, r_speed, angle))
 			# Write data values to a text file
 			#datafile.write("{0}, {1:0>8b}, {2}, {3}, {4:0>8b}, {5}, {6};".format(data_counter, bumper_byte, l_counts, r_counts, light_bumper, l_speed, r_speed))
 			data_counter += 1 # Increment counter for the next data sample

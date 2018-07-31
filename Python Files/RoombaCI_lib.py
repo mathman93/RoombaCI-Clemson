@@ -3,7 +3,7 @@ Purpose: Python Library with LSM9DS1 class and specific functions
 	and iRobot Create 2 (Roomba) class and specific functions
 Import this file in main Python file to access functions
 Made by: Timothy Anglea, Joshua Harvey
-Last Modified: 6/28/2018
+Last Modified: 6/29/2018
 '''
 ## Import Libraries ##
 from ctypes import *
@@ -156,12 +156,28 @@ class LSM9DS1_IMU:
 		return [(cmx - self.mx_offset), (cmy - self.my_offset), (cmz - self.mz_offset)]
 	
 	''' Calculates cardinal heading in degrees from Magnetometer data
+		Reads in the data from the magnetometer to determine the heading
 		Returns:
 			yaw = float; cardinal direction from magnetic North (degrees)
 				(i.e., North = 0 (360); East = 90; South = 180; West = 270
 		Important that you calibrate the magnetometer first. '''
 	def CalculateHeading(self):
-		[mx,my,mz] = self.ReadMag() # Get magnetometer x and y values (don't uses z values)
+		[mx,my,mz] = self.ReadMag() # Get magnetometer x and y values (don't use z values)
+		yaw = (math.degrees(math.atan2(-my,-mx))) # Calculate heading
+		if yaw < 0: # Normalize heading value to [0,360)
+			yaw += 360
+		return yaw
+	
+	''' Calculates cardinal heading in degrees from given x, y magnetometer values
+		Saves time by passing in magnetometer values to the function
+		Parameters:
+			mx = float; x value from the magnetometer
+			my = float; y value from the magnetometer
+		Returns:
+			yaw = float; cardinal direction from magnetic North (degrees)
+				(i.e., North = 0 (360); East = 90; South = 180; West = 270
+		Important that you calibrate the magnetometer first. '''
+	def CalculateHeadingXY(self, mx, my):
 		yaw = (math.degrees(math.atan2(-my,-mx))) # Calculate heading
 		if yaw < 0: # Normalize heading value to [0,360)
 			yaw += 360
@@ -499,7 +515,7 @@ class Create_2:
 		'''
 	def StartQueryStream(self, *args):
 		num = len(args)
-		self.conn.write(b'\x94') # Start sensor data stream
+		self.conn.write(b'\x94') # Start sensor data stream (148)
 		self.DirectWrite(num) # Number of packets to stream
 		for packetID in args:
 			self.DirectWrite(packetID) # Send packet ID for each sensor packet to request
@@ -608,7 +624,7 @@ def DHTurn(angle, desired_heading, epsilon):
 	elif (diff > thresh_2 and diff < (360 - thresh_2)):
 		spin_value = 50 # Move slower when closer to the set point
 	else:
-		spin_value = 15 # Move very slow when very close to the set point
+		spin_value = 25 # Move very slow when very close to the set point
 		# Reduces oscillations due to magnetometer variation and loop execution rate
 	
 	# Determine direction of spin
@@ -668,7 +684,7 @@ def DDSpeed(angle, desired_heading, distance):
 	elif (diff > spin_thresh_2 and diff < (360 - spin_thresh_2)):
 		spin_value = 50 # Move slower when closer to the set point
 	else:
-		spin_value = 15 # Move very slow when very close to the set point
+		spin_value = 25 # Move very slow when very close to the set point
 		# Reduces oscillations due to magnetometer variation and loop execution rate
 	
 	if distance > forward_thresh_1:
