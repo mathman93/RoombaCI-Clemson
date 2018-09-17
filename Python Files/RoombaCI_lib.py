@@ -69,7 +69,7 @@ class LSM9DS1_IMU:
 		if self.lib.lsm9ds1_begin(self.imu) == 0: # If its not there...
 			print("Failed to communicate with LSM9DS1.") # Something went wrong
 			quit()
-		self.lib.lsm9ds1_calibrate(self.imu)
+		# self.lib.lsm9ds1_calibrate(self.imu) # CHANGE BACK !!!!!!!!!!!!!!!!!!
 		# Calibration offset variables
 		self.mx_offset = 0.0
 		self.my_offset = 0.0
@@ -80,7 +80,7 @@ class LSM9DS1_IMU:
 		self.gx_offset = 0.0
 		self.gy_offset = 0.0
 		self.gz_offset = 0.0
-	
+
 	## IMU Functions/Methods ##
 	''' Read X, Y, and Z components of magnetometer
 		Returns:
@@ -101,18 +101,19 @@ class LSM9DS1_IMU:
 		cmz = self.lib.lsm9ds1_calcMag(self.imu, mz)
 		# Return magnetometer component values
 		return [cmx,cmy,cmz]
-	
+
 	''' Determines offset parameters for magnetometer
 		Roomba/IMU should be spinning when this function is called.
 		Make sure Roomba/IMU spins 2-3 times during calibration. '''
 	def CalibrateMag(self):
 		# Initial max and min values
-		x_min = 10.0
-		x_max = -10.0
-		y_min = 10.0
-		y_max = -10.0
-		z_min = 10.0
-		z_max = -10.0
+		[cmx,cmy,cmz] = self.ReadMagRaw() # Read in uncorrected magnetometer data
+		x_min = cmx
+		x_max = cmx
+		y_min = cmy
+		y_max = cmy
+		z_min = cmz
+		z_max = cmz
 		basetime = time.time()
 		while (time.time() - basetime) < 20.0: # Collect data for 20 seconds
 			[cmx,cmy,cmz] = self.ReadMagRaw() # Read in uncorrected magnetometer data
@@ -129,12 +130,12 @@ class LSM9DS1_IMU:
 				z_min = cmz
 			if cmz > z_max:
 				z_max = cmz
-		
+
 		# Calculate offset parameters for each component
 		self.mx_offset = (x_min + x_max)/2
 		self.my_offset = (y_min + y_max)/2
 		self.mz_offset = (z_min + z_max)/2
-	
+
 	''' Read X, Y, and Z components of Magnetometer
 		Returns:
 			cmx - self.mx_offset = float; corrected x-value of magnetometer (Gauss)
@@ -154,7 +155,7 @@ class LSM9DS1_IMU:
 		cmz = self.lib.lsm9ds1_calcMag(self.imu, mz)
 		# Return offset magnetometer component values
 		return [(cmx - self.mx_offset), (cmy - self.my_offset), (cmz - self.mz_offset)]
-	
+
 	''' Calculates cardinal heading in degrees from Magnetometer data
 		Reads in the data from the magnetometer to determine the heading
 		Returns:
@@ -167,7 +168,7 @@ class LSM9DS1_IMU:
 		if yaw < 0: # Normalize heading value to [0,360)
 			yaw += 360
 		return yaw
-	
+
 	''' Calculates cardinal heading in degrees from given x, y magnetometer values
 		Saves time by passing in magnetometer values to the function
 		Parameters:
@@ -182,7 +183,7 @@ class LSM9DS1_IMU:
 		if yaw < 0: # Normalize heading value to [0,360)
 			yaw += 360
 		return yaw
-	
+
 	''' Read X, Y, and Z components of accelerometer
 		Returns:
 			cax = float; x-value of accelerometer (g)
@@ -202,7 +203,7 @@ class LSM9DS1_IMU:
 		caz = self.lib.lsm9ds1_calcAccel(self.imu, az)
 		# Return accelerometer component values
 		return [cax,cay,caz]
-	
+
 	''' Read X, Y, and Z components of gyroscope
 		Returns:
 			cgx = float; x-value of gyroscope (degrees per second)
@@ -222,7 +223,7 @@ class LSM9DS1_IMU:
 		cgz = self.lib.lsm9ds1_calcGyro(self.imu, gz)
 		# Return gyroscope component values
 		return [cgx,cgy,cgz]
-	
+
 	''' Determines offset parameters for accelerometer and gyroscope
 		Roomba/IMU should be still when this is called '''
 	def CalibrateAccelGyro(self):
@@ -249,7 +250,7 @@ class LSM9DS1_IMU:
 		self.gx_offset = gx_avg
 		self.gy_offset = gy_avg
 		self.gz_offset = gz_avg
-	
+
 	''' Read X, Y, and Z components of accelerometer
 		Returns:
 			cax - self.ax_offset = float; corrected x-value of accelerometer (g)
@@ -269,7 +270,7 @@ class LSM9DS1_IMU:
 		caz = self.lib.lsm9ds1_calcAccel(self.imu, az)
 		# Return offset accelerometer component values
 		return [(cax - self.ax_offset), (cay - self.ay_offset), (caz - self.az_offset)]
-	
+
 	''' Read X, Y, and Z components of gyroscope
 		Returns:
 			cgx - self.gx_offset = float; corrected x-value of gyroscope (degrees per second)
@@ -290,12 +291,12 @@ class LSM9DS1_IMU:
 		# Return gyroscope component values
 		return [(cgx - self.gx_offset), (cgy - self.gy_offset), (cgz - self.gz_offset)]
 
-##################################################################		
+##################################################################
 ## iRobot Create 2 (Roomba) Class ##
 class Create_2:
 	ddPin = 0 # Integer specifying ddPin placement on Raspberry Pi
 		# Must be set after creating method object
-	
+
 	# Dictionary of packet byte size and sign
 		# False = unsigned; True = signed;
 	packet_dict = {
@@ -366,26 +367,26 @@ class Create_2:
 		106: [12, list(range(46,52))],
 		107: [9, list(range(54,59))]
 	}
-	
+
 	''' Initialization stuff for the Create_2
 		Parameters:
 			port = string; Raspberry Pi port location (Ex: "/dev/ttyS0")
 			baud = integer; Roomba communication baud rate (Ex: 115200) '''
 	def __init__(self, port, baud):
 		self.conn = serial.Serial(port, baud) # Define serial port connection
-	
+
 	## Roomba Functions ##
 	''' Send a single byte command directly to the Roomba
 		Only does integers in range [0, 255] '''
 	def DirectWrite(self, num):
 		self.conn.write((num).to_bytes(1, byteorder='big', signed=False))
-	
+
 	''' Returns the number of bytes available to read from the buffer
 		Returns:
 			integer; number of bytes currently in the buffer '''
 	def Available(self):
 		return self.conn.inWaiting()
-	
+
 	''' Returns the bytes in the buffer in the order they were received
 		Parameters:
 			num = integer; number of bytes to read from the buffer
@@ -394,7 +395,7 @@ class Create_2:
 	def DirectRead(self, num):
 		return self.conn.read(num)
 		# Ex: 'Roomba.DirectRead(Roomba.Available()).decode()'; or maybe 'Roomba.conn.read(Roomba.conn.inWaiting())'
-	
+
 	''' Roomba Wake-up Sequence
 		Parameters:
 			control = integer; Control Command
@@ -407,7 +408,7 @@ class Create_2:
 		self.DirectWrite(control) # Control command
 		# 131 = Safe Mode; 132 = Full Mode (Be ready to catch it!)
 		time.sleep(0.1)
-	
+
 	''' Roomba Shut-down Sequence
 		Run at end of code to completely close Create_2 connection '''
 	def ShutDown(self):
@@ -415,7 +416,7 @@ class Create_2:
 		self.conn.write(b'\xad') # Stop Roomba OI (173)
 		time.sleep(0.05)
 		self.conn.close() # Close the Roomba serial port.
-		
+
 	''' Blinks the clean button on Roomba during startup
 		Helps determine that RPi -> Roomba communication is working '''
 	def BlinkCleanLight(self):
@@ -429,7 +430,7 @@ class Create_2:
 		# Turn off Clean button
 		self.conn.write(b'\x8b\x19\xff\x00') # 139, 25, 255, 0
 		time.sleep(0.05)
-	
+
 	''' Send command to Roomba to move
 		Parameters:
 			x = integer; common wheel speed (mm/s); x > 0 -> forward motion
@@ -441,7 +442,7 @@ class Create_2:
 		self.conn.write(b'\x91') # Send command to Roomba to set wheel speeds (145)
 		self.conn.write((RW).to_bytes(2, byteorder='big', signed=True))
 		self.conn.write((LW).to_bytes(2, byteorder='big', signed=True))
-	
+
 	''' Request and Return a single Roomba sensor packet
 		Parameters:
 			packetID = integer; ID number for Roomba sensor packet
@@ -451,14 +452,14 @@ class Create_2:
 	def QuerySingle(self, packetID):
 		self.conn.write(b'\x8e') # Request single sensor packet (142)
 		self.DirectWrite(packetID) # Send packet ID of requested sensor
-		
+
 		while self.conn.inWaiting() == 0:
 			pass # Wait for sensor packet values to be returned
-		
+
 		byte, sign = self.packet_dict[packetID] # Get packet info
 		# Return the value of the requested packet
 		return int.from_bytes(self.conn.read(byte), byteorder='big', signed=sign)
-	
+
 	''' Request and Return a list of Roomba sensor packets
 		Combination of SendQuery() and Read(Query)
 		Parameters:
@@ -472,17 +473,17 @@ class Create_2:
 		self.DirectWrite(num) # Number of packets to request
 		for packetID in args:
 			self.DirectWrite(packetID) # Send packet ID for each sensor packet to request
-		
+
 		while self.conn.inWaiting() == 0:
 			pass # Wait for sensor packet values to be returned
-		
+
 		data = [] # Create empty list
 		for packetID in args:
 			byte, sign = self.packet_dict[packetID] # Get packet info
 			# Add the sensor value to the list
 			data.append(int.from_bytes(self.conn.read(byte), byteorder='big', signed=sign))
 		return data # Return the list of values
-		
+
 	''' Request a list of Roomba sensor packets
 		Parameters:
 			*args = integers; sequence of integers representing ID number of Roomba sensor packets
@@ -493,7 +494,7 @@ class Create_2:
 		self.DirectWrite(num) # Number of packets to request
 		for packetID in args:
 			self.DirectWrite(packetID) # Send packet ID for each sensor packet to request
-		
+
 	''' Return a list of Roomba sensor packets
 		Parameters:
 			*args = integers; sequence of integers representing ID number of Roomba sensor packets
@@ -508,7 +509,7 @@ class Create_2:
 			# Add the sensor value to the list
 			data.append(int.from_bytes(self.conn.read(byte), byteorder='big', signed=sign))
 		return data # Return the list of values
-	
+
 	''' Starts Data Stream with specified packets
 		Parameters:
 			*args = integers; sequence of integers representing ID number of Roomba sensor packets
@@ -519,7 +520,7 @@ class Create_2:
 		self.DirectWrite(num) # Number of packets to stream
 		for packetID in args:
 			self.DirectWrite(packetID) # Send packet ID for each sensor packet to request
-	
+
 	''' Reads in data from Roomba sent as a Query Stream
 		The sequence of bytes is very structured
 		Parameters:
@@ -532,16 +533,16 @@ class Create_2:
 		Roomba updates stream every 15.625 ms '''
 	def ReadQueryStream(self, *args):
 		value_dict = {} # Empty dictionary to store packet values
-		
+
 		header = 0 # Initial the header value
 		while header != 19: # Continues when the header byte is found; Error may result if a packet value is 19
 			# Read in the header byte value
 			header = int.from_bytes(self.conn.read(1), byteorder='big', signed=False)
-		
+
 		# Number of bytes to read (not counting checksum)
 		num = int.from_bytes(self.conn.read(1), byteorder='big', signed=False)
 		check = 19 + num # cummulative total of all byte values
-		
+
 		while num > 0: # Go until we reach the checksum
 			# The first byte is the packet ID
 			packetID = int.from_bytes(self.conn.read(1), byteorder='big', signed=False)
@@ -557,35 +558,35 @@ class Create_2:
 				check += (byte_value % 256) # Value of low byte
 				byte_value = (byte_value // 256) # Value of high byte
 			check += byte_value # Add in packet value
-			
+
 			num -= (byte + 1) # Update the number of bytes left to read
-		
+
 		# Read the check sum value
 		checksum = int.from_bytes(self.conn.read(1), byteorder='big', signed=False)
 		check += checksum
 		if (check % 256) != 0: # If checksum isn't correct
 			value_dict.clear() # Erase dictionary; it is corrupted
-		
+
 		# return data found
 		data = [] # Create empty list
 		for packetID in args:
 			# Add the sensor value to the list
 			data.append(value_dict.get(packetID, 0))
 			# Returns a zero if a packetID is not found
-		
+
 		return data # Return the list of values
-		
-	
+
+
 	''' Pause the current Query Stream
 		Does not erase the last set of packets requested '''
 	def PauseQueryStream(self):
 		self.conn.write(b'\x96\x00') # Pause the Roomba data stream (150, 0)
-	
+
 	''' Resume the current Query Stream
 		Uses the last set of packets requested '''
 	def ResumeQueryStream(self):
 		self.conn.write(b'\x96\x01') # Resume the Roomba data stream (150, 1)
-	
+
 	''' You are not expected to understand this. :)
 		'''
 	def PlaySMB(self):
@@ -616,7 +617,7 @@ def DHTurn(angle, desired_heading, epsilon):
 	# Threshold Constants
 	thresh_1 = (50 * epsilon) # First threshold value (degrees)
 	thresh_2 = (10 * epsilon) # Second threshold value (degrees)
-	
+
 	diff = abs(angle - desired_heading)
 	# Determine spin speed based on thresholds
 	if (diff > thresh_1 and diff < (360 - thresh_1)):
@@ -626,12 +627,12 @@ def DHTurn(angle, desired_heading, epsilon):
 	else:
 		spin_value = 25 # Move very slow when very close to the set point
 		# Reduces oscillations due to magnetometer variation and loop execution rate
-	
+
 	# Determine direction of spin
-	if desired_heading < epsilon: # if 0 <= desired_heading < epsilon 
+	if desired_heading < epsilon: # if 0 <= desired_heading < epsilon
 		if (angle > (desired_heading + epsilon) and angle < (desired_heading + 180)):
 			return -spin_value # Spin Left (CCW)
-		elif (angle < (360 + desired_heading - epsilon)): # and angle >= (desired_heading + 180) 
+		elif (angle < (360 + desired_heading - epsilon)): # and angle >= (desired_heading + 180)
 			return spin_value # Spin Right (CW)
 		else: # if (360 + desired_heading - epsilon) < angle < (desired_heading + epsilon)
 			return 0 # Stop Spinning
@@ -647,7 +648,7 @@ def DHTurn(angle, desired_heading, epsilon):
 			return spin_value # Spin Right (CW)
 		elif (angle > (desired_heading + epsilon) or angle <= (desired_heading - 180)):
 			return -spin_value # Spin Left (CCW)
-		else: # if (desired_heading - epsilon) < angle < (desired_heading + epsilon) 
+		else: # if (desired_heading - epsilon) < angle < (desired_heading + epsilon)
 			return 0 # Stop Spinning
 	else: # if desired_heading >= (360 - epsilon)
 		if (angle < (desired_heading - epsilon) and angle > (desired_heading - 180)):
@@ -676,7 +677,7 @@ def DDSpeed(angle, desired_heading, distance):
 	spin_thresh_1 = 25 # First spin threshold value (degrees)
 	spin_thresh_2 = 5 # Second spin threshold value (degrees)
 	forward_thresh_1 = 100 # First forward threshold value (mm)
-	
+
 	diff = abs(angle - desired_heading)
 	# Determine spin speed based on thresholds (Same as DHTurn())
 	if (diff > spin_thresh_1 and diff < (360 - spin_thresh_1)):
@@ -686,20 +687,20 @@ def DDSpeed(angle, desired_heading, distance):
 	else:
 		spin_value = 25 # Move very slow when very close to the set point
 		# Reduces oscillations due to magnetometer variation and loop execution rate
-	
+
 	if distance > forward_thresh_1:
 		forward_value = 100 # Move faster when farther away from the set point
 	else:
 		forward_value = 50 # Move slower when closer to the set point
-	
+
 	# Roomba Constants
 	WHEEL_SEPARATION = 235 # millimeters
-	
+
 	# Radius of unreachable region at the given forward and spin values
 	radius = WHEEL_SEPARATION * (((forward_value + spin_value)/(2 * spin_value)) - 0.5)
 	# Minimum distance that can be guaranteed to be reached for the given forward and spin values
 	d_min = radius * math.sqrt(2 * (1 - math.cos(math.radians(2*diff))))
-	
+
 	if (diff > 90 and diff < 270) and distance < (2 * radius): # Special case
 		return 0 # Need to turn around to get to the close set point
 	if d_min > distance: # Normal cases
