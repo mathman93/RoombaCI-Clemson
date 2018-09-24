@@ -8,12 +8,24 @@ imu = RoombaCI_lib.LSM9DS1_IMU # Initialize IMU
 
 LENGTH = 500
 
-readingX = [0 for i in range(LENGTH)]
-readingY = [0 for i in range(LENGTH)]
-readingZ = [0 for i in range(LENGTH)]
+# readingX = [0 for i in range(LENGTH)]
+# readingY = [0 for i in range(LENGTH)]
+# readingZ = [0 for i in range(LENGTH)]
+
+store = {
+    "readingX" = [],
+    "readingY" = [],
+    "readingZ" = []
+}
+
+def addValue(self, key, value):
+    store[key].append(value)
+
+def writeToFile(slf, key, va)
+
 
 for ii in range(LENGTH):
-    [readingX[ii], readingY[ii], readingZ[ii]] = imu.ReadMagRaw(imu)
+    [readingX[ii], readingY[ii], readingZ[ii]] = imu.ReadMagRaw()
 
 for ii in range(LENGTH):
     print(reading[ii])
