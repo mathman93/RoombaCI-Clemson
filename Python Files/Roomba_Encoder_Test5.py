@@ -95,7 +95,7 @@ if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 	#print(x) # Include for debugging
 
 # Main Code #
-print("Hello, and welcome to Roomba_Encoder_Test4.")
+print("Hello, and welcome to Roomba_Encoder_Test5.")
 print("In this program, you get to specify the x,y coordinates you want the Roomba to move to.")
 print("The Roomba navigates around any obstacles in its path.")
 #print("Any data generated in the run will be stored in a text file.")
