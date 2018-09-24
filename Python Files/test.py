@@ -18,10 +18,10 @@ dictionary = {
     "readingZdict" : []
 }
 
-def addValue(self, key, value):
+def addValue(key, value):
     dictionary[key].append(value)
 
-def writeToFile(self):
+def writeToFile():
     with open('results.json','w') as fp:
         json.dump(dictionary,fp)
 
