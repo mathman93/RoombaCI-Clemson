@@ -4,7 +4,7 @@ import RoombaCI_lib
 
 Roomba = RoombaCI_lib.Create_2("/dev/ttyS0", 115200)
 
-imu = RoombaCI_lib.LSM9DS1_IMU # Initialize IMU
+imu = RoombaCI_lib.LSM9DS1_IMU() # Initialize IMU
 
 LENGTH = 500
 
@@ -23,11 +23,12 @@ def addValue(self, key, value):
 
 def writeToFile(self):
     with open('results.json','w') as fp:
-        json.dum(self.dictionary,fp)
+        json.dump(dictionary,fp)
 
+imu.CalibrateMag()
 
 for ii in range(LENGTH):
-    [a, b, c] = imu.ReadMagRaw()
+    [a, b, c] = imu.ReadMag()
     a.addValue("readingX")
     b.addValue("readingY")
     c.addValue("readingZ")
