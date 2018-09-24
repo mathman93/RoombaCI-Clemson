@@ -13,7 +13,7 @@ readingY = [0 for i in range(LENGTH)]
 readingZ = [0 for i in range(LENGTH)]
 
 for ii in range(LENGTH):
-    [readingX[ii], readingY[ii], readingZ[ii]] = imu.ReadMagRaw()
+    [readingX[ii], readingY[ii], readingZ[ii]] = imu.ReadMagRaw(self)
 
 for ii in range(LENGTH):
     print(reading[ii])
