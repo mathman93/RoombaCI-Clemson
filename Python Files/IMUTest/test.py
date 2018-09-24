@@ -1,3 +1,5 @@
+import sys
+sys.path.insert(0, '../')
 import RoombaCI_lib
 
 Roomba = RoombaCI_lib.Create_2("/dev/ttyS0", 115200)
