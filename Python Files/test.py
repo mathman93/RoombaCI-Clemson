@@ -1,4 +1,4 @@
-import sys
+import sys, json
 sys.path.insert(0, '../')
 import RoombaCI_lib
 
