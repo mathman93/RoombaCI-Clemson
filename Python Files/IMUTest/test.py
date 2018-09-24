@@ -6,8 +6,14 @@ Roomba = RoombaCI_lib.Create_2("/dev/ttyS0", 115200)
 
 imu = RoombaCI_lib.LSM9DS1_IMU() # Initialize IMU
 
-for ii in range(500):
-    reading[ii] = imu.ReadMagRaw
+LENGTH = 500
 
-for ii in range(500):
+readingX = [0 for i in range(LENGTH)]
+readingY = [0 for i in range(LENGTH)]
+readingZ = [0 for i in range(LENGTH)]
+
+for ii in range(LENGTH):
+    readingX[ii], readingY[ii], readingZ[ii] = imu.ReadMagRaw
+
+for ii in range(LENGTH):
     print(reading[ii])
