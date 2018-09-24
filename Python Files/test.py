@@ -8,9 +8,9 @@ imu = RoombaCI_lib.LSM9DS1_IMU() # Initialize IMU
 
 LENGTH = 500
 
-# readingX = [0 for i in range(LENGTH)]
-# readingY = [0 for i in range(LENGTH)]
-# readingZ = [0 for i in range(LENGTH)]
+readingX = [0 for i in range(LENGTH)]
+readingY = [0 for i in range(LENGTH)]
+readingZ = [0 for i in range(LENGTH)]
 
 dictionary = {
     "readingX" : [],
@@ -29,9 +29,12 @@ imu.CalibrateMag()
 
 for ii in range(LENGTH):
     [a, b, c] = imu.ReadMag()
-    a.addValue("readingX")
-    b.addValue("readingY")
-    c.addValue("readingZ")
+    # a.addValue("readingX")
+    # b.addValue("readingY")
+    # c.addValue("readingZ")
+    readingX[ii] = a
+    readingY[ii] = b
+    readingZ[ii] = c
 
 for ii in range(LENGTH):
     print(reading[ii])
