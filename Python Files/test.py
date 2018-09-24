@@ -23,7 +23,7 @@ def addValue(key, value):
 
 def writeToFile():
     with open('results.json','w') as fp:
-        json.dump(dictionary,fp)
+        json.dump(dictionary,fp,separators=(',', ': '))
 
 imu.CalibrateMag()
 
