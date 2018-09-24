@@ -12,20 +12,25 @@ LENGTH = 500
 # readingY = [0 for i in range(LENGTH)]
 # readingZ = [0 for i in range(LENGTH)]
 
-store = {
+dictionary = {
     "readingX" = [],
     "readingY" = [],
     "readingZ" = []
 }
 
 def addValue(self, key, value):
-    store[key].append(value)
+    dictionary[key].append(value)
 
-def writeToFile(slf, key, va)
+def writeToFile(self):
+    with open('results.json','w') as fp:
+        json.dum(self.dictionary,fp)
 
 
 for ii in range(LENGTH):
-    [readingX[ii], readingY[ii], readingZ[ii]] = imu.ReadMagRaw()
+    [a, b, c] = imu.ReadMagRaw()
+    a.addValue("readingX")
+    b.addValue("readingY")
+    c.addValue("readingZ")
 
 for ii in range(LENGTH):
     print(reading[ii])
