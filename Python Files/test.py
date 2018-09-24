@@ -13,9 +13,9 @@ readingY = [0 for i in range(LENGTH)]
 readingZ = [0 for i in range(LENGTH)]
 
 dictionary = {
-    "readingX" : [],
-    "readingY" : [],
-    "readingZ" : []
+    "readingXdict" : [],
+    "readingYdict" : [],
+    "readingZdict" : []
 }
 
 def addValue(self, key, value):
@@ -36,5 +36,8 @@ for ii in range(LENGTH):
     readingY[ii] = b
     readingZ[ii] = c
 
-for ii in range(LENGTH):
-    print(reading[ii])
+addValue("readingXdict",readingX)
+addValue("readingYdict",readingY)
+addValue("readingZdict",readingZ)
+
+writeToFile()
