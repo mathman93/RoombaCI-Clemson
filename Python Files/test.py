@@ -13,9 +13,9 @@ LENGTH = 500
 # readingZ = [0 for i in range(LENGTH)]
 
 dictionary = {
-    "readingX" = [],
-    "readingY" = [],
-    "readingZ" = []
+    "readingX" : [],
+    "readingY" : [],
+    "readingZ" : []
 }
 
 def addValue(self, key, value):
