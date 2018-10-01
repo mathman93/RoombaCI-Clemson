@@ -24,7 +24,7 @@ for ii in range(LENGTH):
     [a, b, c] = imu.ReadMagRaw()
     magX[ii] = a
     magY[ii] = b
-    magZ[ii] = c
+	magZ[ii] = c
 	
 	[a, b, c] = ReadAccelRaw()
 	accelX = a
@@ -38,45 +38,45 @@ for ii in range(LENGTH):
 
 print("magX")
 for ii in range(LENGTH)
-	print("{:.3f}".format(magX[ii]))
-	print(", ")
+	print("{:.3f}".format(magX[ii]),)
+	print(", ",)
 
 print("magY")
 for ii in range(LENGTH)
-	print("{:.3f}".format(magY[ii]))
-	print(", ")
+	print("{:.3f}".format(magY[ii]),)
+	print(", ",)
 
 print("magZ")
 for ii in range(LENGTH)
-	print("{:.3f}".format(magZ[ii]))
-	print(", ")
+	print("{:.3f}".format(magZ[ii]),)
+	print(", ",)
 
 print("accelX")
 for ii in range(LENGTH)
-	print("{:.3f}".format(accelX[ii]))
-	print(", ")
+	print("{:.3f}".format(accelX[ii]),)
+	print(", ",)
 
 print("accelY")
 for ii in range(LENGTH)
-	print("{:.3f}".format(accelY[ii]))
-	print(", ")
+	print("{:.3f}".format(accelY[ii]),)
+	print(", ",)
 
 print("accelZ")
 for ii in range(LENGTH)
-	print("{:.3f}".format(accelZ[ii]))
-	print(", ")
+	print("{:.3f}".format(accelZ[ii]),)
+	print(", ",)
 
 print("gyroX")
 for ii in range(LENGTH)
-	print("{:.3f}".format(gyroX[ii]))
-	print(", ")
+	print("{:.3f}".format(gyroX[ii]),)
+	print(", ",)
 
 print("gyroY")
 for ii in range(LENGTH)
-	print("{:.3f}".format(gyroY[ii]))
-	print(", ")
+	print("{:.3f}".format(gyroY[ii]),)
+	print(", ",)
 
 print("gyroZ")
 for ii in range(LENGTH)
-	print("{:.3f}".format(gyroZ[ii]))
-	print(", ")
+	print("{:.3f}".format(gyroZ[ii]),)
+	print(", ",)
