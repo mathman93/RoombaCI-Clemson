@@ -39,47 +39,47 @@ for ii in range(LENGTH):
 print("IMU TESTING", file=open("output.txt","a"))
 	
 print("magX", file=open("output.txt","a"))
-for ii in range(LENGTH)
+for ii in range(LENGTH):
 	print("{:.3f}".format(magX[ii]), file=open("output.txt","a"), end="")
 	print(", ", file=open("output.txt","a"), end="")
 
 print("magY", file=open("output.txt","a"))
-for ii in range(LENGTH)
+for ii in range(LENGTH):
 	print("{:.3f}".format(magY[ii]), file=open("output.txt","a"), end="")
 	print(", ", file=open("output.txt","a"), end="")
 
 print("magZ", file=open("output.txt","a"))
-for ii in range(LENGTH)
+for ii in range(LENGTH):
 	print("{:.3f}".format(magZ[ii]), file=open("output.txt","a"), end="")
 	print(", ", file=open("output.txt","a"), end="")
 
 print("accelX", file=open("output.txt","a"))
-for ii in range(LENGTH)
+for ii in range(LENGTH):
 	print("{:.3f}".format(accelX[ii]), file=open("output.txt","a"), end="")
 	print(", ", file=open("output.txt","a"), end="")
 
 print("accelY", file=open("output.txt","a"))
-for ii in range(LENGTH)
+for ii in range(LENGTH):
 	print("{:.3f}".format(accelY[ii]), file=open("output.txt","a"), end="")
 	print(", ", file=open("output.txt","a"), end="")
 
 print("accelZ", file=open("output.txt","a"))
-for ii in range(LENGTH)
+for ii in range(LENGTH):
 	print("{:.3f}".format(accelZ[ii]), file=open("output.txt","a"), end="")
 	print(", ", file=open("output.txt","a"), end="")
 
 print("gyroX", file=open("output.txt","a"))
-for ii in range(LENGTH)
+for ii in range(LENGTH):
 	print("{:.3f}".format(gyroX[ii]), file=open("output.txt","a"), end="")
 	print(", ", file=open("output.txt","a"), end="")
 
 print("gyroY", file=open("output.txt","a"))
-for ii in range(LENGTH)
+for ii in range(LENGTH):
 	print("{:.3f}".format(gyroY[ii]), file=open("output.txt","a"), end="")
 	print(", ", file=open("output.txt","a"), end="")
 
 print("gyroZ", file=open("output.txt","a"))
-for ii in range(LENGTH)
+for ii in range(LENGTH):
 	print("{:.3f}".format(gyroZ[ii]), file=open("output.txt","a"), end="")
 	print(", ", file=open("output.txt","a"), end="")
 	
