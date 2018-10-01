@@ -27,14 +27,14 @@ for ii in range(LENGTH):
 	magZ[ii] = c
 	
 	[a, b, c] = imu.ReadAccelRaw()
-	accelX = a
-	accelY = b
-	accelZ = c
+	accelX[ii] = a
+	accelY[ii] = b
+	accelZ[ii] = c
 	
 	[a, b, c] = imu.ReadGyroRaw()
-	gyroX = a
-	gyroY = b
-	gyroZ = c
+	gyroX[ii] = a
+	gyroY[ii] = b
+	gyroZ[ii] = c
 
 print("IMU TESTING", file=open("output.txt","a"))
 	
