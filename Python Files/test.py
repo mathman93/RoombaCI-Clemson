@@ -26,12 +26,12 @@ for ii in range(LENGTH):
 	magY[ii] = b
 	magZ[ii] = c
 	
-	[a, b, c] = ReadAccelRaw()
+	[a, b, c] = imu.ReadAccelRaw()
 	accelX = a
 	accelY = b
 	accelZ = c
 	
-	[a, b, c] = ReadGyroRaw()
+	[a, b, c] = imu.ReadGyroRaw()
 	gyroX = a
 	gyroY = b
 	gyroZ = c
