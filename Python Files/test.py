@@ -43,42 +43,42 @@ for ii in range(LENGTH):
 	print("{:.3f}".format(magX[ii]), file=open("output.txt","a"), end="")
 	print(", ", file=open("output.txt","a"), end="")
 
-print("magY", file=open("output.txt","a"))
+print("\nmagY", file=open("output.txt","a"))
 for ii in range(LENGTH):
 	print("{:.3f}".format(magY[ii]), file=open("output.txt","a"), end="")
 	print(", ", file=open("output.txt","a"), end="")
 
-print("magZ", file=open("output.txt","a"))
+print("\nmagZ", file=open("output.txt","a"))
 for ii in range(LENGTH):
 	print("{:.3f}".format(magZ[ii]), file=open("output.txt","a"), end="")
 	print(", ", file=open("output.txt","a"), end="")
 
-print("accelX", file=open("output.txt","a"))
+print("\naccelX", file=open("output.txt","a"))
 for ii in range(LENGTH):
 	print("{:.3f}".format(accelX[ii]), file=open("output.txt","a"), end="")
 	print(", ", file=open("output.txt","a"), end="")
 
-print("accelY", file=open("output.txt","a"))
+print("\naccelY", file=open("output.txt","a"))
 for ii in range(LENGTH):
 	print("{:.3f}".format(accelY[ii]), file=open("output.txt","a"), end="")
 	print(", ", file=open("output.txt","a"), end="")
 
-print("accelZ", file=open("output.txt","a"))
+print("\naccelZ", file=open("output.txt","a"))
 for ii in range(LENGTH):
 	print("{:.3f}".format(accelZ[ii]), file=open("output.txt","a"), end="")
 	print(", ", file=open("output.txt","a"), end="")
 
-print("gyroX", file=open("output.txt","a"))
+print("\ngyroX", file=open("output.txt","a"))
 for ii in range(LENGTH):
 	print("{:.3f}".format(gyroX[ii]), file=open("output.txt","a"), end="")
 	print(", ", file=open("output.txt","a"), end="")
 
-print("gyroY", file=open("output.txt","a"))
+print("\ngyroY", file=open("output.txt","a"))
 for ii in range(LENGTH):
 	print("{:.3f}".format(gyroY[ii]), file=open("output.txt","a"), end="")
 	print(", ", file=open("output.txt","a"), end="")
 
-print("gyroZ", file=open("output.txt","a"))
+print("\ngyroZ", file=open("output.txt","a"))
 for ii in range(LENGTH):
 	print("{:.3f}".format(gyroZ[ii]), file=open("output.txt","a"), end="")
 	print(", ", file=open("output.txt","a"), end="")
