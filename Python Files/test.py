@@ -21,9 +21,9 @@ gyroY = [0 for i in range(LENGTH)]
 gyroZ = [0 for i in range(LENGTH)]
 
 for ii in range(LENGTH):
-    [a, b, c] = imu.ReadMagRaw()
-    magX[ii] = a
-    magY[ii] = b
+	[a, b, c] = imu.ReadMagRaw()
+	magX[ii] = a
+	magY[ii] = b
 	magZ[ii] = c
 	
 	[a, b, c] = ReadAccelRaw()
