@@ -39,6 +39,7 @@ for ii in range(LENGTH):
 	gyroZ[ii] = c
 
 Roomba.Move(0,0)
+Roomba.BlinkCleanLight()
 
 print("IMU TESTING", file=open("output.txt","a"))
 
