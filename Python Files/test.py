@@ -20,6 +20,7 @@ gyroX = [0 for i in range(LENGTH)]
 gyroY = [0 for i in range(LENGTH)]
 gyroZ = [0 for i in range(LENGTH)]
 
+Roomba.WakeUp(131)
 Roomba.Move(0, 75)
 Roomba.BlinkCleanLight()
 
@@ -39,7 +40,6 @@ for ii in range(LENGTH):
 	gyroY[ii] = b
 	gyroZ[ii] = c
 
-Roomba.Move(0,0)
 
 print("IMU TESTING", file=open("output.txt","a"))
 
@@ -87,3 +87,6 @@ print("\ngyroZ", file=open("output.txt","a"))
 for ii in range(LENGTH):
 	print("{:.3f}".format(gyroZ[ii]), file=open("output.txt","a"), end="")
 	print(", ", file=open("output.txt","a"), end="")
+
+Roomba.Move(0,0)
+Roomba.ShutDown()
