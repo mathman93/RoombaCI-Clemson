@@ -20,24 +20,28 @@ gyroX = [0 for i in range(LENGTH)]
 gyroY = [0 for i in range(LENGTH)]
 gyroZ = [0 for i in range(LENGTH)]
 
+imu.move(0, 75)
+
 for ii in range(LENGTH):
 	[a, b, c] = imu.ReadMagRaw()
 	magX[ii] = a
 	magY[ii] = b
 	magZ[ii] = c
-	
+
 	[a, b, c] = imu.ReadAccelRaw()
 	accelX[ii] = a
 	accelY[ii] = b
 	accelZ[ii] = c
-	
+
 	[a, b, c] = imu.ReadGyroRaw()
 	gyroX[ii] = a
 	gyroY[ii] = b
 	gyroZ[ii] = c
 
+imu.move(0,0)
+
 print("IMU TESTING", file=open("output.txt","a"))
-	
+
 print("magX", file=open("output.txt","a"))
 for ii in range(LENGTH):
 	print("{:.3f}".format(magX[ii]), file=open("output.txt","a"), end="")
@@ -82,4 +86,3 @@ print("\ngyroZ", file=open("output.txt","a"))
 for ii in range(LENGTH):
 	print("{:.3f}".format(gyroZ[ii]), file=open("output.txt","a"), end="")
 	print(", ", file=open("output.txt","a"), end="")
-	
