@@ -27,3 +27,5 @@ These commands can be used on the raspberry pis or your computer from a terminal
 NOTE: you should make sure that you have the latest changes from the remote server ("git pull") before you try to push files
 
 rp1 works
+rp5 works
+
