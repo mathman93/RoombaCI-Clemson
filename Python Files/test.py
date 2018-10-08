@@ -16,6 +16,7 @@ if Roomba.Available() > 0:
 imu = RoombaCI_lib.LSM9DS1_IMU() # Initialize IMU
 
 Roomba.Move(0, 75)
+# Add the calibrate mag and calibrate accelgyro to function	
 LENGTH = 500
 
 magX = [0 for i in range(LENGTH)]
