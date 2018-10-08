@@ -2,12 +2,20 @@ import sys, json
 sys.path.insert(0, '../')
 import RoombaCI_lib
 import RPi.GPIO as GPIO
+import serial
 
 GPIO.setmode(GPIO.BCM) # Use BCM pin numbering for GPIO
 Roomba = RoombaCI_lib.Create_2("/dev/ttyS0", 115200)
 
+Roomba.WakeUp(131)
+Roomba.BlinkCleanLight()
+
+if Roomba.Available() > 0:
+	x = Roomba.DirectRead(Roomba.Available())
+
 imu = RoombaCI_lib.LSM9DS1_IMU() # Initialize IMU
 
+Roomba.Move(0, 75)
 LENGTH = 500
 
 magX = [0 for i in range(LENGTH)]
@@ -22,9 +30,6 @@ gyroX = [0 for i in range(LENGTH)]
 gyroY = [0 for i in range(LENGTH)]
 gyroZ = [0 for i in range(LENGTH)]
 
-Roomba.WakeUp(131)
-Roomba.Move(0, 75)
-Roomba.BlinkCleanLight()
 
 for ii in range(LENGTH):
 	[a, b, c] = imu.ReadMagRaw()
@@ -92,3 +97,4 @@ for ii in range(LENGTH):
 
 Roomba.Move(0,0)
 Roomba.ShutDown()
+GPIO.cleanup()
