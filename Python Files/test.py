@@ -21,6 +21,7 @@ gyroY = [0 for i in range(LENGTH)]
 gyroZ = [0 for i in range(LENGTH)]
 
 Roomba.Move(0, 75)
+Roomba.BlinkCleanLight()
 
 for ii in range(LENGTH):
 	[a, b, c] = imu.ReadMagRaw()
@@ -39,7 +40,6 @@ for ii in range(LENGTH):
 	gyroZ[ii] = c
 
 Roomba.Move(0,0)
-Roomba.BlinkCleanLight()
 
 print("IMU TESTING", file=open("output.txt","a"))
 
