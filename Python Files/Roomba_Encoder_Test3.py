@@ -103,7 +103,7 @@ while True:
 	try:
 		# Read in initial wheel count values from Roomba
 		l_counts_current, r_counts_current = Roomba.Query(43, 44)
-		
+
 		forward_value = 0 # Initial forward speed (millimeters/second)
 		# Print current angle of Roomba
 		print("Current Location: ({0:.3f}, {1:.3f})".format(x_pos, y_pos))
@@ -120,7 +120,7 @@ while True:
 			try:
 				spin_value = DHTurn(angle, desired_heading, epsilon) # Determine the spin speed to turn toward the desired heading
 				Roomba.Move(forward_value, spin_value) # Spin the Roomba toward the desired heading
-				
+
 				if (time.time() - query_base) > query_timer: # Every (query_timer) seconds...
 					l_counts, r_counts, l_speed, r_speed = Roomba.Query(43, 44, 42, 41) # Read new wheel counts
 					# Calculate the count differences and correct for overflow
@@ -147,10 +147,10 @@ while True:
 					delta_y_pos = distance_change * math.sin(math.radians(angle))
 					x_pos += delta_x_pos
 					y_pos += delta_y_pos
-					
+
 					desired_heading = (math.degrees(math.atan2((y_new - y_pos),(x_new - x_pos))) % 360)
 					desired_distance = math.sqrt(pow((y_new - y_pos),2) + pow((x_new - x_pos),2))
-					
+
 					# Record the current time since the beginning of loop
 					data_time = time.time() - base
 					# Print out pertinent data values
@@ -160,21 +160,21 @@ while True:
 					r_counts_current = r_counts
 					# Reset base for query
 					query_base += query_timer
-				
+
 			except KeyboardInterrupt:
 				break
-			
+
 		Roomba.Move(0,0) # Make sure the Roomba stops moving
 		forward_value = 100 # Forward Roomba movement speed (mm/s)
 		# Restart base timers
 		base = time.time()
 		query_base = time.time()
-		
+
 		while desired_distance > 3: # Until we have reached the location...
 			try:
 				spin_value = DHTurn(angle, desired_heading, epsilon) # Determine the spin speed to turn toward the desired heading
 				Roomba.Move(forward_value, spin_value) # Spin the Roomba toward the desired heading
-				
+
 				if (time.time() - query_base) > query_timer: # Every (query_timer) seconds...
 					l_counts, r_counts, l_speed, r_speed = Roomba.Query(43, 44, 42, 41) # Read new wheel counts
 					# Calculate the count differences and correct for overflow
@@ -201,10 +201,10 @@ while True:
 					delta_y_pos = distance_change * math.sin(math.radians(angle))
 					x_pos += delta_x_pos
 					y_pos += delta_y_pos
-					
+
 					desired_heading = (math.degrees(math.atan2((y_new - y_pos),(x_new - x_pos))) % 360)
 					desired_distance = math.sqrt(pow((y_new - y_pos),2) + pow((x_new - x_pos),2))
-					
+
 					# Record the current time since the beginning of loop
 					data_time = time.time() - base
 					# Print out pertinent data values
@@ -214,12 +214,12 @@ while True:
 					r_counts_current = r_counts
 					# Reset base for query
 					query_base += query_timer
-				
-			except KeyboardInterrupt: 
+
+			except KeyboardInterrupt:
 				break # Break out of the loop early
-			
+
 		Roomba.Move(0,0) # Stop Roomba movement
-		
+
 	except KeyboardInterrupt:
 		print("") # Move cursor down a line
 		break # End the loop
