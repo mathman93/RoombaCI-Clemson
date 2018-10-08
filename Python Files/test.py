@@ -3,8 +3,8 @@ sys.path.insert(0, '../')
 import RoombaCI_lib
 import RPi.GPIO as GPIO
 
-Roomba = RoombaCI_lib.Create_2("/dev/ttyS0", 115200)
 GPIO.setmode(GPIO.BCM) # Use BCM pin numbering for GPIO
+Roomba = RoombaCI_lib.Create_2("/dev/ttyS0", 115200)
 
 imu = RoombaCI_lib.LSM9DS1_IMU() # Initialize IMU
 
