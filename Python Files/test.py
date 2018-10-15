@@ -16,10 +16,12 @@ if Roomba.Available() > 0:
 
 imu = RoombaCI_lib.LSM9DS1_IMU() # Initialize IMU
 
-if sys.argv[0] == 1
+if sys.argv[1] == "1":
 	Roomba.Move(0, 75)
-if sys.argv[1] == 2
+if sys.argv[1] == "2":
 	Roomba.Move(75,0)
+if sys.argv[1] == "0":
+	Roomba.Move(0,0)
 
 # Add the calibrate mag and calibrate accelgyro to function	
 LENGTH = 500
