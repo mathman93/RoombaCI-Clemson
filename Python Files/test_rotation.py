@@ -5,7 +5,7 @@ import RoombaCI_lib
 import RPi.GPIO as GPIO
 import sys
 import serial
-#import time
+import time
 import math
 from RoombaCI_lib import DHTurn
 
@@ -57,7 +57,7 @@ Roomba.StartQueryStream(7,43,44,42,41,45)
 
 init_time = time.time ()
 rotation = 360  # in units of degress
-while (angel < rotation):
+while (angle < rotation):
 	
 	if Roomba.Available() > 0:
 		bumper_byte, l_counts, r_counts, l_speed, r_speed, light_bumper = Roomba.ReadQueryStream(7,43,44,42,41,45) # Read new wheel counts
@@ -81,8 +81,8 @@ while (angel < rotation):
 		angle_change = TURN_CONSTANT * (delta_l_count - delta_r_count) # degrees
 		# Update angle of Roomba and correct for overflow
 		angle += angle_change # degrees
-		if angle >= 360 or angle < 0:
-			angle = (angle % 360) # Normalize the angle value from [0,360)
+		#if angle >= 360 or angle < 0:
+		#	angle = (angle % 360) # Normalize the angle value from [0,360)
 		
 		# Calculate the distance change since the last counts
 		if delta_l_count == delta_r_count: # or if angle_change == 0
