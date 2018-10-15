@@ -42,7 +42,7 @@ x_pos = 0.0 # initial x-direction position (millimeters)
 y_pos = 0.0 # initial y-direction position (millimeters)
 forward_value = 75 # initial forward speed value (mm/s)
 spin_value = 0 # initial spin speed value (mm/s)
-bumper_byte, l_counts_current, r_counts_current, l_speed, r_speed, light_bumper = Roomba.ReadQuery(7,43,44,42,41,45) # Read new wheel counts
+bumper_byte, l_counts_current, r_counts_current, l_speed, r_speed, light_bumper = Roomba.Query(7,43,44,42,41,45) # Read new wheel counts
 
 l_counts_list.append(l_counts_current)
 r_counts_list.append(r_counts_current)
