@@ -57,7 +57,7 @@ Roomba.StartQueryStream(7,43,44,42,41,45)
 
 init_time = time.time ()
 
-while (time.time() - init_time < 10):
+while (time.time() - init_time < 60):
 	
 	if Roomba.Available() > 0:
 		bumper_byte, l_counts, r_counts, l_speed, r_speed, light_bumper = Roomba.ReadQueryStream(7,43,44,42,41,45) # Read new wheel counts
@@ -155,7 +155,7 @@ for i in range(len(data_time_list)):
 	print(", ", file=open("outputStraight.txt","a"), end="")	
 
 print("\nFinal Distance: ", final_distance, file=open("outputStraight.txt", "a"))		
-
+print("\nFinal Distance: ", final_distance)
 
 Roomba.ShutDown()
 GPIO.cleanup()
