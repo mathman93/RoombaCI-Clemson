@@ -46,7 +46,7 @@ bumper_byte, l_counts_current, r_counts_current, l_speed, r_speed, light_bumper 
 
 l_counts_list.append(l_counts_current)
 r_counts_list.append(r_counts_current)
-anglelist.append(angle)
+angle_list.append(angle)
 x_pos_list.append(x_pos)
 y_pos_list.append(y_pos)
 data_time_list.append(0.0)
@@ -57,7 +57,7 @@ Roomba.StartQueryStream(7,43,44,42,41,45)
 
 init_time = time.time ()
 
-while (time.time() - init_time < 1):
+while (time.time() - init_time < 10):
 	
 	if Roomba.Available() > 0:
 		bumper_byte, l_counts, r_counts, l_speed, r_speed, light_bumper = Roomba.ReadQueryStream(7,43,44,42,41,45) # Read new wheel counts
@@ -124,37 +124,37 @@ while (time.time() - init_time < 1):
 Roomba.Move(0,0)
 time.sleep(0.5)
 print("Roomba GOING STRAIGHT TESTING", file=open("outputStraight.txt","a"))
-print("Delta L Count", file=open("outputStraight.txt","a"))
+print("\nL Count", file=open("outputStraight.txt","a"))
 for i in range(len(l_counts_list)):
 	print("{:.3f}".format(l_counts_list[i]), file=open("outputStraight.txt","a"), end="")
 	print(", ", file=open("outputStraight.txt","a"), end="")
 
-print("Delta R Count", file=open("outputStraight.txt","a"))
+print("\nR Count", file=open("outputStraight.txt","a"))
 for i in range(len(r_counts_list)):
 	print("{:.3f}".format(r_counts_list[i]), file=open("outputStraight.txt","a"), end="")
 	print(", ", file=open("outputStraight.txt","a"), end="")
 
-print("Angle Change", file=open("outputStraight.txt","a"))
+print("\nAngle", file=open("outputStraight.txt","a"))
 for i in range(len(angle_list)):
 	print("{:.3f}".format(angle_list[i]), file=open("outputStraight.txt","a"), end="")
 	print(", ", file=open("outputStraight.txt","a"), end="")
 
-print("X-Pos", file=open("outputStraight.txt","a"))
+print("\nX-Pos", file=open("outputStraight.txt","a"))
 for i in range(len(x_pos_list)):
 	print("{:.3f}".format(x_pos_list[i]), file=open("outputStraight.txt","a"), end="")
 	print(", ", file=open("outputStraight.txt","a"), end="")
 
-print("Y-Pos", file=open("outputStraight.txt","a"))
+print("\nY-Pos", file=open("outputStraight.txt","a"))
 for i in range(len(y_pos_list)):
 	print("{:.3f}".format(y_pos_list[i]), file=open("outputStraight.txt","a"), end="")
 	print(", ", file=open("outputStraight.txt","a"), end="")	
 
-print("Date Time", file=open("outputStraight.txt","a"))
+print("\nDate Time", file=open("outputStraight.txt","a"))
 for i in range(len(data_time_list)):
 	print("{:.3f}".format(data_time_list[i]), file=open("outputStraight.txt","a"), end="")
 	print(", ", file=open("outputStraight.txt","a"), end="")	
 
-print("Final Distance: " + final_distance, file=open("outputStraight.txt", "a"))		
+print("\nFinal Distance: ", final_distance, file=open("outputStraight.txt", "a"))		
 
 
 Roomba.ShutDown()
