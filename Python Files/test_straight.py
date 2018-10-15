@@ -7,6 +7,7 @@ import sys
 import serial
 import time
 import math
+from RoombaCI_lib import DHTurn
 
 GPIO.setmode(GPIO.BCM) # Use BCM pin numbering for GPIO
 Roomba = RoombaCI_lib.Create_2("/dev/ttyS0", 115200)
@@ -24,13 +25,13 @@ WHEEL_COUNTS = 508.8 # counts per revolution
 DISTANCE_CONSTANT = (WHEEL_DIAMETER * math.pi)/(WHEEL_COUNTS) # millimeters/count
 TURN_CONSTANT = (WHEEL_DIAMETER * 180)/(WHEEL_COUNTS * WHEEL_SEPARATION) # degrees/count
 
-init_time = time.time ()
 
-delta_l_count_list = []
-delta_r_count_list = []
-angle_change_list = []
+l_counts_list = []
+r_counts_list = []
+angle_list = []
 x_pos_list = []
 y_pos_list = []
+data_time_list = []
 
 final_distance  = 0
 #angle = imu.CalculateHeading()
@@ -39,19 +40,28 @@ angle = 0
 distance = 0.0 # total distance traveled (millimeters)
 x_pos = 0.0 # initial x-direction position (millimeters)
 y_pos = 0.0 # initial y-direction position (millimeters)
-forward_value = 0 # initial forward speed value (mm/s)
+forward_value = 75 # initial forward speed value (mm/s)
 spin_value = 0 # initial spin speed value (mm/s)
+bumper_byte, l_counts_current, r_counts_current, l_speed, r_speed, light_bumper = Roomba.ReadQuery(7,43,44,42,41,45) # Read new wheel counts
+
+l_counts_list.append(l_counts_current)
+r_counts_list.append(r_counts_current)
+anglelist.append(angle)
+x_pos_list.append(x_pos)
+y_pos_list.append(y_pos)
+data_time_list.append(0.0)
+
+Roomba.Move(forward_value, spin_value)
+Roomba.StartQueryStream(7,43,44,42,41,45)
+
+
+init_time = time.time ()
 
 while (time.time() - init_time < 1):
-	bumper_byte, l_counts_current, r_counts_current, l_speed, r_speed, light_bumper = Roomba.ReadQuery(7, 43, 44, 42, 41, 45) # Read new wheel counts
-
-	Roomba.Move(75, 0)
+	
 	if Roomba.Available() > 0:
 		bumper_byte, l_counts, r_counts, l_speed, r_speed, light_bumper = Roomba.ReadQueryStream(7,43,44,42,41,45) # Read new wheel counts
-		l_counts_current = 0
-		r_counts_current = 0
-		l_counts = 0
-		r_counts = 0	
+
 			# Record the current time since the beginning of loop
 		data_time = time.time() - init_time
 		
@@ -94,27 +104,39 @@ while (time.time() - init_time < 1):
 
 		final_distance = distance
 
+
+
 		#appending to the lists
-		delta_l_count_list.append(delta_l_count)
-		delta_r_count_list.append(delta_r_count)
-		angle_change_list.append(angle_change)
+		l_counts_list.append(l_counts)
+		r_counts_list.append(r_counts)
+		angle_list.append(angle)
 		x_pos_list.append(x_pos)
 		y_pos_list.append(y_pos)
+		data_time_list.append(data_time)
 
+		spin_value = DHTurn(angle, 0.0, 0.5) # Determine the spin speed to turn toward the desired heading
+		Roomba.Move(forward_value, spin_value)
+
+		l_counts_current = l_counts
+		r_counts_current = r_counts
+	#end if roomba.available > 0
+#end while loop
+Roomba.Move(0,0)
+time.sleep(0.5)
 print("Roomba GOING STRAIGHT TESTING", file=open("outputStraight.txt","a"))
 print("Delta L Count", file=open("outputStraight.txt","a"))
-for i in range(len(delta_l_count_list)):
-	print("{:.3f}".format(delta_l_count_list[i]), file=open("outputStraight.txt","a"), end="")
+for i in range(len(l_counts_list)):
+	print("{:.3f}".format(l_counts_list[i]), file=open("outputStraight.txt","a"), end="")
 	print(", ", file=open("outputStraight.txt","a"), end="")
 
 print("Delta R Count", file=open("outputStraight.txt","a"))
-for i in range(len(delta_r_count_list)):
-	print("{:.3f}".format(delta_r_count_list[i]), file=open("outputStraight.txt","a"), end="")
+for i in range(len(r_counts_list)):
+	print("{:.3f}".format(r_counts_list[i]), file=open("outputStraight.txt","a"), end="")
 	print(", ", file=open("outputStraight.txt","a"), end="")
 
 print("Angle Change", file=open("outputStraight.txt","a"))
-for i in range(len(angle_change_list)):
-	print("{:.3f}".format(angle_change_list[i]), file=open("outputStraight.txt","a"), end="")
+for i in range(len(angle_list)):
+	print("{:.3f}".format(angle_list[i]), file=open("outputStraight.txt","a"), end="")
 	print(", ", file=open("outputStraight.txt","a"), end="")
 
 print("X-Pos", file=open("outputStraight.txt","a"))
@@ -127,8 +149,13 @@ for i in range(len(y_pos_list)):
 	print("{:.3f}".format(y_pos_list[i]), file=open("outputStraight.txt","a"), end="")
 	print(", ", file=open("outputStraight.txt","a"), end="")	
 
+print("Date Time", file=open("outputStraight.txt","a"))
+for i in range(len(data_time_list)):
+	print("{:.3f}".format(data_time_list[i]), file=open("outputStraight.txt","a"), end="")
+	print(", ", file=open("outputStraight.txt","a"), end="")	
+
 print("Final Distance: " + final_distance, file=open("outputStraight.txt", "a"))		
 
-Roomba.Move(0,0)
+
 Roomba.ShutDown()
 GPIO.cleanup()
