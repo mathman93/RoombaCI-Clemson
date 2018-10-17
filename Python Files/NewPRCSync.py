@@ -1,9 +1,9 @@
-''' Roomba_PRCSync.py
+''' NewPRCSync.py
 Purpose: Synchronize heading of Roomba network using PCO model
 	Uses PRC function to synchronize (from Energy-Efficient Sync, Wang, 2012)
 	Uses Roomba wheel encoders to update heading value over time.
 IMPORTANT: Must be run using Python 3 (python3)
-Last Modified: 7/12/2018
+Last Modified: 10/17/2018
 '''
 ## Import libraries ##
 import serial
@@ -27,8 +27,8 @@ reset_pulse = "b" # Rest pulse character
 sync_pulse = "a" # Sync pulse character
 
 # Timing Counter Parameters
-data_timer = 0.05
-reset_timer = 300
+data_timer = (2*0.015625) # seconds until new data point (1/64 = 0.015625)
+reset_timer = 300 # seconds until oscillators reset
 
 # Counter Parameters
 cycle_threshold = 360.0 # Threshold for phase of PCO
@@ -40,12 +40,23 @@ counter_ratio = (cycle_threshold)/(cycle_time) # Fraction of phase cycle complet
 
 # Synchronization Parameters
 global angle # Heading of Roomba (found from magnetometer)
+initial_angle = 0*cycle_threshold/Nodes # Set initial angle value (apart from IMU reading)
 global counter # Counter of Roomba (works with angle to compute "phase")
 coupling_ratio = 0.5 # Ratio for amount to turn - in range (0, 1]
 epsilon = 0.5 # (Ideally) smallest resolution of magnetometer
 global desired_heading  # Heading set point for Roomba
 
 refr_period = 0.0*cycle_threshold # Refractory period for PRC
+
+# Phase Continuity Parameters
+omega_a = 0.3 # Fraction of cycle frequency to have Roomba spin (DHMagnitudeFreq())
+tau = 0.3 # Fraction of cycle time to have Roomba spin (DHMagnitudeTime())
+
+# Determine spin magnitude based on cycle frequency
+spin_CFM = int(omega_a * WHEEL_SEPARATION * math.pi / (cycle_time))
+if spin_CFM < 11: # Roomba does not detect values less than 11
+	spin_CFM = 11
+spin_CTM = 0 # initialize spin magnitude for Constant Time Method
 
 # Roomba Navigation Constants
 WHEEL_DIAMETER = 72 # millimeters
@@ -56,6 +67,16 @@ TURN_CONSTANT = (WHEEL_DIAMETER * 180)/(WHEEL_COUNTS * WHEEL_SEPARATION) # degre
 
 ## Functions and Definitions ##
 
+''' Determines spin magntitude to achieve desired heading based on current heading
+	Optimized to reduce oscillations due to magnetometer readings and loop execution rate
+	Use with DHDirection() to determine value of spin
+	Paramters:
+		angle = float; current heading of Roomba (degrees) - [0,360)
+		desired_heading = float; desired heading of Roomba (degrees) - [0,360)
+		epsilon = float; (Ideally) smallest resolution of magnetometer - ~0.5
+	Returns:
+		spin_value = int; magnitude of spin to command the Roomba wheel motors
+	'''
 def DHMagnitude(angle, desired_heading, epsilon):
 	# Threshold Constants
 	thresh_1 = (50 * epsilon) # First threshold value (degrees)
@@ -70,23 +91,53 @@ def DHMagnitude(angle, desired_heading, epsilon):
 	else:
 		spin_value = 25 # Move very slow when very close to the set point
 	return spin_value
-		# Reduces oscillations due to magnetometer variation and loop execution rate
+	# Reduces oscillations due to magnetometer variation and loop execution rate
 
+''' Determines spin magntitude to achieve desired heading based on current heading
+	Based on Constant Time Method to model phase continuity in PCOs
+	Use with DHDirection() to determine value of spin
+	Paramters:
+		phase = float; amount of phase change determined when a sync pulse is received
+			Includes coupling ratio
+	Returns:
+		spin_value = int; magnitude of spin to command the Roomba wheel motors
+	'''
+def DHMagnitudeTime(phase):
+	global cycle_time
+	global tau
+	global WHEEL_SEPARATION
+	spin_value = int(math.radians(abs(phase)) * WHEEL_SEPARATION / (2 * tau * cycle_time))
+	if spin_value < 11: # Roomba does not detect values less than 11
+		spin_value = 11
+	return spin_value
+
+''' Determines sign of spin to achieve desired heading based on current heading
+	Use with DHMagnitude() to determine value of spin
+	Paramters:
+		angle = float; current heading of Roomba (degrees) - [0,360)
+		desired_heading = float; desired heading of Roomba (degrees) - [0,360)
+		epsilon = float; (Ideally) smallest resolution of magnetometer - ~0.5
+	Returns:
+		spin_dir = int; direction of spin to command the Roomba wheel motors
+			0 = no spin; -1 = CCW spin; 1 = CW spin
+	'''
 def DHDirection(angle, desired_heading, epsilon):
 	# Determine direction of spin
 	global cycle_threshold
 	diff = angle - desired_heading
-	# Normalize diff to [-180, 180]
+	# Normalize diff to [-0.5*cycle_threshold, 0.5*cycle_threshold]
 	if diff > (0.5 * cycle_threshold):
 		diff -= cycle_threshold
 	elif diff < (-0.5 * cycle_threshold):
 		diff += cycle_threshold
+	# Set spin direction
 	if diff > epsilon:
-		return -1 # Spin CCW
+		spin_dir = -1 # Spin CCW
 	elif diff < -epsilon:
-		return 1 # Spin CW
+		spin_dir = 1 # Spin CW
 	else:
-		return 0 # Don't spin
+		spin_dir = 0 # Don't spin
+	return spin_dir
 
 ''' Sends sync_pulse to Xbee
 	Used to signal when phase equals 360 degrees '''
@@ -129,6 +180,7 @@ def ResetCounters():
 	global reset_base
 	global counter
 	global data_counter
+	global initial_angle
 	global angle
 	global desired_heading
 	counter_base = time.time() # Initialize counter
@@ -136,7 +188,8 @@ def ResetCounters():
 	reset_base = time.time() # Initialize reset timer
 	counter = 0 # Reset phase counter
 	data_counter = 0 # Reset data point counter
-	angle = 2*cycle_threshold/Nodes # Reset initial angle value
+	angle = initial_angle # Reset initial angle value (without IMU)
+	#angle = imu.CalculateHeading() # Reset initial angle value (using IMU)
 	desired_heading = angle # Set to initial angle value
 
 ''' Returns necessary change in heading when a sync_pulse is received
@@ -232,7 +285,8 @@ forward = 0
 # Read in initial wheel count values from Roomba
 bumper_byte, l_counts_current, r_counts_current, light_bumper = Roomba.Query(7,43,44,45) # Read new wheel counts
 # Initialize Synchronization
-angle = 1*cycle_threshold/Nodes # Get initial heading information
+angle = initial_angle # Reset initial angle value (without IMU)
+#angle = imu.CalculateHeading() # Reset initial angle value (using IMU)
 
 # Print out data header values
 print("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts;")
@@ -274,10 +328,12 @@ while True:
 			elif angle < 0:
 				angle += cycle_threshold
 				counter_base += counter_adjust
-			
-			spin = DHMagnitude(angle, desired_heading, epsilon) # Value needed to turn to desired heading point
-			spin *= DHDirection(angle, desired_heading, epsilon) # Direction
-			Roomba.Move(forward, spin) # Move Roomba to desired heading point
+			# Value needed to turn to desired heading point
+			spin = DHMagnitude(angle, desired_heading, epsilon) # Use for Optimized Spin Method
+			#spin = spin_CFM # Use for Constant Frequency Method
+			#spin = spin_CTM # Use for Constant Time Method
+			spin *= DHDirection(angle, desired_heading, epsilon) # Determine direction of spin
+			Roomba.Move(forward, spin) # Moves Roomba to desired heading point
 			
 			if spin == 0:
 				GPIO.output(yled, GPIO.LOW) # Indicate Roomba is not turning
@@ -287,7 +343,8 @@ while True:
 			# Update current wheel encoder counts
 			l_counts_current = l_counts
 			r_counts_current = r_counts
-			
+		# End "if Roomba.Available() > 0:
+		
 		# Set counter value
 		counter = (time.time() - counter_base)*counter_ratio
 		# Send sync_pulse
@@ -295,7 +352,7 @@ while True:
 			SendSyncPulse()
 			counter_base += counter_adjust
 			
-			# Receive pulse
+		# Receive pulse
 		message = ReceivePulse()
 			
 		if message == reset_pulse: 
@@ -313,14 +370,12 @@ while True:
 		elif message == sync_pulse:
 			print("Sync Pulse Received.") # Include for debugging
 			d_angle = PRCSync(angle + counter) # Calculate desired change in heading
+			#spin_CTM = DHMagnitudeTime(d_angle * coupling_ratio) # Set spin rate using Constant Time Method
 			desired_heading = angle + (d_angle * coupling_ratio) # Update desired heading
 			# Normalize desired_heading to range [0,360)
 			if desired_heading >= cycle_threshold or desired_heading < 0:
 				desired_heading = (desired_heading % cycle_threshold)
-			
 		
-		
-		# End "if Roomba.Available() > 0:
 		# Print heading data to monitor every second
 		if (time.time() - data_base) > data_timer: # After one second
 			# Print data to monitor
