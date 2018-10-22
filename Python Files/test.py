@@ -56,7 +56,7 @@ for ii in range(LENGTH):
 	gyroZ[ii] = c
 
 
-print("IMU TESTING", file=open("results_" + sys.argv[1] + ".txt","a"))
+print("IMU TESTING", file=open("results_" + sys.argv[1] + ".txt","w"))
 
 print("magX", file=open("results_" + sys.argv[1] + ".txt","a"))
 for ii in range(LENGTH):
