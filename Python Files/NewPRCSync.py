@@ -20,7 +20,8 @@ Xbee = serial.Serial('/dev/ttyUSB0', 115200) # Baud rate should be 115200
 yled = 5
 rled = 6
 gled = 13
-Nodes = 2 #Number of Roombas
+Nodes = input("How many Roombas are testing? ") #Number of Roombas
+RoombaID = input("Which Roomba is this? ") #Which Roomba is being tested
 
 # Pulse definitions
 reset_pulse = "b" # Rest pulse character
@@ -40,7 +41,7 @@ counter_ratio = (cycle_threshold)/(cycle_time) # Fraction of phase cycle complet
 
 # Synchronization Parameters
 global angle # Heading of Roomba (found from magnetometer)
-initial_angle = 0*cycle_threshold/Nodes # Set initial angle value (apart from IMU reading)
+initial_angle = RoombaID*cycle_threshold/Nodes # Set initial angle value (apart from IMU reading)
 global counter # Counter of Roomba (works with angle to compute "phase")
 coupling_ratio = 0.5 # Ratio for amount to turn - in range (0, 1]
 epsilon = 0.5 # (Ideally) smallest resolution of magnetometer
