@@ -53,10 +53,7 @@ refr_period = 0.0*cycle_threshold # Refractory period for PRC
 omega_a = 0.3 # Fraction of cycle frequency to have Roomba spin (DHMagnitudeFreq())
 tau = 0.3 # Fraction of cycle time to have Roomba spin (DHMagnitudeTime())
 
-<<<<<<< HEAD:Python Files/NewPRCSync.py
-# Neede to define wheel separation variable before spin_CFM calculation
-=======
->>>>>>> 02be4e84058d42c01e06e7b9b3944ebff529e09e:Python Files/SyncCode/NewPRCSync.py
+# Need to define wheel separation variable before spin_CFM calculation
 WHEEL_SEPARATION = 235 # millimeters
 # Determine spin magnitude based on cycle frequency
 spin_CFM = int(omega_a * WHEEL_SEPARATION * math.pi / (cycle_time))
