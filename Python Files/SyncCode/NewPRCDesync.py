@@ -340,11 +340,6 @@ while True:
 		
 			
 			# Print data to monitor
-			print("{0}, {1:.6f}, {2:.3f}, {3:.3f}, {4}, {5};".format(data_counter, data_time, angle, counter, l_counts, r_counts))
-			# Write data values to a text file
-			datafile.write("{0}, {1:.6f}, {2:.3f}, {3:.3f}, {4}, {5};\n".format(data_counter, data_time, angle, counter, l_counts, r_counts))
-			
-			data_counter += 1 # Increment counter for the next data sample
 			
 			# Update current wheel encoder counts
 			l_counts_current = l_counts
