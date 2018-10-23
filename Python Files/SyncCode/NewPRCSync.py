@@ -43,7 +43,7 @@ counter_ratio = (cycle_threshold)/(cycle_time) # Fraction of phase cycle complet
 global angle # Heading of Roomba (found from magnetometer)
 initial_angle = RoombaID*cycle_threshold/Nodes # Set initial angle value (apart from IMU reading)
 global counter # Counter of Roomba (works with angle to compute "phase")
-coupling_ratio = 0.5 # Ratio for amount to turn - in range (0, 1]
+coupling_ratio = 0.3 # Ratio for amount to turn - in range (0, 1]
 epsilon = 0.5 # (Ideally) smallest resolution of magnetometer
 global desired_heading  # Heading set point for Roomba
 
@@ -371,7 +371,7 @@ while True:
 			GPIO.output(gled, GPIO.LOW)  # End notify that reset_pulse received
 			GPIO.output(rled, GPIO.LOW)
 		elif message == sync_pulse:
-			print("Sync Pulse Received.") # Include for debugging
+			#print("Sync Pulse Received.") # Include for debugging
 			d_angle = PRCSync(angle + counter) # Calculate desired change in heading
 			#spin_CTM = DHMagnitudeTime(d_angle * coupling_ratio) # Set spin rate using Constant Time Method
 			desired_heading = angle + (d_angle * coupling_ratio) # Update desired heading
