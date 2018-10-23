@@ -158,4 +158,4 @@ print("\nFinal Distance: ", final_distance, file=open("outputStraight.txt", "a")
 print("\nFinal Distance: ", final_distance)
 
 Roomba.ShutDown()
-GPIO.cleanup()
+#GPIO.cleanup()
