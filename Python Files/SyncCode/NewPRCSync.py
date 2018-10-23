@@ -20,8 +20,8 @@ Xbee = serial.Serial('/dev/ttyUSB0', 115200) # Baud rate should be 115200
 yled = 5
 rled = 6
 gled = 13
-Nodes = input("How many Roombas are testing? ") #Number of Roombas
-RoombaID = input("Which Roomba is this? ") #Which Roomba is being tested
+Nodes = int(input("How many Roombas are testing? ")) #Number of Roombas
+RoombaID = int(input("Which Roomba is this? ")) #Which Roomba is being tested
 
 # Pulse definitions
 reset_pulse = "b" # Rest pulse character
