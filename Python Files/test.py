@@ -27,7 +27,7 @@ if sys.argv[1] == "0":
 time.sleep(2)
 
 # Add the calibrate mag and calibrate accelgyro to function	
-LENGTH = 5000
+LENGTH = 2000
 
 magX = [0 for i in range(LENGTH)]
 magY = [0 for i in range(LENGTH)]
