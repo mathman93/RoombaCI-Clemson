@@ -56,52 +56,52 @@ for ii in range(LENGTH):
 	gyroZ[ii] = c
 
 
-print("IMU TESTING", file=open("results_" + sys.argv[1] + ".txt","w"))
+print("IMU TESTING", file=open("results_" + sys.argv[1] + sys.argv[2] + ".txt","w"))
 
-print("magX", file=open("results_" + sys.argv[1] + ".txt","a"))
+print("magX", file=open("results_" + sys.argv[1] + sys.argv[2] + ".txt","a"))
 for ii in range(LENGTH):
-	print("{:.3f}".format(magX[ii]), file=open("results_" + sys.argv[1] + ".txt","a"), end="")
-	print(", ", file=open("results_" + sys.argv[1] + ".txt","a"), end="")
+	print("{:.3f}".format(magX[ii]), file=open("results_" + sys.argv[1] + sys.argv[2] + ".txt","a"), end="")
+	print(", ", file=open("results_" + sys.argv[1] + sys.argv[2] + ".txt","a"), end="")
 
-print("\nmagY", file=open("results_" + sys.argv[1] + ".txt","a"))
+print("\nmagY", file=open("results_" + sys.argv[1] + sys.argv[2] + ".txt","a"))
 for ii in range(LENGTH):
-	print("{:.3f}".format(magY[ii]), file=open("results_" + sys.argv[1] + ".txt","a"), end="")
-	print(", ", file=open("results_" + sys.argv[1] + ".txt","a"), end="")
+	print("{:.3f}".format(magY[ii]), file=open("results_" + sys.argv[1] + sys.argv[2] + ".txt","a"), end="")
+	print(", ", file=open("results_" + sys.argv[1] + sys.argv[2] + ".txt","a"), end="")
 
-print("\nmagZ", file=open("results_" + sys.argv[1] + ".txt","a"))
+print("\nmagZ", file=open("results_" + sys.argv[1] + sys.argv[2] + ".txt","a"))
 for ii in range(LENGTH):
-	print("{:.3f}".format(magZ[ii]), file=open("results_" + sys.argv[1] + ".txt","a"), end="")
-	print(", ", file=open("results_" + sys.argv[1] + ".txt","a"), end="")
+	print("{:.3f}".format(magZ[ii]), file=open("results_" + sys.argv[1] + sys.argv[2] + ".txt","a"), end="")
+	print(", ", file=open("results_" + sys.argv[1] + sys.argv[2] + ".txt","a"), end="")
 
-print("\naccelX", file=open("results_" + sys.argv[1] + ".txt","a"))
+print("\naccelX", file=open("results_" + sys.argv[1] + sys.argv[2] + ".txt","a"))
 for ii in range(LENGTH):
-	print("{:.3f}".format(accelX[ii]), file=open("results_" + sys.argv[1] + ".txt","a"), end="")
-	print(", ", file=open("results_" + sys.argv[1] + ".txt","a"), end="")
+	print("{:.3f}".format(accelX[ii]), file=open("results_" + sys.argv[1] + sys.argv[2] + ".txt","a"), end="")
+	print(", ", file=open("results_" + sys.argv[1] + sys.argv[2] + ".txt","a"), end="")
 
-print("\naccelY", file=open("results_" + sys.argv[1] + ".txt","a"))
+print("\naccelY", file=open("results_" + sys.argv[1] + sys.argv[2] + ".txt","a"))
 for ii in range(LENGTH):
-	print("{:.3f}".format(accelY[ii]), file=open("results_" + sys.argv[1] + ".txt","a"), end="")
-	print(", ", file=open("results_" + sys.argv[1] + ".txt","a"), end="")
+	print("{:.3f}".format(accelY[ii]), file=open("results_" + sys.argv[1] + sys.argv[2] + ".txt","a"), end="")
+	print(", ", file=open("results_" + sys.argv[1] + sys.argv[2] + ".txt","a"), end="")
 
-print("\naccelZ", file=open("results_" + sys.argv[1] + ".txt","a"))
+print("\naccelZ", file=open("results_" + sys.argv[1] + sys.argv[2] + ".txt","a"))
 for ii in range(LENGTH):
-	print("{:.3f}".format(accelZ[ii]), file=open("results_" + sys.argv[1] + ".txt","a"), end="")
-	print(", ", file=open("results_" + sys.argv[1] + ".txt","a"), end="")
+	print("{:.3f}".format(accelZ[ii]), file=open("results_" + sys.argv[1] + sys.argv[2] + ".txt","a"), end="")
+	print(", ", file=open("results_" + sys.argv[1] + sys.argv[2] + ".txt","a"), end="")
 
-print("\ngyroX", file=open("results_" + sys.argv[1] + ".txt","a"))
+print("\ngyroX", file=open("results_" + sys.argv[1] + sys.argv[2] + ".txt","a"))
 for ii in range(LENGTH):
 	print("{:.3f}".format(gyroX[ii]), file=open("results_" + sys.argv[1] + ".txt","a"), end="")
-	print(", ", file=open("results_" + sys.argv[1] + ".txt","a"), end="")
+	print(", ", file=open("results_" + sys.argv[1] + sys.argv[2] + ".txt","a"), end="")
 
-print("\ngyroY", file=open("results_" + sys.argv[1] + ".txt","a"))
+print("\ngyroY", file=open("results_" + sys.argv[1] + sys.argv[2] + ".txt","a"))
 for ii in range(LENGTH):
 	print("{:.3f}".format(gyroY[ii]), file=open("results_" + sys.argv[1] + ".txt","a"), end="")
-	print(", ", file=open("results_" + sys.argv[1] + ".txt","a"), end="")
+	print(", ", file=open("results_" + sys.argv[1] + sys.argv[2] + ".txt","a"), end="")
 
-print("\ngyroZ", file=open("results_" + sys.argv[1] + ".txt","a"))
+print("\ngyroZ", file=open("results_" + sys.argv[1] + sys.argv[2] + ".txt","a"))
 for ii in range(LENGTH):
 	print("{:.3f}".format(gyroZ[ii]), file=open("results_" + sys.argv[1] + ".txt","a"), end="")
-	print(", ", file=open("results_" + sys.argv[1] + ".txt","a"), end="")
+	print(", ", file=open("results_" + sys.argv[1] + sys.argv[2] + ".txt","a"), end="")
 
 Roomba.Move(0,0)
 Roomba.ShutDown()
