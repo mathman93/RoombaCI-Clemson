@@ -107,5 +107,6 @@ for ii in range(LENGTH):
 	print(", ", file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","a"), end="")
 
 Roomba.Move(0,0)
+time.sleep(1)
 Roomba.ShutDown()
 GPIO.cleanup()
