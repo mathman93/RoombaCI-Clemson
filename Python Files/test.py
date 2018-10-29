@@ -4,6 +4,7 @@ import RoombaCI_lib
 import RPi.GPIO as GPIO
 import serial
 import sys
+import time
 
 GPIO.setmode(GPIO.BCM) # Use BCM pin numbering for GPIO
 Roomba = RoombaCI_lib.Create_2("/dev/ttyS0", 115200)
@@ -22,6 +23,8 @@ if sys.argv[1] == "2":
 	Roomba.Move(75,0)
 if sys.argv[1] == "0":
 	Roomba.Move(0,0)
+
+time.sleep(2)
 
 # Add the calibrate mag and calibrate accelgyro to function	
 LENGTH = 500
@@ -56,52 +59,52 @@ for ii in range(LENGTH):
 	gyroZ[ii] = c
 
 
-print("IMU TESTING", file=open("results_" + sys.argv[1] + ".txt","a"))
+print("IMU TESTING", file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","w"))
 
-print("magX", file=open("results_" + sys.argv[1] + ".txt","a"))
+print("magX", file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","a"))
 for ii in range(LENGTH):
-	print("{:.3f}".format(magX[ii]), file=open("results_" + sys.argv[1] + ".txt","a"), end="")
-	print(", ", file=open("results_" + sys.argv[1] + ".txt","a"), end="")
+	print("{:.3f}".format(magX[ii]), file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","a"), end="")
+	print(", ", file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","a"), end="")
 
-print("\nmagY", file=open("results_" + sys.argv[1] + ".txt","a"))
+print("\nmagY", file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","a"))
 for ii in range(LENGTH):
-	print("{:.3f}".format(magY[ii]), file=open("results_" + sys.argv[1] + ".txt","a"), end="")
-	print(", ", file=open("results_" + sys.argv[1] + ".txt","a"), end="")
+	print("{:.3f}".format(magY[ii]), file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","a"), end="")
+	print(", ", file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","a"), end="")
 
-print("\nmagZ", file=open("results_" + sys.argv[1] + ".txt","a"))
+print("\nmagZ", file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","a"))
 for ii in range(LENGTH):
-	print("{:.3f}".format(magZ[ii]), file=open("results_" + sys.argv[1] + ".txt","a"), end="")
-	print(", ", file=open("results_" + sys.argv[1] + ".txt","a"), end="")
+	print("{:.3f}".format(magZ[ii]), file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","a"), end="")
+	print(", ", file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","a"), end="")
 
-print("\naccelX", file=open("results_" + sys.argv[1] + ".txt","a"))
+print("\naccelX", file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","a"))
 for ii in range(LENGTH):
-	print("{:.3f}".format(accelX[ii]), file=open("results_" + sys.argv[1] + ".txt","a"), end="")
-	print(", ", file=open("results_" + sys.argv[1] + ".txt","a"), end="")
+	print("{:.3f}".format(accelX[ii]), file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","a"), end="")
+	print(", ", file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","a"), end="")
 
-print("\naccelY", file=open("results_" + sys.argv[1] + ".txt","a"))
+print("\naccelY", file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","a"))
 for ii in range(LENGTH):
-	print("{:.3f}".format(accelY[ii]), file=open("results_" + sys.argv[1] + ".txt","a"), end="")
-	print(", ", file=open("results_" + sys.argv[1] + ".txt","a"), end="")
+	print("{:.3f}".format(accelY[ii]), file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","a"), end="")
+	print(", ", file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","a"), end="")
 
-print("\naccelZ", file=open("results_" + sys.argv[1] + ".txt","a"))
+print("\naccelZ", file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","a"))
 for ii in range(LENGTH):
-	print("{:.3f}".format(accelZ[ii]), file=open("results_" + sys.argv[1] + ".txt","a"), end="")
-	print(", ", file=open("results_" + sys.argv[1] + ".txt","a"), end="")
+	print("{:.3f}".format(accelZ[ii]), file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","a"), end="")
+	print(", ", file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","a"), end="")
 
-print("\ngyroX", file=open("results_" + sys.argv[1] + ".txt","a"))
+print("\ngyroX", file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","a"))
 for ii in range(LENGTH):
-	print("{:.3f}".format(gyroX[ii]), file=open("results_" + sys.argv[1] + ".txt","a"), end="")
-	print(", ", file=open("results_" + sys.argv[1] + ".txt","a"), end="")
+	print("{:.3f}".format(gyroX[ii]), file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","a"), end="")
+	print(", ", file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","a"), end="")
 
-print("\ngyroY", file=open("results_" + sys.argv[1] + ".txt","a"))
+print("\ngyroY", file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","a"))
 for ii in range(LENGTH):
-	print("{:.3f}".format(gyroY[ii]), file=open("results_" + sys.argv[1] + ".txt","a"), end="")
-	print(", ", file=open("results_" + sys.argv[1] + ".txt","a"), end="")
+	print("{:.3f}".format(gyroY[ii]), file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","a"), end="")
+	print(", ", file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","a"), end="")
 
-print("\ngyroZ", file=open("results_" + sys.argv[1] + ".txt","a"))
+print("\ngyroZ", file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","a"))
 for ii in range(LENGTH):
-	print("{:.3f}".format(gyroZ[ii]), file=open("results_" + sys.argv[1] + ".txt","a"), end="")
-	print(", ", file=open("results_" + sys.argv[1] + ".txt","a"), end="")
+	print("{:.3f}".format(gyroZ[ii]), file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","a"), end="")
+	print(", ", file=open("results_" + sys.argv[1] + "_" + sys.argv[2] + ".csv","a"), end="")
 
 Roomba.Move(0,0)
 Roomba.ShutDown()
