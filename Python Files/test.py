@@ -4,6 +4,7 @@ import RoombaCI_lib
 import RPi.GPIO as GPIO
 import serial
 import sys
+import time
 
 GPIO.setmode(GPIO.BCM) # Use BCM pin numbering for GPIO
 Roomba = RoombaCI_lib.Create_2("/dev/ttyS0", 115200)
@@ -22,6 +23,8 @@ if sys.argv[1] == "2":
 	Roomba.Move(75,0)
 if sys.argv[1] == "0":
 	Roomba.Move(0,0)
+
+time.sleep(2)
 
 # Add the calibrate mag and calibrate accelgyro to function	
 LENGTH = 500
