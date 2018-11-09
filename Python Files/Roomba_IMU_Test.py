@@ -9,7 +9,7 @@ import serial
 import time
 import RPi.GPIO as GPIO
 
-import RoombaCI_lib	
+import RoombaCI_lib
 
 ## Variables and Constants ##
 global Xbee # Specifies connection to Xbee
@@ -27,7 +27,8 @@ move_dict = {
 	3: [2.0, 0, 0],
 	4: [5.0, 0, 75],
 	5: [2.0, 0, 0],
-	6: [10.0, 75, 0]
+	6: [10.0, 75, 0],
+	7: [3.0, 0, 0]
 	}
 
 ## Functions and Definitions ##
@@ -109,10 +110,9 @@ for i in range(1, len(move_dict.keys())+1):
 			[r_speed,l_speed,l_counts,r_counts] = Roomba.ReadQueryStream(41,42,43,44) # Read Roomba data stream
 			[ax,ay,az] = imu.ReadAccel() # Read accelerometer component values
 			[gx,gy,gz] = imu.ReadGyro() # Read gyroscope component values
-			
 			# Write data values to a text file
 			datafile.write("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}, {7}, {8}, {9}, {10}\n".format(data_time, ax, ay, az, gx, gy, gz, l_speed, r_speed, l_counts, r_counts))
-			
+			print("{0:.6f}, {1}, {2}".format(data_time, l_counts, r_counts))
 		# End if Roomba.Available() > 0
 		
 	# End while (time.time() - movetime_base) < movetime_offset
