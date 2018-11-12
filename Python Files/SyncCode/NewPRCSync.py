@@ -33,7 +33,7 @@ reset_timer = 300 # seconds until oscillators reset
 
 # Counter Parameters
 cycle_threshold = 360.0 # Threshold for phase of PCO
-cycle_time = 5.0 # Length of PCO cycle in seconds
+cycle_time = 10.0 # Length of PCO cycle in seconds
 
 # Counter Constants
 counter_adjust = cycle_time # Amount of counter adjustment per cycle
