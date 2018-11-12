@@ -20,8 +20,8 @@ Xbee = serial.Serial('/dev/ttyUSB0', 115200) # Baud rate should be 115200
 yled = 5
 rled = 6
 gled = 13
-Nodes = int(input("How many Roombas are testing? ")) #Number of Roombas
-RoombaID = int(input("Which Roomba is this? ")) #Which Roomba is being tested
+Nodes = input("How many Roombas are testing? ") #Number of Roombas
+RoombaID = input("Which Roomba is this? ") #Which Roomba is being tested
 
 # Pulse definitions
 reset_pulse = "b" # Rest pulse character
@@ -43,7 +43,7 @@ counter_ratio = (cycle_threshold)/(cycle_time) # Fraction of phase cycle complet
 global angle # Heading of Roomba (found from magnetometer)
 initial_angle = RoombaID*cycle_threshold/Nodes # Set initial angle value (apart from IMU reading)
 global counter # Counter of Roomba (works with angle to compute "phase")
-coupling_ratio = 0.3 # Ratio for amount to turn - in range (0, 1]
+coupling_ratio = 0.5 # Ratio for amount to turn - in range (0, 1]
 epsilon = 0.5 # (Ideally) smallest resolution of magnetometer
 global desired_heading  # Heading set point for Roomba
 
@@ -53,7 +53,7 @@ refr_period = 0.0*cycle_threshold # Refractory period for PRC
 omega_a = 0.3 # Fraction of cycle frequency to have Roomba spin (DHMagnitudeFreq())
 tau = 0.3 # Fraction of cycle time to have Roomba spin (DHMagnitudeTime())
 
-# Need to define wheel separation variable before spin_CFM calculation
+# Neede to define wheel separation variable before spin_CFM calculation
 WHEEL_SEPARATION = 235 # millimeters
 # Determine spin magnitude based on cycle frequency
 spin_CFM = int(omega_a * WHEEL_SEPARATION * math.pi / (cycle_time))
@@ -332,9 +332,9 @@ while True:
 				angle += cycle_threshold
 				counter_base += counter_adjust
 			# Value needed to turn to desired heading point
-			#spin = DHMagnitude(angle, desired_heading, epsilon) # Use for Optimized Spin Method
+			spin = DHMagnitude(angle, desired_heading, epsilon) # Use for Optimized Spin Method
 			#spin = spin_CFM # Use for Constant Frequency Method
-			spin = spin_CTM # Use for Constant Time Method
+			#spin = spin_CTM # Use for Constant Time Method
 			spin *= DHDirection(angle, desired_heading, epsilon) # Determine direction of spin
 			Roomba.Move(forward, spin) # Moves Roomba to desired heading point
 			
@@ -371,9 +371,9 @@ while True:
 			GPIO.output(gled, GPIO.LOW)  # End notify that reset_pulse received
 			GPIO.output(rled, GPIO.LOW)
 		elif message == sync_pulse:
-			#print("Sync Pulse Received.") # Include for debugging
+			print("Sync Pulse Received.") # Include for debugging
 			d_angle = PRCSync(angle + counter) # Calculate desired change in heading
-			spin_CTM = DHMagnitudeTime(d_angle * coupling_ratio) # Set spin rate using Constant Time Method
+			#spin_CTM = DHMagnitudeTime(d_angle * coupling_ratio) # Set spin rate using Constant Time Method
 			desired_heading = angle + (d_angle * coupling_ratio) # Update desired heading
 			# Normalize desired_heading to range [0,360)
 			if desired_heading >= cycle_threshold or desired_heading < 0:

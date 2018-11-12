@@ -1,6 +1,6 @@
-''' NewPRCSync.py
-Purpose: Synchronize heading of Roomba network using PCO model
-	Uses PRC function to synchronize (from Energy-Efficient Sync, Wang, 2012)
+''' NewPRCDesync.py
+Purpose: Desynchronize heading of Roomba network using PCO model
+	Uses PRC function to desynchronize
 	Uses Roomba wheel encoders to update heading value over time.
 IMPORTANT: Must be run using Python 3 (python3)
 Last Modified: 10/17/2018
@@ -11,7 +11,7 @@ import time
 import RPi.GPIO as GPIO
 import math
 import RoombaCI_lib # Make sure this file is in the same directory
-
+from RoombaCI_lib import DHTurn
 
 ## Variables and Constants ##
 global Xbee # Specifies connection to Xbee
@@ -20,8 +20,8 @@ Xbee = serial.Serial('/dev/ttyUSB0', 115200) # Baud rate should be 115200
 yled = 5
 rled = 6
 gled = 13
-Nodes = int(input("How many Roombas are testing? ")) #Number of Roombas
-RoombaID = int(input("Which Roomba is this? ")) #Which Roomba is being tested
+Nodes = input("How many Roombas are testing? ") #Number of Roombas
+RoombaID = input("Which Roomba is this? ") #Which Roomba is being tested
 
 # Pulse definitions
 reset_pulse = "b" # Rest pulse character
@@ -33,7 +33,7 @@ reset_timer = 300 # seconds until oscillators reset
 
 # Counter Parameters
 cycle_threshold = 360.0 # Threshold for phase of PCO
-cycle_time = 5.0 # Length of PCO cycle in seconds
+cycle_time = 10.0 # Length of PCO cycle in seconds
 
 # Counter Constants
 counter_adjust = cycle_time # Amount of counter adjustment per cycle
@@ -43,7 +43,8 @@ counter_ratio = (cycle_threshold)/(cycle_time) # Fraction of phase cycle complet
 global angle # Heading of Roomba (found from magnetometer)
 initial_angle = RoombaID*cycle_threshold/Nodes # Set initial angle value (apart from IMU reading)
 global counter # Counter of Roomba (works with angle to compute "phase")
-coupling_ratio = 0.3 # Ratio for amount to turn - in range (0, 1]
+coupling_ratio_fwd = 0.6 # Forward coupling ratio for amount to turn - in range (0, 1]
+coupling_ratio_bkwd = 0.9 # Backward coupling ratio for amount to turn - in range (0, 1]
 epsilon = 0.5 # (Ideally) smallest resolution of magnetometer
 global desired_heading  # Heading set point for Roomba
 
@@ -53,8 +54,6 @@ refr_period = 0.0*cycle_threshold # Refractory period for PRC
 omega_a = 0.3 # Fraction of cycle frequency to have Roomba spin (DHMagnitudeFreq())
 tau = 0.3 # Fraction of cycle time to have Roomba spin (DHMagnitudeTime())
 
-# Need to define wheel separation variable before spin_CFM calculation
-WHEEL_SEPARATION = 235 # millimeters
 # Determine spin magnitude based on cycle frequency
 spin_CFM = int(omega_a * WHEEL_SEPARATION * math.pi / (cycle_time))
 if spin_CFM < 11: # Roomba does not detect values less than 11
@@ -63,7 +62,7 @@ spin_CTM = 0 # initialize spin magnitude for Constant Time Method
 
 # Roomba Navigation Constants
 WHEEL_DIAMETER = 72 # millimeters
-
+WHEEL_SEPARATION = 235 # millimeters
 WHEEL_COUNTS = 508.8 # counts per revolution
 DISTANCE_CONSTANT = (WHEEL_DIAMETER * math.pi)/(WHEEL_COUNTS) # millimeters/count
 TURN_CONSTANT = (WHEEL_DIAMETER * 180)/(WHEEL_COUNTS * WHEEL_SEPARATION) # degrees/count
@@ -183,7 +182,6 @@ def ResetCounters():
 	global reset_base
 	global counter
 	global data_counter
-	global initial_angle
 	global angle
 	global desired_heading
 	counter_base = time.time() # Initialize counter
@@ -196,28 +194,24 @@ def ResetCounters():
 	desired_heading = angle # Set to initial angle value
 
 ''' Returns necessary change in heading when a sync_pulse is received
-	For standard delay-advance phase response function with refractory period
+	For standard PRC Desync function with incorporated forward and backward coupling
 	'''
-def PRCSync(phase):
+def PRCDesync(phase):
+	global Nodes
 	global cycle_threshold
-	global refr_period
+	global coupling_ratio_bkwd
+	global coupling_ratio_fwd
 	global rled
-	global epsilon
-	if phase > refr_period: # If phase is greater than the refractory period...
-		if phase > (cycle_threshold - epsilon):
-			angle_change = 0 # No change in heading
-			GPIO.output(rled, GPIO.HIGH) # Indicate sync pulse received, but no turning
-		elif phase > 0.5*(cycle_threshold):
-			angle_change = (cycle_threshold - phase) # Increase heading
-			GPIO.output(rled, GPIO.LOW) # Indicate sync pulse received caused turn
-		elif phase > epsilon:
-			angle_change = (-1) * phase # Decrease heading
-			GPIO.output(rled, GPIO.LOW) # Indicate sync pulse received caused turn
-		else:
-			angle_change = 0 # No change in heading
-			GPIO.output(rled, GPIO.HIGH) # Indicate sync pulse received, but no turning
+	if phase < (cycle_threshold/Nodes):
+		angle_change = ((cycle_threshold/Nodes)-phase) * coupling_ratio_fwd # Increase heading
+		GPIO.output(rled, GPIO.LOW) # Indicate sync pulse received caused turn
+	elif phase > ((cycle_threshold*(Nodes-1))/Nodes):
+		angle_change = (((cycle_threshold*(Nodes-1))/Nodes) - phase) * coupling_ratio_bkwd # Decrease heading
+		GPIO.output(rled, GPIO.LOW) # Indicate sync pulse received caused turn
 	else:
 		angle_change = 0 # No change in heading
+		GPIO.output(rled, GPIO.HIGH) # Indicate sync pulse received, but no turning
+
 	return angle_change
 
 ''' Displays current date and time to the screen
@@ -255,7 +249,7 @@ Roomba.BlinkCleanLight() # Blink the Clean light on Roomba
 
 if Roomba.Available() > 0: # If anything is in the Roomba receive buffer
 	x = Roomba.DirectRead(Roomba.Available()) # Clear out Roomba boot-up info
-	print(x) # Include for debugging
+	#print(x) # Include for debugging
 
 print(" ROOMBA Setup Complete")
 GPIO.output(yled, GPIO.HIGH) # Indicate within setup sequence
@@ -331,17 +325,26 @@ while True:
 			elif angle < 0:
 				angle += cycle_threshold
 				counter_base += counter_adjust
+
 			# Value needed to turn to desired heading point
-			#spin = DHMagnitude(angle, desired_heading, epsilon) # Use for Optimized Spin Method
+			spin = DHMagnitude(angle, desired_heading, epsilon) # Use for Optimized Spin Method
 			#spin = spin_CFM # Use for Constant Frequency Method
-			spin = spin_CTM # Use for Constant Time Method
+			#spin = spin_CTM # Use for Constant Time Method
 			spin *= DHDirection(angle, desired_heading, epsilon) # Determine direction of spin
-			Roomba.Move(forward, spin) # Moves Roomba to desired heading point
+			Roomba.Move(forward, spin) # Move Roomba to desired heading point
 			
 			if spin == 0:
 				GPIO.output(yled, GPIO.LOW) # Indicate Roomba is not turning
 			else:
 				GPIO.output(yled, GPIO.HIGH) # Indicate Roomba is turning
+		
+			
+			# Print data to monitor
+			print("{0}, {1:.6f}, {2:.3f}, {3:.3f}, {4}, {5};".format(data_counter, data_time, angle, counter, l_counts, r_counts))
+			# Write data values to a text file
+			datafile.write("{0}, {1:.6f}, {2:.3f}, {3:.3f}, {4}, {5};\n".format(data_counter, data_time, angle, counter, l_counts, r_counts))
+			
+			data_counter += 1 # Increment counter for the next data sample
 			
 			# Update current wheel encoder counts
 			l_counts_current = l_counts
@@ -354,10 +357,10 @@ while True:
 		if (angle + counter) > cycle_threshold: # If (angle + counter) is greater than 360 degrees...
 			SendSyncPulse()
 			counter_base += counter_adjust
-			
+		
 		# Receive pulse
 		message = ReceivePulse()
-			
+		
 		if message == reset_pulse: 
 			#print("Reset Pulse Received.") # Include for debugging
 			GPIO.output(gled, GPIO.HIGH) # Notify that reset_pulse received
@@ -372,9 +375,10 @@ while True:
 			GPIO.output(rled, GPIO.LOW)
 		elif message == sync_pulse:
 			#print("Sync Pulse Received.") # Include for debugging
-			d_angle = PRCSync(angle + counter) # Calculate desired change in heading
-			spin_CTM = DHMagnitudeTime(d_angle * coupling_ratio) # Set spin rate using Constant Time Method
-			desired_heading = angle + (d_angle * coupling_ratio) # Update desired heading
+			d_angle = PRCDesync(angle + counter) # Calculate desired change in heading
+				# incorporates coupling ratio(s)
+			#spin_CTM = DHMagnitudeTime(d_angle) # Set spin rate using Constant Time Method
+			desired_heading = angle + (d_angle) # Update desired heading
 			# Normalize desired_heading to range [0,360)
 			if desired_heading >= cycle_threshold or desired_heading < 0:
 				desired_heading = (desired_heading % cycle_threshold)
