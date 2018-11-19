@@ -151,7 +151,6 @@ Roomba.Move(0,0)
 
 # Read in initial values
 [r_speed,l_speed,l_counts,r_counts] = Roomba.Query(41,42,43,44) # Read Roomba data stream
-time_base = time.time() # Set data timer base
 data_time = 0.0
 [ax,ay,az] = ReadAccelNew() # Read accelerometer component values
 [gx,gy,gz] = imu.ReadGyro() # Read gyroscope component values
@@ -161,6 +160,7 @@ print("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}".format(dat
 
 # Start up Roomba query stream
 Roomba.StartQueryStream(41,42,43,44) # Start query stream with specific sensor packets
+time_base = time.time() # Set data timer base
 
 for i in range(1, len(move_dict.keys())+1):
 	[movetime_offset, forward, spin] = move_dict[i] # Read values from dictionary
