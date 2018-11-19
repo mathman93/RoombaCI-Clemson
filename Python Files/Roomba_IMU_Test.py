@@ -8,6 +8,8 @@ Last Modified: 11/9/2018
 import serial
 import time
 import RPi.GPIO as GPIO
+import numpy as np
+import math
 
 import RoombaCI_lib
 
@@ -20,6 +22,7 @@ rled = 6
 gled = 13
 
 data_counter = 0 # Initialize data_counter
+global A # Accelerometer transformation matrix
 
 move_dict = {
 	1: [2.0, 0, 0],
@@ -28,7 +31,7 @@ move_dict = {
 	4: [5.0, 0, 75],
 	5: [2.0, 0, 0],
 	6: [10.0, 75, 0],
-	7: [3.0, 0, 0]
+	7: [2.0, 0, 0]
 	}
 
 ## Functions and Definitions ##
@@ -38,6 +41,57 @@ def DisplayDateTime():
 	# Month day, Year, Hour:Minute:Seconds
 	date_time = time.strftime("%B %d, %Y, %H:%M:%S", time.gmtime())
 	print("Program run: ", date_time)
+
+''' Determines offset parameters for accelerometer and gyroscope
+	Roomba/IMU should be still when this is called '''
+def CalibrateAccelGyroNew():
+	global A
+	# Calculate average value of accelerometer and gyroscope components
+	ax_avg = 0
+	ay_avg = 0
+	az_avg = 0
+	gx_avg = 0
+	gy_avg = 0
+	gz_avg = 0
+	for i in range(0,1000): # Average 1000 readings
+		[cax,cay,caz] = imu.ReadAccelRaw() # Read in uncorrected accelerometer data
+		ax_avg = (cax + (i * ax_avg))/(i+1)
+		ay_avg = (cay + (i * ay_avg))/(i+1)
+		az_avg = (caz + (i * az_avg))/(i+1)
+		[cgx,cgy,cgz] = imu.ReadGyroRaw() # Read in uncorrected gyroscope data
+		gx_avg = (cgx + (i * gx_avg))/(i+1)
+		gy_avg = (cgy + (i * gy_avg))/(i+1)
+		gz_avg = (cgz + (i * gz_avg))/(i+1)
+	# Average value over many data points is the offset value
+	imu.ax_offset = ax_avg
+	imu.ay_offset = ay_avg
+	imu.az_offset = (az_avg - 1) # Assumes z-axis is up
+	imu.gx_offset = gx_avg
+	imu.gy_offset = gy_avg
+	imu.gz_offset = gz_avg
+	# Calculate change of basis matrix for accelerometer values
+	v3 = np.array([ax_avg, ay_avg, az_avg])
+	v2 = np.array([-v3[0]*v3[1], pow(v3[0],2) + pow(v3[2],2), -v3[1]*v3[2]])
+	v1 = np.array([v3[2], 0, -v3[0]])
+	# Orthogonal basis vectors (all same length as v3)
+	v3 = (v3/math.sqrt(np.dot(v3,v3)))*math.sqrt(np.dot(v3,v3))
+	v2 = (v2/math.sqrt(np.dot(v2,v2)))*math.sqrt(np.dot(v3,v3))
+	v1 = (v1/math.sqrt(np.dot(v1,v1)))*math.sqrt(np.dot(v3,v3))
+	
+	A = np.array([v1,v2,v3]) # Change of basis matrix (for row vectors)
+
+''' Read X, Y, and Z components of accelerometer
+	Returns:
+		tax = float; transformed x-value of accelerometer (g)
+		tay = float; transformed y-value of accelerometer (g)
+		taz = float; transformed z-value of accelerometer (g) '''
+def ReadAccelNew():
+	global A
+	[cax,cay,caz] = imu.ReadAccelRaw() # Read in uncorrected accelerometer data
+	w = np.array([cax,cay,caz])
+	[tax,tay,taz] = np.matmul(w,np.linalg.inv(A)) # Matrix multiply with transformation matrix inverse
+	# Return transformed accelerometer component values
+	return [tax,tay,taz]
 
 ## -- Code Starts Here -- ##
 # Setup Code #
@@ -75,13 +129,13 @@ print(" Calibrating IMU...")
 #imu.CalibrateMag() # Calculate magnetometer offset values
 #Roomba.Move(0,0) # Stop Roomba spinning
 #time.sleep(0.5)
-imu.CalibrateAccelGyro() # Calculate accelerometer and gyroscope offset values
+CalibrateAccelGyroNew() # Calculate accelerometer and gyroscope offset values
 # Display offset values
 #print("mx_offset = {:f}; my_offset = {:f}; mz_offset = {:f}".format(imu.mx_offset, imu.my_offset, imu.mz_offset))
 print("ax_offset = {:f}; ay_offset = {:f}; az_offset = {:f}".format(imu.ax_offset, imu.ay_offset, imu.az_offset))
 print("gx_offset = {:f}; gy_offset = {:f}; gz_offset = {:f}".format(imu.gx_offset, imu.gy_offset, imu.gz_offset))
 print(" IMU Setup Complete")
-time.sleep(1) # Gives time to read offset values before continuing
+time.sleep(3) # Gives time to read offset values before continuing
 GPIO.output(yled, GPIO.LOW) # Indicate setup sequence is complete
 
 if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
@@ -89,15 +143,24 @@ if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 	#print(x) # Include for debugging
 
 # Main Code #
-
+datafile = open("IMU_Data_Test1.txt", "w") # Open a text file for storing data
+	# Will overwrite anything that was in the text file previously
 basetime = time.time()
 basetime_offset = (1/64)
 Roomba.Move(0,0)
 
+# Read in initial values
+[r_speed,l_speed,l_counts,r_counts] = Roomba.Query(41,42,43,44) # Read Roomba data stream
+data_time = 0.0
+[ax,ay,az] = ReadAccelNew() # Read accelerometer component values
+[gx,gy,gz] = imu.ReadGyro() # Read gyroscope component values
+# Write data values to a text file
+datafile.write("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}, {7}, {8}, {9}, {10}\n".format(data_time, ax, ay, az, gx, gy, gz, l_speed, r_speed, l_counts, r_counts))
+print("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}".format(data_time, ax, ay, az, gx, gy, gz))
+
+# Start up Roomba query stream
 Roomba.StartQueryStream(41,42,43,44) # Start query stream with specific sensor packets
-datafile = open("IMU_Data_Test1.txt", "w") # Open a text file for storing data
-	# Will overwrite anything that was in the text file previously
-time_base = time.time()
+time_base = time.time() # Set data timer base
 
 for i in range(1, len(move_dict.keys())+1):
 	[movetime_offset, forward, spin] = move_dict[i] # Read values from dictionary
@@ -108,11 +171,11 @@ for i in range(1, len(move_dict.keys())+1):
 			# Retrieve data values (Happens every ~1/64 seconds)
 			data_time = time.time() - time_base # Time that data is received
 			[r_speed,l_speed,l_counts,r_counts] = Roomba.ReadQueryStream(41,42,43,44) # Read Roomba data stream
-			[ax,ay,az] = imu.ReadAccel() # Read accelerometer component values
+			[ax,ay,az] = ReadAccelNew() # Read accelerometer component values
 			[gx,gy,gz] = imu.ReadGyro() # Read gyroscope component values
 			# Write data values to a text file
 			datafile.write("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}, {7}, {8}, {9}, {10}\n".format(data_time, ax, ay, az, gx, gy, gz, l_speed, r_speed, l_counts, r_counts))
-			print("{0:.6f}, {1}, {2}".format(data_time, l_counts, r_counts))
+			print("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}".format(data_time, ax, ay, az, gx, gy, gz))
 		# End if Roomba.Available() > 0
 		
 	# End while (time.time() - movetime_base) < movetime_offset
