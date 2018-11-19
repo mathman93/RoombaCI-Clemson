@@ -89,7 +89,7 @@ def ReadAccelNew():
 	global A
 	[cax,cay,caz] = imu.ReadAccelRaw() # Read in uncorrected accelerometer data
 	w = np.array([cax,cay,caz])
-	[tax,tay,taz] = np.matmul(w,A.T) # Matrix multiply with transformation matrix
+	[tax,tay,taz] = np.matmul(w,np.linalg.inv(A)) # Matrix multiply with transformation matrix inverse
 	# Return transformed accelerometer component values
 	return [tax,tay,taz]
 
