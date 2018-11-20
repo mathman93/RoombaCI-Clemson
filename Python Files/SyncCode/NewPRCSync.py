@@ -32,7 +32,7 @@ data_timer = (2*0.015625) # seconds until new data point (1/64 = 0.015625)
 reset_timer = 300 # seconds until oscillators reset
 
 # Counter Parameters
-cycle_threshold = 360.0 # Threshold for phase of PCO
+cycle_threshold = 360 # Threshold for phase of PCO
 cycle_time = 10.0 # Length of PCO cycle in seconds
 
 # Counter Constants
