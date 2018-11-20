@@ -29,8 +29,8 @@ rled = 6
 gled = 13
 
 # Roomba Constants
-WHEEL_DIAMETER = 72 # millimeters
-WHEEL_SEPARATION = 235 # millimeters
+WHEEL_DIAMETER = 71.3 # millimeters
+WHEEL_SEPARATION = 231.5 # millimeters
 WHEEL_COUNTS = 508.8 # counts per revolution
 DISTANCE_CONSTANT = (WHEEL_DIAMETER * math.pi)/(WHEEL_COUNTS) # millimeters/count
 TURN_CONSTANT = (WHEEL_DIAMETER * 180)/(WHEEL_COUNTS * WHEEL_SEPARATION) # degrees/count
