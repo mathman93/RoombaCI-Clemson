@@ -34,7 +34,7 @@ reset_timer = 300 # seconds until oscillators reset
 # Counter Parameters
 cycle_threshold = 360 # Threshold for phase of PCO
 cycle_time = 10.0 # Length of PCO cycle in seconds
-
+print("Nodes: ",Nodes,"RoombaID: ",RoombaID,"Cycle Threshold: ",cycle_threshold)
 # Counter Constants
 counter_adjust = cycle_time # Amount of counter adjustment per cycle
 counter_ratio = (cycle_threshold)/(cycle_time) # Fraction of phase cycle completed in one second
