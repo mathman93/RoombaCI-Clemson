@@ -43,8 +43,8 @@ counter_ratio = (cycle_threshold)/(cycle_time) # Fraction of phase cycle complet
 global angle # Heading of Roomba (found from magnetometer)
 initial_angle = float(input("Enter the initial Angle: ")) # Set initial angle value (apart from IMU reading)
 global counter # Counter of Roomba (works with angle to compute "phase")
-coupling_ratio_fwd = 0.6 # Forward coupling ratio for amount to turn - in range (0, 1]
-coupling_ratio_bkwd = 0.9 # Backward coupling ratio for amount to turn - in range (0, 1]
+coupling_ratio_fwd = 0.5 # Forward coupling ratio for amount to turn - in range (0, 1]
+coupling_ratio_bkwd = 0.8 # Backward coupling ratio for amount to turn - in range (0, 1]
 epsilon = 0.5 # (Ideally) smallest resolution of magnetometer
 global desired_heading  # Heading set point for Roomba
 
