@@ -2,7 +2,7 @@
 Purpose: Testing communication between Roomba and LSM9DS1 IMU
 	Form basis of Roomba code for other tests.
 IMPORTANT: Must be run using Python 3 (python3)
-Last Modified: 11/9/2018
+Last Modified: 11/20/2018
 '''
 ## Import libraries ##
 import serial
@@ -66,9 +66,9 @@ def CalibrateAccelGyroNew():
 	imu.ax_offset = ax_avg
 	imu.ay_offset = ay_avg
 	imu.az_offset = (az_avg - 1) # Assumes z-axis is up
-	imu.gx_offset = gx_avg
-	imu.gy_offset = gy_avg
-	imu.gz_offset = gz_avg
+	#imu.gx_offset = gx_avg
+	#imu.gy_offset = gy_avg
+	#imu.gz_offset = gz_avg
 	# Calculate change of basis matrix for accelerometer values
 	v3 = np.array([ax_avg, ay_avg, az_avg])
 	v2 = np.array([-v3[0]*v3[1], pow(v3[0],2) + pow(v3[2],2), -v3[1]*v3[2]])
@@ -79,6 +79,11 @@ def CalibrateAccelGyroNew():
 	v1 = (v1/math.sqrt(np.dot(v1,v1)))*math.sqrt(np.dot(v3,v3))
 	
 	A = np.array([v1,v2,v3]) # Change of basis matrix (for row vectors)
+	
+	g1 = np.array([gx_avg, gy_avg, gz_avg])
+	g_offset = np.matmul(g1,np.linalg.inv(A))
+	# Need to check scaling of gyro offsets using change of basis matrix
+	[imu.gx_offset, imu.gy_offset, imu.gz_offset] = g_offset
 
 ''' Read X, Y, and Z components of accelerometer
 	Returns:
@@ -92,6 +97,14 @@ def ReadAccelNew():
 	[tax,tay,taz] = np.matmul(w,np.linalg.inv(A)) # Matrix multiply with transformation matrix inverse
 	# Return transformed accelerometer component values
 	return [tax,tay,taz]
+
+def ReadGyroNew():
+	global A
+	[cgx,cgy,cgz] = imu.ReadGyroRaw() # Read in uncorrected gyroscope data
+	w = np.array([cgx,gcy,cgz])
+	[tgx,tgy,tgz] = np.matmul(w,np.linalg.inv(A)) # Matrix multiply with change of basis matrix
+	# Return transformed and offset gyroscope component values
+	return [tgx - imu.gx_offset, tgy - imu.gy_offset, tgz - imu.gz_offset]
 
 ## -- Code Starts Here -- ##
 # Setup Code #
@@ -153,7 +166,7 @@ Roomba.Move(0,0)
 [r_speed,l_speed,l_counts,r_counts] = Roomba.Query(41,42,43,44) # Read Roomba data stream
 data_time = 0.0
 [ax,ay,az] = ReadAccelNew() # Read accelerometer component values
-[gx,gy,gz] = imu.ReadGyro() # Read gyroscope component values
+[gx,gy,gz] = ReadGyroNew() # Read gyroscope component values
 # Write data values to a text file
 datafile.write("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}, {7}, {8}, {9}, {10}\n".format(data_time, ax, ay, az, gx, gy, gz, l_speed, r_speed, l_counts, r_counts))
 print("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}".format(data_time, ax, ay, az, gx, gy, gz))
@@ -172,7 +185,7 @@ for i in range(1, len(move_dict.keys())+1):
 			data_time = time.time() - time_base # Time that data is received
 			[r_speed,l_speed,l_counts,r_counts] = Roomba.ReadQueryStream(41,42,43,44) # Read Roomba data stream
 			[ax,ay,az] = ReadAccelNew() # Read accelerometer component values
-			[gx,gy,gz] = imu.ReadGyro() # Read gyroscope component values
+			[gx,gy,gz] = ReadGyroNew() # Read gyroscope component values
 			# Write data values to a text file
 			datafile.write("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}, {7}, {8}, {9}, {10}\n".format(data_time, ax, ay, az, gx, gy, gz, l_speed, r_speed, l_counts, r_counts))
 			print("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}".format(data_time, ax, ay, az, gx, gy, gz))
