@@ -43,7 +43,7 @@ counter_ratio = (cycle_threshold)/(cycle_time) # Fraction of phase cycle complet
 global angle # Heading of Roomba (found from magnetometer)
 initial_angle = RoombaID*cycle_threshold/Nodes # Set initial angle value (apart from IMU reading)
 global counter # Counter of Roomba (works with angle to compute "phase")
-coupling_ratio = 0.5 # Ratio for amount to turn - in range (0, 1]
+coupling_ratio = 0.7 # Ratio for amount to turn - in range (0, 1]
 epsilon = 0.5 # (Ideally) smallest resolution of magnetometer
 global desired_heading  # Heading set point for Roomba
 
