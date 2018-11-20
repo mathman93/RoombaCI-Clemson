@@ -101,7 +101,7 @@ def ReadAccelNew():
 def ReadGyroNew():
 	global A
 	[cgx,cgy,cgz] = imu.ReadGyroRaw() # Read in uncorrected gyroscope data
-	w = np.array([cgx,gcy,cgz])
+	w = np.array([cgx,cgy,cgz])
 	[tgx,tgy,tgz] = np.matmul(w,np.linalg.inv(A)) # Matrix multiply with change of basis matrix
 	# Return transformed and offset gyroscope component values
 	return [tgx - imu.gx_offset, tgy - imu.gy_offset, tgz - imu.gz_offset]
