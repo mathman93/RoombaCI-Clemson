@@ -328,8 +328,8 @@ while True:
 
 			# Value needed to turn to desired heading point
 			#spin = DHMagnitude(angle, desired_heading, epsilon) # Use for Optimized Spin Method
-			#spin = spin_CFM # Use for Constant Frequency Method
-			spin = spin_CTM # Use for Constant Time Method
+			spin = spin_CFM # Use for Constant Frequency Method
+			#spin = spin_CTM # Use for Constant Time Method
 			#spin *= DHDirection(angle, desired_heading, epsilon) # Determine direction of spin
 			Roomba.Move(forward, spin) # Move Roomba to desired heading point
 			
@@ -377,7 +377,7 @@ while True:
 			#print("Sync Pulse Received.") # Include for debugging
 			d_angle = PRCDesync(angle + counter) # Calculate desired change in heading
 				# incorporates coupling ratio(s)
-			spin_CTM = DHMagnitudeTime(d_angle) # Set spin rate using Constant Time Method
+			#spin_CTM = DHMagnitudeTime(d_angle) # Set spin rate using Constant Time Method
 			#desired_heading = angle + (d_angle) # Update desired heading
 			# Normalize desired_heading to range [0,360)
 			#if desired_heading >= cycle_threshold or desired_heading < 0:
