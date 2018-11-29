@@ -335,7 +335,7 @@ while True:
 			#spin = DHMagnitude(angle, desired_heading, epsilon) # Use for Optimized Spin Method
 			spin = spin_CFM # Use for Constant Frequency Method
 			#spin = spin_CTM # Use for Constant Time Method
-			#spin *= DHDirection(angle, desired_heading, epsilon) # Determine direction of spin
+			spin *= DHDirection(angle, desired_heading, epsilon) # Determine direction of spin
 			Roomba.Move(forward, spin) # Moves Roomba to desired heading point
 			
 			if spin == 0:
