@@ -373,8 +373,8 @@ while True:
 		elif message == sync_pulse:
 			#print("Sync Pulse Received.") # Include for debugging
 			d_angle = PRCSync(angle + counter) # Calculate desired change in heading
-			#spin_CTM = DHMagnitudeTime(d_angle * coupling_ratio) # Set spin rate using Constant Time Method
-			#desired_heading = angle + (d_angle * coupling_ratio) # Update desired heading
+			spin_CTM = DHMagnitudeTime(d_angle * coupling_ratio) # Set spin rate using Constant Time Method
+			desired_heading = angle + (d_angle * coupling_ratio) # Update desired heading
 			# Normalize desired_heading to range [0,360)
 			if desired_heading >= cycle_threshold or desired_heading < 0:
 				desired_heading = (desired_heading % cycle_threshold)
