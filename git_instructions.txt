@@ -1,5 +1,7 @@
 Git has a lot of features that are useful for anyone working in code development, but if all you care about is trying to get the code on your computer onto the raspberry pis and vice versa here is the basic process:
 
+For all code changes, you should be on branch "testing". This is necessary when you push or pull anything. To get on this branch type "git checkout testing".
+
 [make changes]
 
 git commit -am "[message here]"
@@ -25,3 +27,9 @@ These commands can be used on the raspberry pis or your computer from a terminal
 -git pull gets the changes from the remote server
 
 NOTE: you should make sure that you have the latest changes from the remote server ("git pull") before you try to push files
+
+rp1 works
+rp5 works
+rp4 works
+rp6 works
+rp2 works
