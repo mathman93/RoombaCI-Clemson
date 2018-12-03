@@ -625,7 +625,7 @@ def DHTurn(angle, desired_heading, epsilon):
 	elif (diff > thresh_2 and diff < (360 - thresh_2)):
 		spin_value = 50 # Move slower when closer to the set point
 	else:
-		spin_value = 25 # Move very slow when very close to the set point
+		spin_value = 15 # Move very slow when very close to the set point
 		# Reduces oscillations due to magnetometer variation and loop execution rate
 
 	# Determine direction of spin
@@ -685,7 +685,7 @@ def DDSpeed(angle, desired_heading, distance):
 	elif (diff > spin_thresh_2 and diff < (360 - spin_thresh_2)):
 		spin_value = 50 # Move slower when closer to the set point
 	else:
-		spin_value = 25 # Move very slow when very close to the set point
+		spin_value = 15 # Move very slow when very close to the set point
 		# Reduces oscillations due to magnetometer variation and loop execution rate
 
 	if distance > forward_thresh_1:
