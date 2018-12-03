@@ -56,7 +56,7 @@ Roomba.StartQueryStream(7,43,44,42,41,45)
 
 
 init_time = time.time ()
-rotation = 360  # in units of degress
+rotation = 3600  # in units of degress
 while (angle < rotation):
 	
 	if Roomba.Available() > 0:
