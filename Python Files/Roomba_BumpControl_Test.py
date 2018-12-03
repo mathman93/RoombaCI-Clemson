@@ -1,9 +1,9 @@
 ''' 
-Roomba_DataRead_Test.py
-Purpose: Testing communication between Roomba and RPi
-	Form basis of Roomba code for other tests.
+Roomba_BumpControl_Test.py
+Purpose: Test code to read bump sensors and avoid obstacles
+	Does not control properly; needs adjustment to use of lightbumper value
 IMPORTANT: Must be run using Python 3 (python3)
-Last Modified: 5/31/2018
+Last Modified: 9/7/2018
 '''
 ## Import libraries ##
 import serial
