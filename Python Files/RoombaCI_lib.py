@@ -3,13 +3,14 @@ Purpose: Python Library with LSM9DS1 class and specific functions
 	and iRobot Create 2 (Roomba) class and specific functions
 Import this file in main Python file to access functions
 Made by: Timothy Anglea, Joshua Harvey
-Last Modified: 6/29/2018
+Last Modified: 12/5/2018
 '''
 ## Import Libraries ##
 from ctypes import *
 import time
 import math
 import serial
+import numpy as np
 
 ##################################################################
 ## LSM9DS1 IMU Class ##
@@ -80,6 +81,8 @@ class LSM9DS1_IMU:
 		self.gx_offset = 0.0
 		self.gy_offset = 0.0
 		self.gz_offset = 0.0
+		# Calibration transformation matrix
+		self.Atran = np.identity(3)
 
 	## IMU Functions/Methods ##
 	''' Read X, Y, and Z components of magnetometer
@@ -235,22 +238,34 @@ class LSM9DS1_IMU:
 		gy_avg = 0
 		gz_avg = 0
 		for i in range(0,1000): # Average 1000 readings
-			[cax,cay,caz] = self.ReadAccelRaw() # Read in uncorrected accelerometer data
+			[cax,cay,caz] = imu.ReadAccelRaw() # Read in uncorrected accelerometer data
 			ax_avg = (cax + (i * ax_avg))/(i+1)
 			ay_avg = (cay + (i * ay_avg))/(i+1)
 			az_avg = (caz + (i * az_avg))/(i+1)
-			[cgx,cgy,cgz] = self.ReadGyroRaw() # Read in uncorrected gyroscope data
+			[cgx,cgy,cgz] = imu.ReadGyroRaw() # Read in uncorrected gyroscope data
 			gx_avg = (cgx + (i * gx_avg))/(i+1)
 			gy_avg = (cgy + (i * gy_avg))/(i+1)
 			gz_avg = (cgz + (i * gz_avg))/(i+1)
 		# Average value over many data points is the offset value
-		self.ax_offset = ax_avg
-		self.ay_offset = ay_avg
-		self.az_offset = (az_avg - 1) # Assumes z-axis is up
-		self.gx_offset = gx_avg
-		self.gy_offset = gy_avg
-		self.gz_offset = gz_avg
-
+		imu.ax_offset = ax_avg
+		imu.ay_offset = ay_avg
+		imu.az_offset = (az_avg - 1) # Assumes z-axis is up
+		# Calculate change of basis matrix for accelerometer values
+		v3 = np.array([ax_avg, ay_avg, az_avg])
+		v2 = np.array([-v3[0]*v3[1], pow(v3[0],2) + pow(v3[2],2), -v3[1]*v3[2]])
+		v1 = np.array([v3[2], 0, -v3[0]])
+		# Orthogonal basis vectors (all same length as v3)
+		v3 = (v3/math.sqrt(np.dot(v3,v3)))*math.sqrt(np.dot(v3,v3)) # Technically redundant
+		v2 = (v2/math.sqrt(np.dot(v2,v2)))*math.sqrt(np.dot(v3,v3))
+		v1 = (v1/math.sqrt(np.dot(v1,v1)))*math.sqrt(np.dot(v3,v3))
+		
+		self.Atran = np.array([v1,v2,v3]) # Change of basis matrix (for row vectors)
+		
+		g1 = np.array([gx_avg, gy_avg, gz_avg])
+		g_offset = np.matmul(g1,np.linalg.inv(self.Atran))
+		# Need to check scaling of gyro offsets using change of basis matrix
+		[imu.gx_offset, imu.gy_offset, imu.gz_offset] = g_offset
+	
 	''' Read X, Y, and Z components of accelerometer
 		Returns:
 			cax - self.ax_offset = float; corrected x-value of accelerometer (g)
@@ -268,8 +283,10 @@ class LSM9DS1_IMU:
 		cax = self.lib.lsm9ds1_calcAccel(self.imu, ax)
 		cay = self.lib.lsm9ds1_calcAccel(self.imu, ay)
 		caz = self.lib.lsm9ds1_calcAccel(self.imu, az)
-		# Return offset accelerometer component values
-		return [(cax - self.ax_offset), (cay - self.ay_offset), (caz - self.az_offset)]
+		w = np.array([cax,cay,caz])
+		[tax,tay,taz] = np.matmul(w,np.linalg.inv(self.Atran)) # Matrix multiply with transformation matrix inverse
+		# Return transformed accelerometer component values
+		return [tax,tay,taz]
 
 	''' Read X, Y, and Z components of gyroscope
 		Returns:
@@ -288,8 +305,10 @@ class LSM9DS1_IMU:
 		cgx = self.lib.lsm9ds1_calcGyro(self.imu, gx)
 		cgy = self.lib.lsm9ds1_calcGyro(self.imu, gy)
 		cgz = self.lib.lsm9ds1_calcGyro(self.imu, gz)
-		# Return gyroscope component values
-		return [(cgx - self.gx_offset), (cgy - self.gy_offset), (cgz - self.gz_offset)]
+		w = np.array([cgx,cgy,cgz])
+		[tgx,tgy,tgz] = np.matmul(w,np.linalg.inv(self.Atran)) # Matrix multiply with change of basis matrix
+		# Return transformed and offset gyroscope component values
+		return [tgx - imu.gx_offset, tgy - imu.gy_offset, tgz - imu.gz_offset]
 
 ##################################################################
 ## iRobot Create 2 (Roomba) Class ##

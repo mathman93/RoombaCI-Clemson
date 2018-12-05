@@ -142,7 +142,7 @@ print(" Calibrating IMU...")
 #imu.CalibrateMag() # Calculate magnetometer offset values
 #Roomba.Move(0,0) # Stop Roomba spinning
 #time.sleep(0.5)
-CalibrateAccelGyroNew() # Calculate accelerometer and gyroscope offset values
+imu.CalibrateAccelGyro() # Calculate accelerometer and gyroscope offset values
 # Display offset values
 #print("mx_offset = {:f}; my_offset = {:f}; mz_offset = {:f}".format(imu.mx_offset, imu.my_offset, imu.mz_offset))
 print("ax_offset = {:f}; ay_offset = {:f}; az_offset = {:f}".format(imu.ax_offset, imu.ay_offset, imu.az_offset))
@@ -165,8 +165,8 @@ Roomba.Move(0,0)
 # Read in initial values
 [r_speed,l_speed,l_counts,r_counts] = Roomba.Query(41,42,43,44) # Read Roomba data stream
 data_time = 0.0
-[ax,ay,az] = ReadAccelNew() # Read accelerometer component values
-[gx,gy,gz] = ReadGyroNew() # Read gyroscope component values
+[ax,ay,az] = imu.ReadAccel() # Read accelerometer component values
+[gx,gy,gz] = imu.ReadGyro() # Read gyroscope component values
 # Write data values to a text file
 datafile.write("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}, {7}, {8}, {9}, {10}\n".format(data_time, ax, ay, az, gx, gy, gz, l_speed, r_speed, l_counts, r_counts))
 print("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}".format(data_time, ax, ay, az, gx, gy, gz))
@@ -184,8 +184,8 @@ for i in range(1, len(move_dict.keys())+1):
 			# Retrieve data values (Happens every ~1/64 seconds)
 			data_time = time.time() - time_base # Time that data is received
 			[r_speed,l_speed,l_counts,r_counts] = Roomba.ReadQueryStream(41,42,43,44) # Read Roomba data stream
-			[ax,ay,az] = ReadAccelNew() # Read accelerometer component values
-			[gx,gy,gz] = ReadGyroNew() # Read gyroscope component values
+			[ax,ay,az] = imu.ReadAccel() # Read accelerometer component values
+			[gx,gy,gz] = imu.ReadGyro() # Read gyroscope component values
 			# Write data values to a text file
 			datafile.write("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}, {7}, {8}, {9}, {10}\n".format(data_time, ax, ay, az, gx, gy, gz, l_speed, r_speed, l_counts, r_counts))
 			print("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}".format(data_time, ax, ay, az, gx, gy, gz))
