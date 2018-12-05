@@ -238,18 +238,18 @@ class LSM9DS1_IMU:
 		gy_avg = 0
 		gz_avg = 0
 		for i in range(0,1000): # Average 1000 readings
-			[cax,cay,caz] = imu.ReadAccelRaw() # Read in uncorrected accelerometer data
+			[cax,cay,caz] = self.ReadAccelRaw() # Read in uncorrected accelerometer data
 			ax_avg = (cax + (i * ax_avg))/(i+1)
 			ay_avg = (cay + (i * ay_avg))/(i+1)
 			az_avg = (caz + (i * az_avg))/(i+1)
-			[cgx,cgy,cgz] = imu.ReadGyroRaw() # Read in uncorrected gyroscope data
+			[cgx,cgy,cgz] = self.ReadGyroRaw() # Read in uncorrected gyroscope data
 			gx_avg = (cgx + (i * gx_avg))/(i+1)
 			gy_avg = (cgy + (i * gy_avg))/(i+1)
 			gz_avg = (cgz + (i * gz_avg))/(i+1)
 		# Average value over many data points is the offset value
-		imu.ax_offset = ax_avg
-		imu.ay_offset = ay_avg
-		imu.az_offset = (az_avg - 1) # Assumes z-axis is up
+		self.ax_offset = ax_avg
+		self.ay_offset = ay_avg
+		self.az_offset = (az_avg - 1) # Assumes z-axis is up
 		# Calculate change of basis matrix for accelerometer values
 		v3 = np.array([ax_avg, ay_avg, az_avg])
 		v2 = np.array([-v3[0]*v3[1], pow(v3[0],2) + pow(v3[2],2), -v3[1]*v3[2]])
@@ -264,7 +264,7 @@ class LSM9DS1_IMU:
 		g1 = np.array([gx_avg, gy_avg, gz_avg])
 		g_offset = np.matmul(g1,np.linalg.inv(self.Atran))
 		# Need to check scaling of gyro offsets using change of basis matrix
-		[imu.gx_offset, imu.gy_offset, imu.gz_offset] = g_offset
+		[self.gx_offset, self.gy_offset, self.gz_offset] = g_offset
 	
 	''' Read X, Y, and Z components of accelerometer
 		Returns:
@@ -308,7 +308,7 @@ class LSM9DS1_IMU:
 		w = np.array([cgx,cgy,cgz])
 		[tgx,tgy,tgz] = np.matmul(w,np.linalg.inv(self.Atran)) # Matrix multiply with change of basis matrix
 		# Return transformed and offset gyroscope component values
-		return [tgx - imu.gx_offset, tgy - imu.gy_offset, tgz - imu.gz_offset]
+		return [tgx - self.gx_offset, tgy - self.gy_offset, tgz - self.gz_offset]
 
 ##################################################################
 ## iRobot Create 2 (Roomba) Class ##
