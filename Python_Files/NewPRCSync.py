@@ -255,7 +255,7 @@ Roomba.BlinkCleanLight() # Blink the Clean light on Roomba
 
 if Roomba.Available() > 0: # If anything is in the Roomba receive buffer
 	x = Roomba.DirectRead(Roomba.Available()) # Clear out Roomba boot-up info
-	print(x) # Include for debugging
+	#print(x) # Include for debugging
 
 print(" ROOMBA Setup Complete")
 GPIO.output(yled, GPIO.HIGH) # Indicate within setup sequence
