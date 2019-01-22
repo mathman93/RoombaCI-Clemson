@@ -10,8 +10,8 @@ import serial
 import time
 import RPi.GPIO as GPIO
 import math
+import os.path
 import RoombaCI_lib # Make sure this file is in the same directory
-from RoombaCI_lib import DHTurn
 
 ## Variables and Constants ##
 global Xbee # Specifies connection to Xbee
@@ -232,8 +232,9 @@ GPIO.setup(rled, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(gled, GPIO.OUT, initial=GPIO.LOW)
 
 # Open a text file for data retrieval
-file_name = input("Name for data file: ")
-file_name += ".txt"
+file_name_input = input("Name for data file: ")
+dir_path = "/home/pi/RoombaCI-Clemson/Data_Files/2019_Spring/" # Directory path to save file
+file_name = os.path.join(dir_path, file_name_input+".txt")
 datafile = open(file_name, "w") # Open a text file for storing data
 	# Will overwrite anything that was in the text file previously
 
@@ -286,9 +287,9 @@ angle = initial_angle # Reset initial angle value (without IMU)
 #angle = imu.CalculateHeading() # Reset initial angle value (using IMU)
 
 # Print out data header values
-print("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts;")
+print("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts, Bumper Byte, Desired Heading\n")
 # Write data values to a text file
-datafile.write("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts;\n")
+datafile.write("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts, Bumper Byte, Desired Heading\n")
 
 # Ready to begin PRCSync Loop
 SendResetPulse() # Send reset pulse
@@ -325,7 +326,6 @@ while True:
 			elif angle < 0:
 				angle += cycle_threshold
 				counter_base += counter_adjust
-
 			# Value needed to turn to desired heading point
 			spin = DHMagnitude(angle, desired_heading, epsilon) # Use for Optimized Spin Method
 			#spin = spin_CFM # Use for Constant Frequency Method
@@ -337,9 +337,6 @@ while True:
 				GPIO.output(yled, GPIO.LOW) # Indicate Roomba is not turning
 			else:
 				GPIO.output(yled, GPIO.HIGH) # Indicate Roomba is turning
-		
-			
-			# Print data to monitor
 			
 			# Update current wheel encoder counts
 			l_counts_current = l_counts
@@ -365,7 +362,7 @@ while True:
 			datafile = open(file_name, "w") # Open a text file for storing data
 				# Will overwrite anything that was in the text file previously
 			# Write data values to a text file
-			datafile.write("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts;\n")
+			datafile.write("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts, Bumper Byte, Desired Heading\n")
 			GPIO.output(gled, GPIO.LOW)  # End notify that reset_pulse received
 			GPIO.output(rled, GPIO.LOW)
 		elif message == sync_pulse:
@@ -381,9 +378,9 @@ while True:
 		# Print heading data to monitor every second
 		if (time.time() - data_base) > data_timer: # After one second
 			# Print data to monitor
-			print("{0}, {1:.6f}, {2:.3f}, {3:.3f}, {4}, {5}, {6:0>8b}, {7};".format(data_counter, data_time, angle, counter, l_counts, r_counts, bumper_byte, desired_heading))
+			print("{0}, {1:.6f}, {2:.3f}, {3:.3f}, {4}, {5}, {6:0>8b}, {7}".format(data_counter, data_time, angle, counter, l_counts, r_counts, bumper_byte, desired_heading))
 			# Write data values to a text file
-			datafile.write("{0}, {1:.6f}, {2:.3f}, {3:.3f}, {4}, {5}, {6:0>8b}, {7};\n".format(data_counter, data_time, angle, counter, l_counts, r_counts, bumper_byte, desired_heading))
+			datafile.write("{0}, {1:.6f}, {2:.3f}, {3:.3f}, {4}, {5}, {6:0>8b}, {7}\n".format(data_counter, data_time, angle, counter, l_counts, r_counts, bumper_byte, desired_heading))
 			
 			data_counter += 1 # Increment counter for the next data sample
 			data_base += data_timer

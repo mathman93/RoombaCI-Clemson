@@ -41,7 +41,7 @@ counter_ratio = (cycle_threshold)/(cycle_time) # Fraction of phase cycle complet
 
 # Synchronization Parameters
 global angle # Heading of Roomba (found from magnetometer)
-initial_angle = RoombaID*cycle_threshold/Nodes # Set initial angle value (apart from IMU reading)
+initial_angle = float(input("Enter the initial Angle: ")) # Set initial angle value (apart from IMU reading)
 global counter # Counter of Roomba (works with angle to compute "phase")
 coupling_ratio = 0.7 # Ratio for amount to turn - in range (0, 1]
 epsilon = 0.5 # (Ideally) smallest resolution of magnetometer
@@ -63,7 +63,6 @@ spin_CTM = 0 # initialize spin magnitude for Constant Time Method
 
 # Roomba Navigation Constants
 WHEEL_DIAMETER = 72 # millimeters
-
 WHEEL_COUNTS = 508.8 # counts per revolution
 DISTANCE_CONSTANT = (WHEEL_DIAMETER * math.pi)/(WHEEL_COUNTS) # millimeters/count
 TURN_CONSTANT = (WHEEL_DIAMETER * 180)/(WHEEL_COUNTS * WHEEL_SEPARATION) # degrees/count
