@@ -646,36 +646,23 @@ def DHTurn(angle, desired_heading, epsilon):
 	else:
 		spin_value = 15 # Move very slow when very close to the set point
 		# Reduces oscillations due to magnetometer variation and loop execution rate
-
+	
 	# Determine direction of spin
-	if desired_heading < epsilon: # if 0 <= desired_heading < epsilon
-		if (angle > (desired_heading + epsilon) and angle < (desired_heading + 180)):
-			return -spin_value # Spin Left (CCW)
-		elif (angle < (360 + desired_heading - epsilon)): # and angle >= (desired_heading + 180)
-			return spin_value # Spin Right (CW)
-		else: # if (360 + desired_heading - epsilon) < angle < (desired_heading + epsilon)
-			return 0 # Stop Spinning
-	elif desired_heading < 180: # and desired_heading >= epsilon...
-		if (angle > (desired_heading + epsilon) and angle < (desired_heading + 180)):
-			return -spin_value # Spin Left (CCW)
-		elif (angle < (desired_heading - epsilon) or angle >= (desired_heading + 180)):
-			return spin_value # Spin Right (CW)
-		else: # if (desired_heading - epsilon) < angle < (desired_heading + epsilon)
-			return 0 # Stop Spinning
-	elif desired_heading < (360 - epsilon):
-		if (angle < (desired_heading - epsilon) and angle > (desired_heading - 180)):
-			return spin_value # Spin Right (CW)
-		elif (angle > (desired_heading + epsilon) or angle <= (desired_heading - 180)):
-			return -spin_value # Spin Left (CCW)
-		else: # if (desired_heading - epsilon) < angle < (desired_heading + epsilon)
-			return 0 # Stop Spinning
-	else: # if desired_heading >= (360 - epsilon)
-		if (angle < (desired_heading - epsilon) and angle > (desired_heading - 180)):
-			return spin_value # Spin Right (CW)
-		elif (angle > (desired_heading + epsilon - 360)): # and (angle <= (desired_heading - 180))
-			return -spin_value # Spin Left (CCW)
-		else: # if (angle > (desired_heading - epsilon) or angle < (desired_heading + epsilon - 360))
-			return 0 # Stop Spinning
+	diff = angle - desired_heading
+	# Normalize diff to [-0.5*360, 0.5*360]
+	if diff > 180:
+		diff -= 360
+	elif diff < -180:
+		diff += 360
+	# Set spin direction
+	if diff > epsilon:
+		spin_dir = -1 # Spin CCW
+	elif diff < -epsilon:
+		spin_dir = 1 # Spin CW
+	else:
+		spin_dir = 0 # Don't spin
+	
+	return (spin_value * spin_dir)
 
 ''' Returns Roomba forward speed to make sure it can reach a certain set point
 		in a direction of "desired_heading" a distance "distance" millimeters away
