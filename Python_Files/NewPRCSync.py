@@ -91,7 +91,7 @@ def DHMagnitude(angle, desired_heading, epsilon):
 	elif (diff > thresh_2 and diff < (360 - thresh_2)):
 		spin_value = 50 # Move slower when closer to the set point
 	else:
-		spin_value = 25 # Move very slow when very close to the set point
+		spin_value = 15 # Move very slow when very close to the set point
 	return spin_value
 	# Reduces oscillations due to magnetometer variation and loop execution rate
 
