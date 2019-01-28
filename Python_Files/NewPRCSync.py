@@ -273,7 +273,7 @@ GPIO.setup(yled, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(rled, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(gled, GPIO.OUT, initial=GPIO.LOW)
 
-# User Input Information
+# User Input Information and Data Validation
 while True:
 	try:
 		Nodes = int(input("How many Roombas are being tested? ")) # Total number of Roombas
@@ -326,7 +326,7 @@ while True:
 
 while True:
 	try:
-		topology_opt = int(input("What kind of topology is being used (1 = ATA; 2 = Ring)? ")) # Set topology
+		topology_opt = int(input("Select topology being used (1 = ATA; 2 = Ring): ")) # Set topology
 	except ValueError: # Check that the entered number is an integer
 		print("Not a valid number. Try again.")
 		continue # Start at the beginning of the loop.
@@ -339,7 +339,7 @@ while True:
 
 while True:
 	try:
-		method_opt = int(input("Which phase continuity method is being used (1 = CFM; 2 = CTM; 3 = Standard)?" )) # Set phase continuity method
+		method_opt = int(input("Select phase continuity method being used (1 = CFM; 2 = CTM; 3 = Standard): ")) # Set phase continuity method
 	except ValueError: # Check that the entered number is an integer
 		print("Not a valid number. Try again.")
 		continue # Start at the beginning of the loop.
@@ -356,6 +356,7 @@ print("Nodes: {0}; RoombaID: {1}; Cycle Threshold: {2}".format(Nodes, RoombaID, 
 reset_pulse = "b" # Rest pulse character
 sync_pulse = str(RoombaID) # Sync pulse character
 connected = SwitchTopology(topology_opt, RoombaID, Nodes) # List of RoombaIDs that are connected to this Roomba
+print("Connected nodes: {0}".format(connected)) # Include for debugging
 
 # Open a text file for data retrieval
 file_name_input = input("Name for data file: ")
