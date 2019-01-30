@@ -212,7 +212,7 @@ def SwitchTopology(number, ID, nodes):
 def ATA(ID, nodes):
 	c = []
 	for i in range(1, (nodes + 1)):
-		c.append(str(num))
+		c.append(str(i))
 	return c
 
 ''' Used by SwitchTopology function; returns list of two IDs for the Ring topology
