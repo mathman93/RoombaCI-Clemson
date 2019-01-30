@@ -26,7 +26,7 @@ data_timer = (2*0.015625) # seconds until new data point (1/64 = 0.015625)
 reset_timer = 300 # seconds until oscillators reset
 
 # Counter Parameters
-cycle_threshold = 360 # Threshold for phase of PCO
+cycle_threshold = 360.0 # Threshold for phase of PCO
 cycle_time = 10.0 # Length of PCO cycle in seconds
 
 # Counter Constants
@@ -312,16 +312,17 @@ while True:
 	# Normalize value to range [0,360)
 	if initial_angle < 0: # Check that the entered number is not negative.
 		while initial_angle < 0:
-			initial_angle += 360
-		print("Initial angle entered was too small. Converted to value: {0}".format(initial_angle))
+			initial_angle += cycle_threshold
+		print("Initial angle is too small. Converted to value: {0:.6f}".format(initial_angle))
 		break # Leave while loop
-	elif initial_angle >= 360: # Check that the entered number is not too big.
-		while initial_angle >= 360:
-			initial_angle -= 360
-		print("Initial angle entered was too large. Converted to value: {0}".format(initial_angle))
+	elif initial_angle >= cycle_threshold: # Check that the entered number is not too big.
+		while initial_angle >= cycle_threshold:
+			initial_angle -= cycle_threshold
+		print("Initial angle is too large. Converted to value: {0:.6f}".format(initial_angle))
 		break # Leave while loop
 	else:
 		# The initial angle value is good.
+		print("Initial angle value: {0:.6f}".format(initial_angle))
 		break # Leave while loop
 
 while True:
@@ -361,7 +362,7 @@ print("Connected nodes: {0}".format(connected)) # Include for debugging
 # Open a text file for data retrieval
 file_name_input = input("Name for data file: ")
 dir_path = "/home/pi/RoombaCI-Clemson/Data_Files/2019_Spring/" # Directory path to save file
-file_name = os.path.join(dir_path, file_name_input+".txt")
+file_name = os.path.join(dir_path, file_name_input+".dat") # MATLAB file extension
 datafile = open(file_name, "w") # Open a text file for storing data
 	# Will overwrite anything that was in the text file previously
 
@@ -416,7 +417,7 @@ angle = initial_angle # Reset initial angle value (without IMU)
 # Print out data header values
 print("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts, Bumper Byte, Desired Heading")
 # Write data values to a text file
-datafile.write("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts, Bumper Byte, Desired Heading\n")
+#datafile.write("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts, Bumper Byte, Desired Heading\n")
 			
 # Ready to begin PRCSync Loop
 SendResetPulse() # Send reset pulse
@@ -492,7 +493,7 @@ while True:
 			datafile = open(file_name, "w") # Open a text file for storing data
 				# Will overwrite anything that was in the text file previously
 			# Write data values to a text file
-			datafile.write("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts, Bumper Byte, Desired Heading\n")
+			#datafile.write("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts, Bumper Byte, Desired Heading\n")
 			GPIO.output(gled, GPIO.LOW)  # End notify that reset_pulse received
 			GPIO.output(rled, GPIO.LOW)
 		elif message in connected:
@@ -508,9 +509,9 @@ while True:
 		# Print heading data to monitor so often
 		if (time.time() - data_base) > data_timer: # After value of data_timer...
 			# Print data to monitor
-			print("{0}, {1:.6f}, {2:.3f}, {3:.3f}, {4}, {5}, {6:0>8b}, {7}".format(data_counter, data_time, angle, counter, l_counts, r_counts, bumper_byte, desired_heading))
+			print("{0}, {1:.6f}, {2:.6f}, {3:.6f}, {4}, {5}, {6:0>8b}, {7:.6f}".format(data_counter, data_time, angle, counter, l_counts, r_counts, bumper_byte, desired_heading))
 			# Write data values to a text file
-			datafile.write("{0}, {1:.6f}, {2:.3f}, {3:.3f}, {4}, {5}, {6:0>8b}, {7}\n".format(data_counter, data_time, angle, counter, l_counts, r_counts, bumper_byte, desired_heading))
+			datafile.write("{0} {1:.6f} {2:.6f} {3:.6f} {4} {5} {6:0>8b} {7:.6f}\n".format(data_counter, data_time, angle, counter, l_counts, r_counts, bumper_byte, desired_heading))
 			
 			data_counter += 1 # Increment counter for the next data sample
 			data_base += data_timer
