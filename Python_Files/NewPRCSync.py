@@ -36,11 +36,11 @@ counter_ratio = (cycle_threshold)/(cycle_time) # Fraction of phase cycle complet
 # Synchronization Parameters
 global angle # Heading of Roomba (found from magnetometer)
 global counter # Counter of Roomba (works with angle to compute "phase")
-coupling_ratio = 0.7 # Ratio for amount to turn - in range (0, 1]
+coupling_ratio = 0.5 # Ratio for amount to turn - in range (0, 1]
 epsilon = 0.5 # (Ideally) smallest resolution of magnetometer
 global desired_heading  # Heading set point for Roomba
 
-refr_period = 0.0*cycle_threshold # Refractory period for PRC
+refr_period = 0.001*cycle_threshold # Refractory period for PRC
 
 # Phase Continuity Parameters
 omega_a = 0.3 # Fraction of cycle frequency to have Roomba spin (DHMagnitudeFreq())
