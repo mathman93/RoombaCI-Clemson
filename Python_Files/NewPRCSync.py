@@ -46,19 +46,18 @@ refr_period = 0.001*cycle_threshold # Refractory period for PRC
 omega_a = 0.3 # Fraction of cycle frequency to have Roomba spin (DHMagnitudeFreq())
 tau = 0.3 # Fraction of cycle time to have Roomba spin (DHMagnitudeTime())
 
-# Need to define wheel separation variable before spin_CFM calculation
+# Roomba Navigation Constants
 WHEEL_SEPARATION = 235 # millimeters
+WHEEL_DIAMETER = 72 # millimeters
+WHEEL_COUNTS = 508.8 # counts per revolution
+DISTANCE_CONSTANT = (WHEEL_DIAMETER * math.pi)/(WHEEL_COUNTS) # millimeters/count
+TURN_CONSTANT = (WHEEL_DIAMETER * 180)/(WHEEL_COUNTS * WHEEL_SEPARATION) # degrees/count
+
 # Determine spin magnitude based on cycle frequency
 spin_CFM = int(omega_a * WHEEL_SEPARATION * math.pi / (cycle_time))
 if spin_CFM < 11: # Roomba does not detect values less than 11
 	spin_CFM = 11
 spin_CTM = 0 # initialize spin magnitude for Constant Time Method
-
-# Roomba Navigation Constants
-WHEEL_DIAMETER = 72 # millimeters
-WHEEL_COUNTS = 508.8 # counts per revolution
-DISTANCE_CONSTANT = (WHEEL_DIAMETER * math.pi)/(WHEEL_COUNTS) # millimeters/count
-TURN_CONSTANT = (WHEEL_DIAMETER * 180)/(WHEEL_COUNTS * WHEEL_SEPARATION) # degrees/count
 
 ## Functions and Definitions ##
 

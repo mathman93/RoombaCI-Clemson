@@ -20,12 +20,6 @@ Xbee = serial.Serial('/dev/ttyUSB0', 115200) # Baud rate should be 115200
 yled = 5
 rled = 6
 gled = 13
-Nodes = int(input("How many Roombas are testing? ")) #Number of Roombas
-RoombaID = int(input("Which Roomba is this? ")) #Which Roomba is being tested
-
-# Pulse definitions
-reset_pulse = "b" # Rest pulse character
-sync_pulse = "a" # Sync pulse character
 
 # Timing Counter Parameters
 data_timer = (2*0.015625) # seconds until new data point (1/64 = 0.015625)
@@ -43,29 +37,27 @@ counter_ratio = (cycle_threshold)/(cycle_time) # Fraction of phase cycle complet
 global angle # Heading of Roomba (found from magnetometer)
 initial_angle = float(input("Enter the initial Angle: ")) # Set initial angle value (apart from IMU reading)
 global counter # Counter of Roomba (works with angle to compute "phase")
-coupling_ratio_fwd = 0.4 # Forward coupling ratio for amount to turn - in range (0, 1]
-coupling_ratio_bkwd = 0.7 # Backward coupling ratio for amount to turn - in range (0, 1]
+coupling_ratio_fwd = 0.6 # Forward coupling ratio for amount to turn - in range (0, 1]
+coupling_ratio_bkwd = 0.9 # Backward coupling ratio for amount to turn - in range (0, 1]
 epsilon = 0.5 # (Ideally) smallest resolution of magnetometer
 global desired_heading  # Heading set point for Roomba
-
-refr_period = 0.0*cycle_threshold # Refractory period for PRC
 
 # Phase Continuity Parameters
 omega_a = 0.3 # Fraction of cycle frequency to have Roomba spin (DHMagnitudeFreq())
 tau = 0.3 # Fraction of cycle time to have Roomba spin (DHMagnitudeTime())
 
+# Roomba Navigation Constants
 WHEEL_SEPARATION = 235 # millimeters
+WHEEL_DIAMETER = 72 # millimeters
+WHEEL_COUNTS = 508.8 # counts per revolution
+DISTANCE_CONSTANT = (WHEEL_DIAMETER * math.pi)/(WHEEL_COUNTS) # millimeters/count
+TURN_CONSTANT = (WHEEL_DIAMETER * 180)/(WHEEL_COUNTS * WHEEL_SEPARATION) # degrees/count
+
 # Determine spin magnitude based on cycle frequency
 spin_CFM = int(omega_a * WHEEL_SEPARATION * math.pi / (cycle_time))
 if spin_CFM < 11: # Roomba does not detect values less than 11
 	spin_CFM = 11
 spin_CTM = 0 # initialize spin magnitude for Constant Time Method
-
-# Roomba Navigation Constants
-WHEEL_DIAMETER = 72 # millimeters
-WHEEL_COUNTS = 508.8 # counts per revolution
-DISTANCE_CONSTANT = (WHEEL_DIAMETER * math.pi)/(WHEEL_COUNTS) # millimeters/count
-TURN_CONSTANT = (WHEEL_DIAMETER * 180)/(WHEEL_COUNTS * WHEEL_SEPARATION) # degrees/count
 
 ## Functions and Definitions ##
 
@@ -182,6 +174,7 @@ def ResetCounters():
 	global reset_base
 	global counter
 	global data_counter
+	global initial_angle
 	global angle
 	global desired_heading
 	counter_base = time.time() # Initialize counter
@@ -192,6 +185,50 @@ def ResetCounters():
 	angle = initial_angle # Reset initial angle value (without IMU)
 	#angle = imu.CalculateHeading() # Reset initial angle value (using IMU)
 	desired_heading = angle # Set to initial angle value
+
+''' Choose between two different network topologies: All-to-all (ATA) and Ring
+	Parameters:
+		number = int; topology option, where 1 = ATA and 2 = Ring
+		ID = int; ID number of Roomba being considered
+		nodes = int; Total number of Roombas in the network
+	Returns:
+		connections = list; list of integers representing ID of Roombas that are connected to this Roomba
+	Be sure to validate parameters before calling this function
+	'''
+def SwitchTopology(number, ID, nodes):
+	topology_switcher = {1: ATA, 2: Ring}
+	topology = topology_switcher.get(number)
+	connections = topology(ID, nodes)
+	return connections
+
+''' Used by SwitchTopology function; returns list of all IDs for the ATA topology
+	Paramters:
+		ID = int; ID number of Roomba being considered (not technically used)
+		nodes = int; Total number of Roombas in the network
+	Returns:
+		c = list; list of integers representing ID of Roombas that are connected to this Roomba
+	'''
+def ATA(ID, nodes):
+	c = []
+	for i in range(1, (nodes + 1)):
+		c.append(str(i))
+	return c
+
+''' Used by SwitchTopology function; returns list of two IDs for the Ring topology
+	Paramters:
+		ID = int; ID number of Roomba being considered
+		nodes = int; Total number of Roombas in the network
+	Returns:
+		list; list of integers representing ID of Roombas that are connected to this Roomba
+	'''
+def Ring(ID, nodes):
+	if ID == 1:
+		c = [str(ID + 1), str(nodes)]
+	elif ID == nodes:
+		c = [str(1), str(ID - 1)]
+	else:
+		c = [str(ID - 1), str(ID + 1)]
+	return c
 
 ''' Returns necessary change in heading when a sync_pulse is received
 	For standard PRC Desync function with incorporated forward and backward coupling
@@ -231,10 +268,96 @@ GPIO.setup(yled, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(rled, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(gled, GPIO.OUT, initial=GPIO.LOW)
 
+# User Input Information and Data Validation
+while True:
+	try:
+		Nodes = int(input("How many Roombas are being tested? ")) # Total number of Roombas
+	except ValueError: # Check that the entered number is an integer
+		print("Not a valid number. Try again.")
+		continue # Start at the beginning of the loop.
+	if Nodes < 1: # Check that the entered number is positive.
+		print("Need at least 1 Roomba in the network. Try again.")
+		continue # Start at the beginning of the loop.
+	else:
+		# The number of nodes/Roombas is good.
+		break # Leave while loop
+
+while True:
+	try:
+		RoombaID = int(input("Which Roomba is this one? ")) # Which Roomba is being tested
+	except ValueError: # Check that the entered number is an integer
+		print("Not a valid number. Try again.")
+		continue # Start at the beginning of the loop.
+	if RoombaID < 1: # Check that the entered number is positive.
+		print("Please enter a positve Roomba ID number. Try again.")
+		continue # Start at the beginning of the loop.
+	elif RoombaID > Nodes: # Check that the entered number is not too big.
+		print("There aren't that many Roombas in the network. Try again.")
+		continue
+	else:
+		# The Roomba ID number is good.
+		break # Leave while loop
+
+while True:
+	try:
+		initial_angle = float(input("Enter the initial angle: ")) # Set initial angle value (apart from IMU reading)
+	except ValueError: # Check that the entered number is an integer
+		print("Not a valid number. Try again.")
+		continue # Start at the beginning of the loop.
+	# Normalize value to range [0,360)
+	if initial_angle < 0: # Check that the entered number is not negative.
+		while initial_angle < 0:
+			initial_angle += cycle_threshold
+		print("Initial angle is too small. Converted to value: {0:.6f}".format(initial_angle))
+		break # Leave while loop
+	elif initial_angle >= cycle_threshold: # Check that the entered number is not too big.
+		while initial_angle >= cycle_threshold:
+			initial_angle -= cycle_threshold
+		print("Initial angle is too large. Converted to value: {0:.6f}".format(initial_angle))
+		break # Leave while loop
+	else:
+		# The initial angle value is good.
+		print("Initial angle value: {0:.6f}".format(initial_angle))
+		break # Leave while loop
+
+while True:
+	try:
+		topology_opt = int(input("Select topology being used (1 = ATA; 2 = Ring): ")) # Set topology
+	except ValueError: # Check that the entered number is an integer
+		print("Not a valid number. Try again.")
+		continue # Start at the beginning of the loop.
+	if topology_opt in [1, 2]: # Check that the entered number is valid.
+		# The option number is good.
+		break # Leave while loop
+	else:
+		print("Invalid option selection. Try again.")
+		continue
+
+while True:
+	try:
+		method_opt = int(input("Select phase continuity method being used (1 = CFM; 2 = CTM; 3 = Standard): ")) # Set phase continuity method
+	except ValueError: # Check that the entered number is an integer
+		print("Not a valid number. Try again.")
+		continue # Start at the beginning of the loop.
+	if method_opt in [1, 2, 3]: # Check that the entered number is valid.
+		# The option number is good.
+		break # Leave while loop
+	else:
+		print("Invalid option selection. Try again.")
+		continue
+
+print("Nodes: {0}; RoombaID: {1}; Cycle Threshold: {2}".format(Nodes, RoombaID, cycle_threshold))
+
+# Pulse definitions
+reset_pulse = "b" # Rest pulse character
+sync_pulse = str(RoombaID) # Sync pulse character
+connected = SwitchTopology(topology_opt, RoombaID, Nodes) # List of RoombaIDs that are connected to this Roomba
+print("Connected nodes: {0}".format(connected)) # Include for debugging
+
 # Open a text file for data retrieval
 file_name_input = input("Name for data file: ")
 dir_path = "/home/pi/RoombaCI-Clemson/Data_Files/2019_Spring/" # Directory path to save file
-file_name = os.path.join(dir_path, file_name_input+".txt")
+file_name = os.path.join(dir_path, file_name_input+".dat") # MATLAB file extension
 datafile = open(file_name, "w") # Open a text file for storing data
 	# Will overwrite anything that was in the text file previously
 
@@ -289,7 +412,7 @@ angle = initial_angle # Reset initial angle value (without IMU)
 # Print out data header values
 print("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts, Bumper Byte, Desired Heading\n")
 # Write data values to a text file
-datafile.write("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts, Bumper Byte, Desired Heading\n")
+#datafile.write("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts, Bumper Byte, Desired Heading\n")
 
 # Ready to begin PRCSync Loop
 SendResetPulse() # Send reset pulse
@@ -327,11 +450,14 @@ while True:
 				angle += cycle_threshold
 				counter_base += counter_adjust
 			# Value needed to turn to desired heading point
-			spin = DHMagnitude(angle, desired_heading, epsilon) # Use for Optimized Spin Method
-			#spin = spin_CFM # Use for Constant Frequency Method
-			#spin = spin_CTM # Use for Constant Time Method
+			if method_opt == 1: # Choose CFM
+				spin = spin_CFM # Use for Constant Frequency Method
+			elif method_opt == 2: # Choose CTM
+				spin = spin_CTM # Use for Constant Time Method
+			else: # Choose Standard 
+				spin = DHMagnitude(angle, desired_heading, epsilon) # Use for Standard Spin Method
 			spin *= DHDirection(angle, desired_heading, epsilon) # Determine direction of spin
-			Roomba.Move(forward, spin) # Move Roomba to desired heading point
+			Roomba.Move(forward, spin) # Moves Roomba to desired heading point
 			
 			if spin == 0:
 				GPIO.output(yled, GPIO.LOW) # Indicate Roomba is not turning
@@ -362,25 +488,25 @@ while True:
 			datafile = open(file_name, "w") # Open a text file for storing data
 				# Will overwrite anything that was in the text file previously
 			# Write data values to a text file
-			datafile.write("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts, Bumper Byte, Desired Heading\n")
+			#datafile.write("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts, Bumper Byte, Desired Heading\n")
 			GPIO.output(gled, GPIO.LOW)  # End notify that reset_pulse received
 			GPIO.output(rled, GPIO.LOW)
-		elif message == sync_pulse:
+		elif message in connected:
 			#print("Sync Pulse Received.") # Include for debugging
 			d_angle = PRCDesync(angle + counter) # Calculate desired change in heading
-				# incorporates coupling ratio(s)
-			#spin_CTM = DHMagnitudeTime(d_angle) # Set spin rate using Constant Time Method
+			if method_opt == 2: # If using CTM for phase continuity
+				spin_CTM = DHMagnitudeTime(d_angle * coupling_ratio) # Set spin rate using Constant Time Method
 			desired_heading = angle + (d_angle) # Update desired heading
 			# Normalize desired_heading to range [0,360)
 			if desired_heading >= cycle_threshold or desired_heading < 0:
 				desired_heading = (desired_heading % cycle_threshold)
 		
-		# Print heading data to monitor every second
-		if (time.time() - data_base) > data_timer: # After one second
+		# Print heading data to monitor so often
+		if (time.time() - data_base) > data_timer: # After value of data_timer...
 			# Print data to monitor
-			print("{0}, {1:.6f}, {2:.3f}, {3:.3f}, {4}, {5}, {6:0>8b}, {7}".format(data_counter, data_time, angle, counter, l_counts, r_counts, bumper_byte, desired_heading))
+			print("{0}, {1:.6f}, {2:.6f}, {3:.6f}, {4}, {5}, {6:0>8b}, {7:.6f}".format(data_counter, data_time, angle, counter, l_counts, r_counts, bumper_byte, desired_heading))
 			# Write data values to a text file
-			datafile.write("{0}, {1:.6f}, {2:.3f}, {3:.3f}, {4}, {5}, {6:0>8b}, {7}\n".format(data_counter, data_time, angle, counter, l_counts, r_counts, bumper_byte, desired_heading))
+			datafile.write("{0} {1:.6f} {2:.6f} {3:.6f} {4} {5} {6:0>8b} {7:.6f}\n".format(data_counter, data_time, angle, counter, l_counts, r_counts, bumper_byte, desired_heading))
 			
 			data_counter += 1 # Increment counter for the next data sample
 			data_base += data_timer
