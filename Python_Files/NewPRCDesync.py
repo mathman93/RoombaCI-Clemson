@@ -494,7 +494,7 @@ while True:
 			#print("Sync Pulse Received.") # Include for debugging
 			d_angle = PRCDesync(angle + counter) # Calculate desired change in heading
 			if method_opt == 2: # If using CTM for phase continuity
-				spin_CTM = DHMagnitudeTime(d_angle * coupling_ratio) # Set spin rate using Constant Time Method
+				spin_CTM = DHMagnitudeTime(d_angle) # Set spin rate using Constant Time Method
 			desired_heading = angle + (d_angle) # Update desired heading
 			# Normalize desired_heading to range [0,360)
 			if desired_heading >= cycle_threshold or desired_heading < 0:
