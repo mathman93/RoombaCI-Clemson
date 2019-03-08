@@ -235,8 +235,8 @@ def Ring(ID, nodes):
 def StaleDesync(backPhase, frontPhase):
 	global rled
 	angle_change = ((360 - frontPhase) - backPhase) / 2
-	if angle_change != 0:
-		GPIO.output(rled, GPIO.LOW) # Indicate sync pulse received, turn required
+	if angle_change != 0
+		GPIO.output(rlead, GPIO.LOW) # Indicate sync pulse received, turn required
 	else:
 		angle_change = 0 # No change in heading
 		GPIO.output(rled, GPIO.HIGH) # Indicate sync pulse received, but no turning
@@ -492,14 +492,14 @@ while True:
 			if pulseCounter == 0: # if incoming signal is from following ROOMBA
 				backNeighborPhase = angle + counter
 				d_angle = StaleDesync(backNeighborPhase, frontNeighborPhase) # Calculate desired change in heading
-			if pulseCounter != 0:
+				if method_opt == 2: # If using CTM for phase continuity
+					spin_CTM = DHMagnitudeTime(d_angle) # Set spin rate using Constant Time Method
+				desired_heading = angle + (d_angle) # Update desired heading
+				# Normalize desired_heading to range [0,360)
+				if desired_heading >= cycle_threshold or desired_heading < 0:
+					desired_heading = (desired_heading % cycle_threshold)
+			else:
 				frontNeighborPhase = angle + counter
-			if method_opt == 2: # If using CTM for phase continuity
-				spin_CTM = DHMagnitudeTime(d_angle) # Set spin rate using Constant Time Method
-			desired_heading = angle + (d_angle) # Update desired heading
-			# Normalize desired_heading to range [0,360)
-			if desired_heading >= cycle_threshold or desired_heading < 0:
-				desired_heading = (desired_heading % cycle_threshold)
 			pulseCounter += 1
 
 		# Print heading data to monitor so often
@@ -507,7 +507,7 @@ while True:
 			# Print data to monitor
 			print("{0}, {1:.6f}, {2:.6f}, {3:.6f}, {4}, {5}, {6:0>8b}, {7:.6f}".format(data_counter, data_time, angle, counter, l_counts, r_counts, bumper_byte, desired_heading))
 			# Write data values to a text file
-#			datafile.write("{0} {1:.6f} {2:.6f} {3:.6f} {4} {5} {6:0>8b} {7:.6f}\n".format(data_counter, data_time, angle, counter, l_counts, r_counts, bumper_byte, desired_heading))
+			datafile.write("{0} {1:.6f} {2:.6f} {3:.6f} {4} {5} {6:0>8b} {7:.6f}\n".format(data_counter, data_time, angle, counter, l_counts, r_counts, bumper_byte, desired_heading))
 
 			data_counter += 1 # Increment counter for the next data sample
 			data_base += data_timer
