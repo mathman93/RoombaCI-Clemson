@@ -235,7 +235,7 @@ def Ring(ID, nodes):
 def StaleDesync(backPhase, frontPhase):
 	global rled
 	angle_change = ((360 - frontPhase) - backPhase) / 2
-	if angle_change != 0
+	if angle_change != 0:
 		GPIO.output(rlead, GPIO.LOW) # Indicate sync pulse received, turn required
 	else:
 		angle_change = 0 # No change in heading
