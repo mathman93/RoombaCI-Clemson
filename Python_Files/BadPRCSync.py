@@ -499,7 +499,7 @@ while True:
 		elif message in connected:
 			#print("Sync Pulse Received.") # Include for debugging
 			########## HERE: Bad implementation of algorithm
-			d_angle = PRCSync(desired_heading + counter) # Calculate desired change in heading
+			d_angle = PRCSync(angle + counter) # Calculate desired change in heading
 			if method_opt == 2: # If using CTM for phase continuity
 				spin_CTM = DHMagnitudeTime(d_angle * coupling_ratio) # Set spin rate using Constant Time Method
 			desired_heading += (d_angle * coupling_ratio) # Update desired heading
