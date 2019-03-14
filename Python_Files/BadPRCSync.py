@@ -1,9 +1,9 @@
-''' NewPRCDesync.py
-Purpose: Desynchronize heading of Roomba network using PCO model
-	Uses PRC function to desynchronize
+''' BadPRCSync.py
+Purpose: Bad implementation of PRC Sync algorithm (For illustration purposes only)
+	Uses PRC function to synchronize (from Energy-Efficient Sync, Wang, 2012)
 	Uses Roomba wheel encoders to update heading value over time.
 IMPORTANT: Must be run using Python 3 (python3)
-Last Modified: 10/17/2018
+Last Modified: 3/14/2019
 '''
 ## Import libraries ##
 import serial
@@ -36,10 +36,11 @@ counter_ratio = (cycle_threshold)/(cycle_time) # Fraction of phase cycle complet
 # Synchronization Parameters
 global angle # Heading of Roomba (found from magnetometer)
 global counter # Counter of Roomba (works with angle to compute "phase")
-coupling_ratio_fwd = 0.6 # Forward coupling ratio for amount to turn - in range (0, 1]
-coupling_ratio_bkwd = 0.4 # Backward coupling ratio for amount to turn - in range (0, 1]
+coupling_ratio = 0.5 # Ratio for amount to turn - in range (0, 1]
 epsilon = 0.5 # (Ideally) smallest resolution of magnetometer
 global desired_heading  # Heading set point for Roomba
+
+refr_period = 0.001*cycle_threshold # Refractory period for PRC
 
 # Phase Continuity Parameters
 omega_a = 0.3 # Fraction of cycle frequency to have Roomba spin (DHMagnitudeFreq())
@@ -230,24 +231,28 @@ def Ring(ID, nodes):
 	return c
 
 ''' Returns necessary change in heading when a sync_pulse is received
-	For standard PRC Desync function with incorporated forward and backward coupling
+	For standard delay-advance phase response function with refractory period
 	'''
-def PRCDesync(phase):
-	global Nodes
+def PRCSync(phase):
 	global cycle_threshold
-	global coupling_ratio_bkwd
-	global coupling_ratio_fwd
+	global refr_period
 	global rled
-	if phase < (cycle_threshold/Nodes):
-		angle_change = ((cycle_threshold/Nodes)-phase) * coupling_ratio_fwd # Increase heading
-		GPIO.output(rled, GPIO.LOW) # Indicate sync pulse received caused turn
-	elif phase > ((cycle_threshold*(Nodes-1))/Nodes):
-		angle_change = (((cycle_threshold*(Nodes-1))/Nodes) - phase) * coupling_ratio_bkwd # Decrease heading
-		GPIO.output(rled, GPIO.LOW) # Indicate sync pulse received caused turn
+	global epsilon
+	if phase > refr_period: # If phase is greater than the refractory period...
+		if phase > (cycle_threshold - epsilon):
+			angle_change = 0 # No change in heading
+			GPIO.output(rled, GPIO.HIGH) # Indicate sync pulse received, but no turning
+		elif phase > 0.5*(cycle_threshold):
+			angle_change = (cycle_threshold - phase) # Increase heading
+			GPIO.output(rled, GPIO.LOW) # Indicate sync pulse received caused turn
+		elif phase > epsilon:
+			angle_change = (-1) * phase # Decrease heading
+			GPIO.output(rled, GPIO.LOW) # Indicate sync pulse received caused turn
+		else:
+			angle_change = 0 # No change in heading
+			GPIO.output(rled, GPIO.HIGH) # Indicate sync pulse received, but no turning
 	else:
 		angle_change = 0 # No change in heading
-		GPIO.output(rled, GPIO.HIGH) # Indicate sync pulse received, but no turning
-
 	return angle_change
 
 ''' Displays current date and time to the screen
@@ -409,10 +414,10 @@ angle = initial_angle # Reset initial angle value (without IMU)
 #angle = imu.CalculateHeading() # Reset initial angle value (using IMU)
 
 # Print out data header values
-print("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts, Bumper Byte, Desired Heading\n")
+print("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts, Bumper Byte, Desired Heading")
 # Write data values to a text file
 #datafile.write("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts, Bumper Byte, Desired Heading\n")
-
+			
 # Ready to begin PRCSync Loop
 SendResetPulse() # Send reset pulse
 ResetCounters() # Reset counter values
@@ -471,13 +476,14 @@ while True:
 		# Set counter value
 		counter = (time.time() - counter_base)*counter_ratio
 		# Send sync_pulse
-		if (angle + counter) > cycle_threshold: # If (angle + counter) is greater than 360 degrees...
+		########## HERE: Bad implementation of algorithm
+		if (desired_heading + counter) > cycle_threshold: # If (angle + counter) is greater than 360 degrees...
 			SendSyncPulse()
 			counter_base += counter_adjust
-		
+		##########
 		# Receive pulse
 		message = ReceivePulse()
-		
+			
 		if message == reset_pulse: 
 			#print("Reset Pulse Received.") # Include for debugging
 			GPIO.output(gled, GPIO.HIGH) # Notify that reset_pulse received
@@ -492,10 +498,12 @@ while True:
 			GPIO.output(rled, GPIO.LOW)
 		elif message in connected:
 			#print("Sync Pulse Received.") # Include for debugging
-			d_angle = PRCDesync(angle + counter) # Calculate desired change in heading
+			########## HERE: Bad implementation of algorithm
+			d_angle = PRCSync(desired_heading + counter) # Calculate desired change in heading
 			if method_opt == 2: # If using CTM for phase continuity
-				spin_CTM = DHMagnitudeTime(d_angle) # Set spin rate using Constant Time Method
-			desired_heading = angle + (d_angle) # Update desired heading
+				spin_CTM = DHMagnitudeTime(d_angle * coupling_ratio) # Set spin rate using Constant Time Method
+			desired_heading += (d_angle * coupling_ratio) # Update desired heading
+			##########
 			# Normalize desired_heading to range [0,360)
 			if desired_heading >= cycle_threshold or desired_heading < 0:
 				desired_heading = (desired_heading % cycle_threshold)

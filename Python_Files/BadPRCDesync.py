@@ -1,9 +1,9 @@
-''' NewPRCDesync.py
-Purpose: Desynchronize heading of Roomba network using PCO model
+''' BadPRCDesync.py
+Purpose: Bad implementation of PRC Desync algorithm (For illustration purposes only)
 	Uses PRC function to desynchronize
 	Uses Roomba wheel encoders to update heading value over time.
 IMPORTANT: Must be run using Python 3 (python3)
-Last Modified: 10/17/2018
+Last Modified: 3/8/2019
 '''
 ## Import libraries ##
 import serial
@@ -471,10 +471,11 @@ while True:
 		# Set counter value
 		counter = (time.time() - counter_base)*counter_ratio
 		# Send sync_pulse
-		if (angle + counter) > cycle_threshold: # If (angle + counter) is greater than 360 degrees...
+		########## HERE: Bad implementation of algorithm
+		if (desired_heading + counter) > cycle_threshold: # If (angle + counter) is greater than 360 degrees...
 			SendSyncPulse()
 			counter_base += counter_adjust
-		
+		##########
 		# Receive pulse
 		message = ReceivePulse()
 		
@@ -492,10 +493,12 @@ while True:
 			GPIO.output(rled, GPIO.LOW)
 		elif message in connected:
 			#print("Sync Pulse Received.") # Include for debugging
-			d_angle = PRCDesync(angle + counter) # Calculate desired change in heading
+			########## HERE: improper implementation of algorithm.
+			d_angle = PRCDesync(desired_heading + counter) # Calculate desired change in heading
 			if method_opt == 2: # If using CTM for phase continuity
 				spin_CTM = DHMagnitudeTime(d_angle) # Set spin rate using Constant Time Method
-			desired_heading = angle + (d_angle) # Update desired heading
+			desired_heading += (d_angle) # Update desired heading
+			##########
 			# Normalize desired_heading to range [0,360)
 			if desired_heading >= cycle_threshold or desired_heading < 0:
 				desired_heading = (desired_heading % cycle_threshold)
