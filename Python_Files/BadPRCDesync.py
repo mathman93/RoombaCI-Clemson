@@ -472,7 +472,7 @@ while True:
 		counter = (time.time() - counter_base)*counter_ratio
 		# Send sync_pulse
 		########## HERE: Bad implementation of algorithm
-		if (desired_heading + counter) > cycle_threshold: # If (angle + counter) is greater than 360 degrees...
+		if (angle + counter) > cycle_threshold: # If (angle + counter) is greater than 360 degrees...
 			SendSyncPulse()
 			counter_base += counter_adjust
 		##########
@@ -494,7 +494,7 @@ while True:
 		elif message in connected:
 			#print("Sync Pulse Received.") # Include for debugging
 			########## HERE: improper implementation of algorithm.
-			d_angle = PRCDesync(desired_heading + counter) # Calculate desired change in heading
+			d_angle = PRCDesync(angle + counter) # Calculate desired change in heading
 			if method_opt == 2: # If using CTM for phase continuity
 				spin_CTM = DHMagnitudeTime(d_angle) # Set spin rate using Constant Time Method
 			desired_heading += (d_angle) # Update desired heading
