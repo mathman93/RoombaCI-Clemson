@@ -412,7 +412,7 @@ ResetCounters() # Reset counter values
 # Request data packets from Roomba (Stream)
 Roomba.StartQueryStream(7,43,44,45) # Start query stream with specific sensor packets
 pulseCounter = 0 # pulseCounter is used in staleDESYNC algorithm to identify whether a pulse is coming in front or behind Roomba
-frontNeighborPhase = 0; # relative angle of preceding roomba to current roomba
+frontNeighborPhase = -1; # relative angle of preceding roomba to current roomba
 backNeighborPhase = 0; # relative angle of following roomba to current roomba
 
 while True:
@@ -491,13 +491,14 @@ while True:
 			#print("Sync Pulse Received.") # Include for debugging
 			if pulseCounter == 0: # if incoming signal is from following ROOMBA
 				backNeighborPhase = angle + counter
-				d_angle = StaleDesync(backNeighborPhase, frontNeighborPhase) # Calculate desired change in heading
-				if method_opt == 2: # If using CTM for phase continuity
-					spin_CTM = DHMagnitudeTime(d_angle) # Set spin rate using Constant Time Method
-				desired_heading = angle + (d_angle) # Update desired heading
-				# Normalize desired_heading to range [0,360)
-				if desired_heading >= cycle_threshold or desired_heading < 0:
-					desired_heading = (desired_heading % cycle_threshold)
+				if frontNeighborPhase != -1:
+					d_angle = StaleDesync(backNeighborPhase, frontNeighborPhase) # Calculate desired change in heading
+					if method_opt == 2: # If using CTM for phase continuity
+						spin_CTM = DHMagnitudeTime(d_angle) # Set spin rate using Constant Time Method
+					desired_heading = angle + (d_angle) # Update desired heading
+					# Normalize desired_heading to range [0,360)
+					if desired_heading >= cycle_threshold or desired_heading < 0:
+						desired_heading = (desired_heading % cycle_threshold)
 			else:
 				frontNeighborPhase = angle + counter
 			pulseCounter += 1
