@@ -404,7 +404,7 @@ angle = initial_angle # Reset initial angle value (without IMU)
 # Print out data header values
 print("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts, Bumper Byte, Desired Heading\n")
 # Write data values to a text file
-#datafile.write("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts, Bumper Byte, Desired Heading\n")
+datafile.write("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts, Bumper Byte, Desired Heading\n")
 
 # Ready to begin PRCSync Loop
 SendResetPulse() # Send reset pulse
@@ -484,7 +484,7 @@ while True:
 			datafile = open(file_name, "w") # Open a text file for storing data
 				# Will overwrite anything that was in the text file previously
 			# Write data values to a text file
-			#datafile.write("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts, Bumper Byte, Desired Heading\n")
+			datafile.write("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts, Bumper Byte, Desired Heading\n")
 			GPIO.output(gled, GPIO.LOW)  # End notify that reset_pulse received
 			GPIO.output(rled, GPIO.LOW)
 		elif message in connected:
