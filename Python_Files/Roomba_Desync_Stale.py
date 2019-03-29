@@ -318,19 +318,6 @@ while True:
 
 while True:
 	try:
-		topology_opt = int(input("Select topology being used (1 = ATA; 2 = Ring): ")) # Set topology
-	except ValueError: # Check that the entered number is an integer
-		print("Not a valid number. Try again.")
-		continue # Start at the beginning of the loop.
-	if topology_opt in [1, 2]: # Check that the entered number is valid.
-		# The option number is good.
-		break # Leave while loop
-	else:
-		print("Invalid option selection. Try again.")
-		continue
-
-while True:
-	try:
 		coupling_ratio = float(input("Enter the coupling ratio: "))
 	except ValueError: # Check that the entered number is a number
 		print("Not a valid number. Try again.")
@@ -344,6 +331,19 @@ while True:
 	else:
 		print("Coupling ratio is {0:.6f}".format(coupling_ratio))
 		break
+
+while True:
+	try:
+		topology_opt = int(input("Select topology being used (1 = ATA; 2 = Ring): ")) # Set topology
+	except ValueError: # Check that the entered number is an integer
+		print("Not a valid number. Try again.")
+		continue # Start at the beginning of the loop.
+	if topology_opt in [1, 2]: # Check that the entered number is valid.
+		# The option number is good.
+		break # Leave while loop
+	else:
+		print("Invalid option selection. Try again.")
+		continue
 
 while True:
 	try:
