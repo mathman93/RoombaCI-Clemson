@@ -236,9 +236,7 @@ def StaleDesync(backPhase, frontPhase):
 	global rled
 	angle_change = ((360 - frontPhase) - backPhase) / 2
 
-	# Coupling ratio. Roomba should only move partway to midpoint,
-	# not all the way instantaneously
-	coupling_ratio = 0.5
+	# Coupling ratio is determined through user input
 	angle_change = angle_change * coupling_ratio
 
 	if angle_change != 0:
@@ -333,6 +331,22 @@ while True:
 
 while True:
 	try:
+		coupling_ratio = float(input("Enter the coupling ratio: "))
+	except ValueError: # Check that the entered number is a number
+		print("Not a valid number. Try again.")
+		continue # Start at beginning of loop
+	if coupling_ratio > 1: # Check that the number is between 0 and 1
+		print("Coupling ratio too big. Must be within 0 and 1. Try again.")
+		continue
+	if coupling_ratio <= 0: # 0 is not allowed because it means no movement
+		print("Coupling ratio too small. Must be within 0 and 1. Try again.")
+		continue
+	else:
+		print("Coupling ratio is {0:.6f}".format(coupling_ratio))
+		break
+
+while True:
+	try:
 		method_opt = int(input("Select phase continuity method being used (1 = CFM; 2 = CTM; 3 = Standard): ")) # Set phase continuity method
 	except ValueError: # Check that the entered number is an integer
 		print("Not a valid number. Try again.")
@@ -343,6 +357,8 @@ while True:
 	else:
 		print("Invalid option selection. Try again.")
 		continue
+
+
 
 print("Nodes: {0}; RoombaID: {1}; Cycle Threshold: {2}".format(Nodes, RoombaID, cycle_threshold))
 
