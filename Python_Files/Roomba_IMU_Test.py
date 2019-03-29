@@ -10,7 +10,7 @@ import time
 import RPi.GPIO as GPIO
 import numpy as np
 import math
-
+import os.path
 import RoombaCI_lib
 
 ## Variables and Constants ##
@@ -22,7 +22,7 @@ rled = 6
 gled = 13
 
 data_counter = 0 # Initialize data_counter
-global A # Accelerometer transformation matrix
+#global A # Accelerometer transformation matrix
 
 move_dict = {
 	1: [2.0, 0, 0],
@@ -45,7 +45,7 @@ def DisplayDateTime():
 ''' Determines offset parameters for accelerometer and gyroscope
 	Roomba/IMU should be still when this is called '''
 def CalibrateAccelGyroNew():
-	global A
+	#global A
 	# Calculate average value of accelerometer and gyroscope components
 	ax_avg = 0
 	ay_avg = 0
@@ -91,20 +91,20 @@ def CalibrateAccelGyroNew():
 		tay = float; transformed y-value of accelerometer (g)
 		taz = float; transformed z-value of accelerometer (g) '''
 def ReadAccelNew():
-	global A
+	#global A
 	[cax,cay,caz] = imu.ReadAccelRaw() # Read in uncorrected accelerometer data
-	w = np.array([cax,cay,caz])
-	[tax,tay,taz] = np.matmul(w,np.linalg.inv(A)) # Matrix multiply with transformation matrix inverse
+	#w = np.array([cax,cay,caz])
+	#[tax,tay,taz] = np.matmul(w,np.linalg.inv(A)) # Matrix multiply with transformation matrix inverse
 	# Return transformed accelerometer component values
-	return [tax,tay,taz]
+	return [cax,cay,caz]
 
 def ReadGyroNew():
-	global A
+	#global A
 	[cgx,cgy,cgz] = imu.ReadGyroRaw() # Read in uncorrected gyroscope data
-	w = np.array([cgx,cgy,cgz])
-	[tgx,tgy,tgz] = np.matmul(w,np.linalg.inv(A)) # Matrix multiply with change of basis matrix
+	#w = np.array([cgx,cgy,cgz])
+	#[tgx,tgy,tgz] = np.matmul(w,np.linalg.inv(A)) # Matrix multiply with change of basis matrix
 	# Return transformed and offset gyroscope component values
-	return [tgx - imu.gx_offset, tgy - imu.gy_offset, tgz - imu.gz_offset]
+	return [cgx - imu.gx_offset, cgy - imu.gy_offset, cgz - imu.gz_offset]
 
 ## -- Code Starts Here -- ##
 # Setup Code #
@@ -156,8 +156,13 @@ if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 	#print(x) # Include for debugging
 
 # Main Code #
-datafile = open("IMU_Data_Test1.txt", "w") # Open a text file for storing data
+# Open a text file for data retrieval
+file_name_input = input("Name for data file: ")
+dir_path = "/home/pi/RoombaCI-Clemson/Data_Files/2019_Spring/" # Directory path to save file
+file_name = os.path.join(dir_path, file_name_input+".txt") # text file extension
+datafile = open(file_name, "w") # Open a text file for storing data
 	# Will overwrite anything that was in the text file previously
+
 basetime = time.time()
 basetime_offset = (1/64)
 Roomba.Move(0,0)
@@ -165,8 +170,8 @@ Roomba.Move(0,0)
 # Read in initial values
 [r_speed,l_speed,l_counts,r_counts] = Roomba.Query(41,42,43,44) # Read Roomba data stream
 data_time = 0.0
-[ax,ay,az] = imu.ReadAccel() # Read accelerometer component values
-[gx,gy,gz] = imu.ReadGyro() # Read gyroscope component values
+[ax,ay,az] = ReadAccelNew() # Read accelerometer component values
+[gx,gy,gz] = ReadGyroNew() # Read gyroscope component values
 # Write data values to a text file
 datafile.write("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}, {7}, {8}, {9}, {10}\n".format(data_time, ax, ay, az, gx, gy, gz, l_speed, r_speed, l_counts, r_counts))
 print("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}".format(data_time, ax, ay, az, gx, gy, gz))
@@ -184,8 +189,8 @@ for i in range(1, len(move_dict.keys())+1):
 			# Retrieve data values (Happens every ~1/64 seconds)
 			data_time = time.time() - time_base # Time that data is received
 			[r_speed,l_speed,l_counts,r_counts] = Roomba.ReadQueryStream(41,42,43,44) # Read Roomba data stream
-			[ax,ay,az] = imu.ReadAccel() # Read accelerometer component values
-			[gx,gy,gz] = imu.ReadGyro() # Read gyroscope component values
+			[ax,ay,az] = ReadAccelNew() # Read accelerometer component values
+			[gx,gy,gz] = ReadGyroNew() # Read gyroscope component values
 			# Write data values to a text file
 			datafile.write("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}, {7}, {8}, {9}, {10}\n".format(data_time, ax, ay, az, gx, gy, gz, l_speed, r_speed, l_counts, r_counts))
 			print("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}".format(data_time, ax, ay, az, gx, gy, gz))
