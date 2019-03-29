@@ -10,7 +10,7 @@ import time
 import RPi.GPIO as GPIO
 import numpy as np
 import math
-
+import os.path
 import RoombaCI_lib
 
 ## Variables and Constants ##
@@ -156,8 +156,13 @@ if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 	#print(x) # Include for debugging
 
 # Main Code #
-datafile = open("IMU_Data_Test1.txt", "w") # Open a text file for storing data
+# Open a text file for data retrieval
+file_name_input = input("Name for data file: ")
+dir_path = "/home/pi/RoombaCI-Clemson/Data_Files/2019_Spring/" # Directory path to save file
+file_name = os.path.join(dir_path, file_name_input+".txt") # text file extension
+datafile = open(file_name, "w") # Open a text file for storing data
 	# Will overwrite anything that was in the text file previously
+
 basetime = time.time()
 basetime_offset = (1/64)
 Roomba.Move(0,0)
