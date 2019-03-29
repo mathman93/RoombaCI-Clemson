@@ -238,9 +238,9 @@ def StaleDesync(backPhase, frontPhase):
 
 	# Coupling ratio. Roomba should only move partway to midpoint,
 	# not all the way instantaneously
-	coupling_ratio = 0.75
+	coupling_ratio = 0.25
 	angle_change = angle_change * coupling_ratio
-	
+
 	if angle_change != 0:
 		GPIO.output(rled, GPIO.LOW) # Indicate sync pulse received, turn required
 	else:
