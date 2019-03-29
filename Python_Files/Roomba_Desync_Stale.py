@@ -235,6 +235,12 @@ def Ring(ID, nodes):
 def StaleDesync(backPhase, frontPhase):
 	global rled
 	angle_change = ((360 - frontPhase) - backPhase) / 2
+
+	# Coupling ratio. Roomba should only move partway to midpoint,
+	# not all the way instantaneously
+	coupling_ratio = 0.75
+	angle_change = angle_change * coupling_ratio
+	
 	if angle_change != 0:
 		GPIO.output(rled, GPIO.LOW) # Indicate sync pulse received, turn required
 	else:
