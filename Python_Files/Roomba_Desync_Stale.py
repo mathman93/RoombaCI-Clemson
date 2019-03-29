@@ -238,7 +238,7 @@ def StaleDesync(backPhase, frontPhase):
 
 	# Coupling ratio. Roomba should only move partway to midpoint,
 	# not all the way instantaneously
-	coupling_ratio = 0.25
+	coupling_ratio = 0.5
 	angle_change = angle_change * coupling_ratio
 
 	if angle_change != 0:
