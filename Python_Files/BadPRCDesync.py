@@ -448,6 +448,7 @@ while True:
 			elif angle < 0:
 				angle += cycle_threshold
 				counter_base += counter_adjust
+            ########## HERE: Bad implementation of algorithm
 			# Value needed to turn to desired heading point
 			if method_opt == 1: # Choose CFM
 				spin = spin_CFM # Use for Constant Frequency Method
@@ -457,7 +458,7 @@ while True:
 				spin = DHMagnitude(angle, desired_heading, epsilon) # Use for Standard Spin Method
 			spin *= DHDirection(angle, desired_heading, epsilon) # Determine direction of spin
 			Roomba.Move(forward, spin) # Moves Roomba to desired heading point
-			
+			##########
 			if spin == 0:
 				GPIO.output(yled, GPIO.LOW) # Indicate Roomba is not turning
 			else:
