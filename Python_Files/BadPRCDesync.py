@@ -443,12 +443,14 @@ while True:
 			# Calculate the turn angle change since the last counts
 			angle_change = TURN_CONSTANT * (delta_l_count - delta_r_count)
 			angle += angle_change # Update angle of Roomba and correct for overflow
+			########## HERE: Bad implementation of algorithm
 			if angle >= cycle_threshold:
 				angle -= cycle_threshold
-				counter_base -= counter_adjust
+				#counter_base -= counter_adjust
 			elif angle < 0:
 				angle += cycle_threshold
-				counter_base += counter_adjust
+				#counter_base += counter_adjust
+			##########
 			# Value needed to turn to desired heading point
 			if method_opt == 1: # Choose CFM
 				spin = spin_CFM # Use for Constant Frequency Method
@@ -501,6 +503,12 @@ while True:
 				spin_CTM = DHMagnitudeTime(d_angle) # Set spin rate using Constant Time Method
 			desired_heading = angle + (d_angle) # Update desired heading
 			bad_heading += (d_angle) # Update bad heading
+			if bad_heading >= cycle_threshold:
+				bad_heading -= cycle_threshold
+				counter_base -= counter_adjust
+			elif bad_heading < 0:
+				bad_heading += cycle_threshold
+				counter_base += counter_adjust
 			##########
 			# Normalize desired_heading to range [0,360)
 			if desired_heading >= cycle_threshold or desired_heading < 0:
