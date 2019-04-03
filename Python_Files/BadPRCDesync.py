@@ -409,13 +409,14 @@ angle = initial_angle # Reset initial angle value (without IMU)
 #angle = imu.CalculateHeading() # Reset initial angle value (using IMU)
 
 # Print out data header values
-print("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts, Bumper Byte, Desired Heading\n")
+print("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts, Bumper Byte, Desired Heading, Bad Heading\n")
 # Write data values to a text file
 #datafile.write("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts, Bumper Byte, Desired Heading\n")
 
 # Ready to begin PRCSync Loop
 SendResetPulse() # Send reset pulse
 ResetCounters() # Reset counter values
+bad_heading = angle ########## Bad implementation
 # Request data packets from Roomba (Stream)
 Roomba.StartQueryStream(7,43,44,45) # Start query stream with specific sensor packets
 
@@ -448,7 +449,6 @@ while True:
 			elif angle < 0:
 				angle += cycle_threshold
 				counter_base += counter_adjust
-            ########## HERE: Bad implementation of algorithm
 			# Value needed to turn to desired heading point
 			if method_opt == 1: # Choose CFM
 				spin = spin_CFM # Use for Constant Frequency Method
@@ -458,7 +458,7 @@ while True:
 				spin = DHMagnitude(angle, desired_heading, epsilon) # Use for Standard Spin Method
 			spin *= DHDirection(angle, desired_heading, epsilon) # Determine direction of spin
 			Roomba.Move(forward, spin) # Moves Roomba to desired heading point
-			##########
+			
 			if spin == 0:
 				GPIO.output(yled, GPIO.LOW) # Indicate Roomba is not turning
 			else:
@@ -473,7 +473,7 @@ while True:
 		counter = (time.time() - counter_base)*counter_ratio
 		# Send sync_pulse
 		########## HERE: Bad implementation of algorithm
-		if (angle + counter) > cycle_threshold: # If (angle + counter) is greater than 360 degrees...
+		if (bad_heading + counter) > cycle_threshold: # If (angle + counter) is greater than 360 degrees...
 			SendSyncPulse()
 			counter_base += counter_adjust
 		##########
@@ -486,6 +486,7 @@ while True:
 			GPIO.output(rled, GPIO.HIGH)
 			datafile.close() # Close the file to reset the data in it.
 			ResetCounters() # Reset counters
+			bad_heading = angle ########## Bad implementation
 			datafile = open(file_name, "w") # Open a text file for storing data
 				# Will overwrite anything that was in the text file previously
 			# Write data values to a text file
@@ -495,10 +496,11 @@ while True:
 		elif message in connected:
 			#print("Sync Pulse Received.") # Include for debugging
 			########## HERE: improper implementation of algorithm.
-			d_angle = PRCDesync(desired_heading + counter) # Calculate desired change in heading
+			d_angle = PRCDesync(bad_heading + counter) # Calculate desired change in heading
 			if method_opt == 2: # If using CTM for phase continuity
 				spin_CTM = DHMagnitudeTime(d_angle) # Set spin rate using Constant Time Method
-			desired_heading += (d_angle) # Update desired heading
+			desired_heading = angle + (d_angle) # Update desired heading
+			bad_heading += (d_angle) # Update bad heading
 			##########
 			# Normalize desired_heading to range [0,360)
 			if desired_heading >= cycle_threshold or desired_heading < 0:
@@ -507,7 +509,7 @@ while True:
 		# Print heading data to monitor so often
 		if (time.time() - data_base) > data_timer: # After value of data_timer...
 			# Print data to monitor
-			print("{0}, {1:.6f}, {2:.6f}, {3:.6f}, {4}, {5}, {6:0>8b}, {7:.6f}".format(data_counter, data_time, angle, counter, l_counts, r_counts, bumper_byte, desired_heading))
+			print("{0}, {1:.6f}, {2:.6f}, {3:.6f}, {4}, {5}, {6:0>8b}, {7:.6f}, {8:.6f}".format(data_counter, data_time, angle, counter, l_counts, r_counts, bumper_byte, desired_heading, bad_heading))
 			# Write data values to a text file
 			datafile.write("{0} {1:.6f} {2:.6f} {3:.6f} {4} {5} {6:0>8b} {7:.6f}\n".format(data_counter, data_time, angle, counter, l_counts, r_counts, bumper_byte, desired_heading))
 			
@@ -519,6 +521,7 @@ while True:
 			SendResetPulse() # Send reset_pulse
 			# Reset all counters
 			ResetCounters()
+			bad_heading = angle ########## Bad implementation
 		
 	except KeyboardInterrupt:
 		print('') # Print new line
