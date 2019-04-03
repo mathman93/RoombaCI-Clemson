@@ -23,7 +23,7 @@ gled = 13
 
 # Timing Counter Parameters
 data_timer = (2*0.015625) # seconds until new data point (1/64 = 0.015625)
-reset_timer = 300 # seconds until oscillators reset
+reset_timer = 600 # seconds until oscillators reset
 
 # Counter Parameters
 cycle_threshold = 360.0 # Threshold for phase of PCO
@@ -179,7 +179,7 @@ def ResetCounters():
 	counter_base = time.time() # Initialize counter
 	data_base = time.time() # Initialize data timer
 	reset_base = time.time() # Initialize reset timer
-	counter = 0 # Reset phase counter
+	counter = 0.0 # Reset phase counter
 	data_counter = 0 # Reset data point counter
 	angle = initial_angle # Reset initial angle value (without IMU)
 	#angle = imu.CalculateHeading() # Reset initial angle value (using IMU)
@@ -494,7 +494,7 @@ while True:
 		elif message in connected:
 			#print("Sync Pulse Received.") # Include for debugging
 			########## HERE: improper implementation of algorithm.
-			d_angle = PRCDesync(angle + counter) # Calculate desired change in heading
+			d_angle = PRCDesync(desired_heading + counter) # Calculate desired change in heading
 			if method_opt == 2: # If using CTM for phase continuity
 				spin_CTM = DHMagnitudeTime(d_angle) # Set spin rate using Constant Time Method
 			desired_heading += (d_angle) # Update desired heading
