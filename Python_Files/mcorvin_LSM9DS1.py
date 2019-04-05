@@ -161,7 +161,7 @@ class I2CDevice(Lockable):
 			device_address = _LSM9DS1_ADDRESS_MAG
 		else:
 			device_address = _LSM9DS1_ADDRESS_ACCELGYRO	
-		self.try_bus(self,device_address)
+		self.try_bus(device_address)
 
 		self._device_address = device_address
 
