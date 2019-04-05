@@ -142,7 +142,7 @@ class I2CDevice(Lockable):
 
 	def __init__(self, sensor_type, sda=SDA, scl=SCL, freq=400000, bus_num=BUS, mode=MASTER):
 		self.deinit()
-		if scl == SCL and sda == SDA:
+		if scl == self.SCL and sda == self.SDA:
 			if mode != self.MASTER:
 				raise NotImplementedError("Only I2C Master supported!")
 			else:
