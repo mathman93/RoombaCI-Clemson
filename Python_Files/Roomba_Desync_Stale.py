@@ -293,6 +293,19 @@ while True:
 	else:
 		# The Roomba ID number is good.
 		break # Leave while loop
+		
+while True:
+	# Set the timer so that the program will automatically stop - makes testing easier.
+	try:
+		reset_timer = int(input("How long do you want to run the test in seconds?"))
+	except ValueError:
+		print("Not a valid number. Try again.")
+		continue
+	if reset_timer < 1:
+		print("Please enter a positive time number. Try again.")
+		continue
+	else:
+		break
 
 while True:
 	try:
