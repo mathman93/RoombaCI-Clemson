@@ -238,28 +238,27 @@ class LSM9DS1_I2C(I2CDevice):
 	def accel_range(self):
                 # The accelerometer range. Must be a value of:
                 #	- ACCELRANGE_2G
-	        #	- ACCELRANGE_4G
-	        #	- ACCELRANGE_8G
-	        #	- ACCELRANGE_16G
+                #	- ACCELRANGE_4G
+                #	- ACCELRANGE_8G
+                #	- ACCELRANGE_16G
                 reg = self._read_u8(_XGTYPE, _LSM9DS1_REGISTER_CTRL_REG6_XL)
-	        return (reg & 0b00011000) & 0xFF
+                return (reg & 0b00011000) & 0xFF
 
 	@accel_range.setter
 	def accel_range(self, val):
-		assert val in (ACCELRANGE_2G, ACCELRANGE_4G, ACCELRANGE_8G,
-				ACCELRANGE_16G)
-		reg = self._read_u8(_XGTYPE, _LSM9DS1_REGISTER_CTRL_REG6_XL)
-		reg = (reg & ~(0b00011000)) & 0xFF
-		reg |= val
+                assert val in (ACCELRANGE_2G, ACCELRANGE_4G, ACCELRANGE_8G,ACCELRANGE_16G)
+                reg = self._read_u8(_XGTYPE, _LSM9DS1_REGISTER_CTRL_REG6_XL)
+                reg = (reg & ~(0b00011000)) & 0xFF
+                reg |= val
 		self._write_u8(_XGTYPE, _LSM9DS1_REGISTER_CTRL_REG6_XL, reg)
-		if val == ACCELRANGE_2G:
-			self._accel_mg_lsb = _LSM9DS1_ACCEL_MG_LSB_2G
-		elif val == ACCELRANGE_4G:
-			self._accel_mg_lsb = _LSM9DS1_ACCEL_MG_LSB_4G
-		elif val == ACCELRANGE_8G:
-			self._accel_mg_lsb = _LSM9DS1_ACCEL_MG_LSB_8G
-		elif val == ACCELRANGE_16G:
-			self._accel_mg_lsb = _LSM9DS1_ACCEL_MG_LSB_16G
+                if val == ACCELRANGE_2G:
+                    self._accel_mg_lsb = _LSM9DS1_ACCEL_MG_LSB_2G
+                elif val == ACCELRANGE_4G:
+                    self._accel_mg_lsb = _LSM9DS1_ACCEL_MG_LSB_4G
+                elif val == ACCELRANGE_8G:
+                    self._accel_mg_lsb = _LSM9DS1_ACCEL_MG_LSB_8G
+                elif val == ACCELRANGE_16G:
+                    self._accel_mg_lsb = _LSM9DS1_ACCEL_MG_LSB_16G
 
 	@property
 	def mag_gain(self):
