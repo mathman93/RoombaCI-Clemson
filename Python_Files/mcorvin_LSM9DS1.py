@@ -209,14 +209,14 @@ class LSM9DS1_I2C(I2CDevice):
 
 	def __init__(self):
                 # create attributes and set default ranges for sensors
+                self._mag_device = I2CDevice(_MAGTYPE)
+                self._xg_device = I2CDevice(_XGTYPE)
                 self._accel_mg_lsb = None
                 self._mag_mgauss_lsb = None
                 self._gyro_dps_digit = None
                 self.accel_range = ACCELRANGE_2G
                 self.mag_gain = MAGGAIN_4GAUSS
                 self.gyro_scale = GYROSCALE_245DPS
-                self._mag_device = I2CDevice(_MAGTYPE)
-                self._xg_device = I2CDevice(_XGTYPE)
                 # soft reset & reboot accel/gyro
                 self._write_u8(_XGTYPE, _LSM9DS1_REGISTER_CTRL_REG8, 0x05)
                 # soft reset & reboot magnetometer
