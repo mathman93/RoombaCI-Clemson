@@ -217,11 +217,11 @@ class LSM9DS1_I2C(I2CDevice):
                 self.gyro_scale = GYROSCALE_245DPS
                 self._mag_device = I2CDevice(_MAGTYPE)
                 self._xg_device = I2CDevice(_XGTYPE)
-                    # soft reset & reboot accel/gyro
-                    self._write_u8(_XGTYPE, _LSM9DS1_REGISTER_CTRL_REG8, 0x05)
-                    # soft reset & reboot magnetometer
-                    self._write_u8(_MAGTYPE, _LSM9DS1_REGISTER_CTRL_REG2_M, 0x0C)
-                    time.sleep(0.01)
+                # soft reset & reboot accel/gyro
+                self._write_u8(_XGTYPE, _LSM9DS1_REGISTER_CTRL_REG8, 0x05)
+                # soft reset & reboot magnetometer
+                self._write_u8(_MAGTYPE, _LSM9DS1_REGISTER_CTRL_REG2_M, 0x0C)
+                time.sleep(0.01)
                 # Check ID Registers
                 if self._read_u8(_XGTYPE, _LSM9DS1_REGISTER_WHO_AM_I_XG) != _LSM9DS1_XG_ID or \
                 self._read_u8(_MAGTYPE, _LSM9DS1_REGISTER_WHO_AM_I_M) != _LSM9DS1_MAG_ID:
