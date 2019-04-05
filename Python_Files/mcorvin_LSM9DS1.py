@@ -5,6 +5,9 @@
 # Written by Madeline Corvin
 
 # imports
+# NOTE: The RaspberryPi will need to have the smbus2 module installed.
+#       To check, use pip3 list. If smbus2 is not currently installed,
+#       type pip3 install smbus2.
 import time
 try:
 	import struct
