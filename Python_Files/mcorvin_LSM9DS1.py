@@ -217,32 +217,32 @@ class LSM9DS1_I2C(I2CDevice):
                 self.gyro_scale = GYROSCALE_245DPS
                 self._mag_device = I2CDevice(_MAGTYPE)
                 self._xg_device = I2CDevice(_XGTYPE)
-		# soft reset & reboot accel/gyro
-		self._write_u8(_XGTYPE, _LSM9DS1_REGISTER_CTRL_REG8, 0x05)
-		# soft reset & reboot magnetometer
-		self._write_u8(_MAGTYPE, _LSM9DS1_REGISTER_CTRL_REG2_M, 0x0C)
-		time.sleep(0.01)
-		# Check ID Registers
-		if self._read_u8(_XGTYPE, _LSM9DS1_REGISTER_WHO_AM_I_XG) != _LSM9DS1_XG_ID or \
-		   self._read_u8(_MAGTYPE, _LSM9DS1_REGISTER_WHO_AM_I_M) != _LSM9DS1_MAG_ID:
-			raise RuntimeError("Could not find LSM9DS1, check wiring!")
-		# enable gyro continuous
-		self._write_u8(_XGTYPE, _LSM9DS1_REGISTER_CTRL_REG1_G, 0xC0)
-		# enable accelerometer continuous
-		self._write_u8(_XGTYPE, _LSM9DS1_REGISTER_CTRL_REG5_XL, 0x38)
-		self._write_u8(_XGTYPE, _LSM9DS1_REGISTER_CTRL_REG6_XL, 0xC0)
-		# enable mag continuous
-		self._write_u8(_MAGTYPE, _LSM9DS1_REGISTER_CTRL_REG3_M, 0x00)
+                    # soft reset & reboot accel/gyro
+                    self._write_u8(_XGTYPE, _LSM9DS1_REGISTER_CTRL_REG8, 0x05)
+                    # soft reset & reboot magnetometer
+                    self._write_u8(_MAGTYPE, _LSM9DS1_REGISTER_CTRL_REG2_M, 0x0C)
+                    time.sleep(0.01)
+                # Check ID Registers
+                if self._read_u8(_XGTYPE, _LSM9DS1_REGISTER_WHO_AM_I_XG) != _LSM9DS1_XG_ID or \
+                self._read_u8(_MAGTYPE, _LSM9DS1_REGISTER_WHO_AM_I_M) != _LSM9DS1_MAG_ID:
+                    raise RuntimeError("Could not find LSM9DS1, check wiring!")
+                # enable gyro continuous
+                self._write_u8(_XGTYPE, _LSM9DS1_REGISTER_CTRL_REG1_G, 0xC0)
+                # enable accelerometer continuous
+                self._write_u8(_XGTYPE, _LSM9DS1_REGISTER_CTRL_REG5_XL, 0x38)
+                self._write_u8(_XGTYPE, _LSM9DS1_REGISTER_CTRL_REG6_XL, 0xC0)
+                # enable mag continuous
+                self._write_u8(_MAGTYPE, _LSM9DS1_REGISTER_CTRL_REG3_M, 0x00)
 
 	@property
 	def accel_range(self):
-		# The accelerometer range. Must be a value of:
-		#	- ACCELRANGE_2G
-		#	- ACCELRANGE_4G
-		#	- ACCELRANGE_8G
-		#	- ACCELRANGE_16G
-		reg = self._read_u8(_XGTYPE, _LSM9DS1_REGISTER_CTRL_REG6_XL)
-		return (reg & 0b00011000) & 0xFF
+                # The accelerometer range. Must be a value of:
+                #	- ACCELRANGE_2G
+	        #	- ACCELRANGE_4G
+	        #	- ACCELRANGE_8G
+	        #	- ACCELRANGE_16G
+                reg = self._read_u8(_XGTYPE, _LSM9DS1_REGISTER_CTRL_REG6_XL)
+	        return (reg & 0b00011000) & 0xFF
 
 	@accel_range.setter
 	def accel_range(self, val):
@@ -327,8 +327,7 @@ class LSM9DS1_I2C(I2CDevice):
 		# The accelerometer X, Y, Z axis values as a 3-tuple of
 		# m/s^2 values.
 		raw = self.read_accel_raw()
-		return map(lambda x: x * self._accel_mg_lsb / 1000.0 * _SENSORS_GRAVITY_STANDARD,
-				raw)
+		return map(lambda x: x * self._accel_mg_lsb / 1000.0 * _SENSORS_GRAVITY_STANDARD, raw)
 
 	def read_mag_raw(self):
 		# Read the raw magnetometer sensor values and return it as
