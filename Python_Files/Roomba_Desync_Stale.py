@@ -297,7 +297,7 @@ while True:
 while True:
 	# Set the timer so that the program will automatically stop - makes testing easier.
 	try:
-		reset_timer = int(input("How long do you want to run the test in seconds?"))
+		reset_timer = int(input("How long do you want to run the test in seconds? "))
 	except ValueError:
 		print("Not a valid number. Try again.")
 		continue
