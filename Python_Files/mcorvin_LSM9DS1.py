@@ -246,17 +246,10 @@ class LSM9DS1_I2C(I2CDevice):
 
 	@accel_range.setter
 	def accel_range(self, val):
-<<<<<<< HEAD
-		assert val in (ACCELRANGE_2G, ACCELRANGE_4G, ACCELRANGE_8G,ACCELRANGE_16G)
-		reg = self._read_u8(_XGTYPE, _LSM9DS1_REGISTER_CTRL_REG6_XL)
-		reg = (reg & ~(0b00011000)) & 0xFF
-		reg |= val
-=======
                 assert val in (ACCELRANGE_2G, ACCELRANGE_4G, ACCELRANGE_8G,ACCELRANGE_16G)
                 reg = self._read_u8(_XGTYPE, _LSM9DS1_REGISTER_CTRL_REG6_XL)
                 reg = (reg & ~(0b00011000)) & 0xFF
                 reg |= val
->>>>>>> 0850a0f0f58868d70200013c1e3fed6289b10259
 		self._write_u8(_XGTYPE, _LSM9DS1_REGISTER_CTRL_REG6_XL, reg)
                 if val == ACCELRANGE_2G:
                     self._accel_mg_lsb = _LSM9DS1_ACCEL_MG_LSB_2G
