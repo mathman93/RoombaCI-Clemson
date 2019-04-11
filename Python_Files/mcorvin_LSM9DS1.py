@@ -180,8 +180,8 @@ class I2CDevice(Lockable):
 		while not self.try_lock():	# check lock
 			pass
 		try:
-			 Try to read a byte from the device...
-			 If you get an OSError, it means the device is not there
+			# Try to read a byte from the device...
+			# If you get an OSError, it means the device is not there
 			self._i2c_bus.write_byte(device_address, int.from_bytes(b' ', byteorder='little', signed='False'));
 		except OSError:
 			# Some devices don't like writing an empty bytesting...
