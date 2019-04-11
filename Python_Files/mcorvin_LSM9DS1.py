@@ -401,9 +401,9 @@ class LSM9DS1_I2C(I2CDevice):
 		with device as i2c:
 			address &= 0xFF
 			#self._BUFFER[0] = i2c.read_from(address)
-                        return i2c.read_from(address)
+			return i2c.read_from(address)
 		#return self._BUFFER[0]
-                
+		
 
 	def _read_bytes(self, sensor_type, address, count):
 		# Read a count number of bytes into _BUFFER starting from the
