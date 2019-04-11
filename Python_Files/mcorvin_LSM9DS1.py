@@ -179,7 +179,7 @@ class I2CDevice(Lockable):
 		try:
 			# Try to read a byte from the device...
 			# If you get an OSError, it means the device is not there
-			self._i2c_bus.write_byte(device_address, 0.to_bytes(1, byteorder='little', signed='False'));
+			self._i2c_bus.write_byte(device_address, (0).to_bytes(1, byteorder='little', signed='False'));
 		except OSError:
 			# Some devices don't like writing an empty bytesting...
 			# Retry by reading a byte
