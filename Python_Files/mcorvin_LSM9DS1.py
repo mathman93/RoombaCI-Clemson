@@ -215,7 +215,7 @@ class LSM9DS1_I2C(I2CDevice):
 		self._accel_mg_lsb = None
 		self._mag_mgauss_lsb = None
 		self._gyro_dps_digit = None
-		self.accel_range = ACCELRANGE_2G
+		#self.accel_range = ACCELRANGE_2G
 		self.mag_gain = MAGGAIN_4GAUSS
 		self.gyro_scale = GYROSCALE_245DPS
 		# soft reset & reboot accel/gyro
