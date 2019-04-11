@@ -215,7 +215,7 @@ class LSM9DS1_I2C(I2CDevice):
 		self._accel_mg_lsb = None
 		self._mag_mgauss_lsb = None
 		self._gyro_dps_digit = None
-		#self.accel_range = ACCELRANGE_2G
+		self.accel_range = ACCELRANGE_2G
 		self.mag_gain = MAGGAIN_4GAUSS
 		self.gyro_scale = GYROSCALE_245DPS
 		# soft reset & reboot accel/gyro
@@ -251,7 +251,7 @@ class LSM9DS1_I2C(I2CDevice):
 		reg = self._read_u8(_XGTYPE, _LSM9DS1_REGISTER_CTRL_REG6_XL)
 		reg = (reg & ~(0b00011000)) & 0xFF
 		reg |= val
-		self._write_u8(_XGTYPE, _LSM9DS1_REGISTER_CTRL_REG6_XL, reg)
+		self._xg_device._write_u8(_XGTYPE, _LSM9DS1_REGISTER_CTRL_REG6_XL, reg)
 		if val == ACCELRANGE_2G:
 			self._accel_mg_lsb = _LSM9DS1_ACCEL_MG_LSB_2G
 		elif val == ACCELRANGE_4G:
