@@ -192,7 +192,7 @@ class I2CDevice(Lockable):
 			except OSError:
 				raise ValueError("No I2C Device at address: %x" % device_address)
 		finally:
-			#self.unlock()
+			self.unlock()
 
 	def read_from(self, reg_address):
 		buf = bytearray(1)
