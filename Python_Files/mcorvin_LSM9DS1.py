@@ -171,7 +171,7 @@ class I2CDevice(Lockable):
 			del self._i2c_bus
 			del self._device_address
 		except AttributeError:
-			pass
+			print("Test")
 
 	def try_bus(self, device_address):
 		while not self.try_lock():	# check lock
