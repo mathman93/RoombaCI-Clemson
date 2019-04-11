@@ -13,7 +13,8 @@ try:
 	import struct
 except ImportError:
 	import ustruct as struct
-import smbus2
+#import smbus2
+from smbus import SMBus
 	
 
 # Internal constants and register values:
@@ -149,7 +150,8 @@ class I2CDevice(Lockable):
 				self._mode = self.MASTER
 
 			try:
-				self._i2c_bus = smbus2.SMBus(bus_num)
+				#self._i2c_bus = smbus2.SMBus(bus_num)
+                                self._i2c_bus = SMBus(bus_num)
 				print("_i2c_bus made")
 			except FileNotFoundError:
 				raise RuntimeError("I2C Bus #%d not found!" % bus_num)
@@ -251,7 +253,7 @@ class LSM9DS1_I2C(I2CDevice):
 		reg = self._read_u8(_XGTYPE, _LSM9DS1_REGISTER_CTRL_REG6_XL)
 		reg = (reg & ~(0b00011000)) & 0xFF
 		reg |= val
-		self._xg_device._write_u8(_XGTYPE, _LSM9DS1_REGISTER_CTRL_REG6_XL, reg)
+		self._write_u8(_XGTYPE, _LSM9DS1_REGISTER_CTRL_REG6_XL, reg)
 		if val == ACCELRANGE_2G:
 			self._accel_mg_lsb = _LSM9DS1_ACCEL_MG_LSB_2G
 		elif val == ACCELRANGE_4G:
