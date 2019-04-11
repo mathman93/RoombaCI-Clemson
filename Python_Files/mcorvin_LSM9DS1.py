@@ -202,9 +202,7 @@ class I2CDevice(Lockable):
 		print(self._device_address)
 		print(reg_address)
 		#buf[0] = self._i2c_bus.read_byte_data(self._device_address, reg_address)
-                val = self._i2c_bus.read_byte_data(self._device_address, reg_address)
-                (val).to_bytes(1, byteorder='little', signed='False')
-		return buf[0]
+		return self._i2c_bus.read_byte_data(self._device_address, reg_address)
 	
 	def write(self, reg_address, value):
 		self._i2c_bus.write_byte_data(self._device_address, reg_address, value)
@@ -402,8 +400,10 @@ class LSM9DS1_I2C(I2CDevice):
 			device = self._xg_device
 		with device as i2c:
 			address &= 0xFF
-			self._BUFFER[0] = i2c.read_from(address)
-		return self._BUFFER[0]
+			#self._BUFFER[0] = i2c.read_from(address)
+                        return i2c.read_from(address)
+		#return self._BUFFER[0]
+                
 
 	def _read_bytes(self, sensor_type, address, count):
 		# Read a count number of bytes into _BUFFER starting from the
