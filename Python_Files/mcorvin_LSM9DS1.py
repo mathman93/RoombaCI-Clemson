@@ -150,7 +150,7 @@ class I2CDevice(Lockable):
 
 			try:
 				self._i2c_bus = smbus2.SMBus(bus_num)
-                                print("_i2c_bus made")
+				print("_i2c_bus made")
 			except FileNotFoundError:
 				raise RuntimeError("I2C Bus #%d not found!" % bus_num)
 
