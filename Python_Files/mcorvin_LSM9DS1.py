@@ -414,7 +414,7 @@ class LSM9DS1_I2C(I2CDevice):
 		with device as i2c:
 			current_addr &= 0xFF
 			for x in range(0,count):
-				self._BUFFER[x] = read_from(current_addr)
+				self._BUFFER[x] = i2c.read_from(current_addr)
 				current_addr += 0x01
 
 	def _write_u8(self, sensor_type, address, value):
