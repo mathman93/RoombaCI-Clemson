@@ -108,7 +108,8 @@ class ContextManaged:
 		return self
 
 	def __exit__(self, exc_type, exc_value, traceback):
-		self.deinit()
+		#self.deinit()
+		pass
 
 	def deinit(self):
 		# Free any hardware used by the object.
