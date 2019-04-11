@@ -199,6 +199,8 @@ class I2CDevice(Lockable):
 
 	def read_from(self, reg_address):
 		buf = bytearray(1)
+                print(self._device_address)
+                print(reg_address)
 		buf[0] = self._i2c_bus.read_byte_data(self._device_address, reg_address)
 		return buf[0]
 	
