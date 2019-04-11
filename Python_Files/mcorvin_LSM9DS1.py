@@ -201,7 +201,9 @@ class I2CDevice(Lockable):
 		buf = bytearray(1)
 		print(self._device_address)
 		print(reg_address)
-		buf[0] = self._i2c_bus.read_byte_data(self._device_address, reg_address)
+		#buf[0] = self._i2c_bus.read_byte_data(self._device_address, reg_address)
+                val = self._i2c_bus.read_byte_data(self._device_address, reg_address)
+                (val).to_bytes(1, byteorder='little', signed='False')
 		return buf[0]
 	
 	def write(self, reg_address, value):
