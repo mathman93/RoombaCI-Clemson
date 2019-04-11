@@ -162,7 +162,7 @@ class I2CDevice(Lockable):
 		# test bus connection
 		if sensor_type == _MAGTYPE:
 			device_address = _LSM9DS1_ADDRESS_MAG
-                        print("Mag!")
+            print("Mag!")
 		else:
 			device_address = _LSM9DS1_ADDRESS_ACCELGYRO
                         print("Accel/gyro")
