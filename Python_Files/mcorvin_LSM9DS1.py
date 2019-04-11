@@ -164,7 +164,7 @@ class I2CDevice(Lockable):
 			device_address = _LSM9DS1_ADDRESS_MAG
 		else:
 			device_address = _LSM9DS1_ADDRESS_ACCELGYRO	
-		self.try_bus(device_address)
+		#self.try_bus(device_address)
 
 		self._device_address = device_address
 
@@ -179,18 +179,18 @@ class I2CDevice(Lockable):
 	def try_bus(self, device_address):
 		while not self.try_lock():	# check lock
 			pass
-		try:
+		#try:
 			# Try to read a byte from the device...
 			# If you get an OSError, it means the device is not there
 			#self._i2c_bus.write_byte(device_address, int.from_bytes(b' ', byteorder='little', signed='False'));
-		except OSError:
+		#except OSError:
 			# Some devices don't like writing an empty bytesting...
 			# Retry by reading a byte
-			try:
+			#try:
 				#result = bytearray(1)
 				#result[0] = self._i2c_bus.read_byte(device_address)
-			except OSError:
-				raise ValueError("No I2C Device at address: %x" % device_address)
+			#except OSError:
+				#raise ValueError("No I2C Device at address: %x" % device_address)
 		finally:
 			self.unlock()
 
