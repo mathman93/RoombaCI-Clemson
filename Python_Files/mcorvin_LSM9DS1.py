@@ -420,7 +420,7 @@ class LSM9DS1_I2C(I2CDevice):
             device = self._xg_device
         with device as i2c:
             current_addr &= 0xFF
-                        buffer = []
+            buffer = []
             for x in range(0,count):
                 #self._BUFFER[x] = (i2c.read_from(current_addr)).to_bytes(1, byteorder='little', signed='False')
                 buffer.append(i2c.read_from(current_addr)) # adds new int to end of list
