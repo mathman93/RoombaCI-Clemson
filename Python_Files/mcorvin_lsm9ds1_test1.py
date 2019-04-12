@@ -6,6 +6,7 @@ import time
 # Setup:
 sensor = lsm9ds1.LSM9DS1_I2C()
 
+# At this point the loop will repeat until 'Ctrl+C' is typed.
 while True:
     # Read acceleration, magnetometer, gyroscope, temperature
     accel_x, accel_y, accel_z = sensor.acceleration
