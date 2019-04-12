@@ -349,7 +349,7 @@ class LSM9DS1_I2C(I2CDevice):
         raw_x = (buf[1] << 8) + buf[0]
         raw_y = (buf[3] << 8) + buf[2]
         raw_z = (buf[5] << 8) + buf[4]
-        return [raw_x, raw_y, raw_]
+        return [raw_x, raw_y, raw_z]
 
     @property
     def magnetic(self):
