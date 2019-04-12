@@ -213,7 +213,7 @@ class LSM9DS1_I2C(I2CDevice):
 	# connecting over I2C.	
 
 	# Class level buffer for reading and writing data with the sensor.
-	_BUFFER = bytearray(1)
+	#_BUFFER = bytearray(1)
 
 	def __init__(self):
 		# create attributes and set default ranges for sensors
@@ -319,19 +319,22 @@ class LSM9DS1_I2C(I2CDevice):
 			self._gyro_dps_digit = _LSM9DS1_GYRO_DPS_DIGIT_2000DPS
 	
 	def read_accel_raw(self):
-		# Read the raw accelerometer sensor values and return it as
-		# a 3-tuple of X, Y, Z axis values that are 16-bit unsigned values.
+		# Read the raw accelerometer sensor values and returns it as
+		# a list of X, Y, Z axis values that are 16-bit unsigned values.
 		# If you want the acceleration in nice units, you probably want to
 		# use the accelerometer property!
 
 		# read the accelerometer
-		self._read_bytes(_XGTYPE, _LSM9DS1_REGISTER_OUT_X_L_XL, 6)
-		raw_x, raw_y, raw_z = struct.unpackfrom('<hhh', self._BUFFER[0:6])
-		return (raw_x, raw_y, raw_z)
+		buf = self._read_bytes(_XGTYPE, _LSM9DS1_REGISTER_OUT_X_L_XL, 6)
+		#raw_x, raw_y, raw_z = struct.unpackfrom('<hhh', self._BUFFER[0:6])
+                raw_x = (buf[1] << 8) + buf[0]
+                raw_y = (buf[3] << 8) + buf[2]
+                raw_z = (buf[5] << 8) + buf[4]
+		return [raw_x, raw_y, raw_z]
 
 	@property
 	def acceleration(self):
-		# The accelerometer X, Y, Z axis values as a 3-tuple of
+		# The accelerometer X, Y, Z axis values as a list of
 		# m/s^2 values.
 		raw = self.read_accel_raw()
 		return map(lambda x: x * self._accel_mg_lsb / 1000.0 * _SENSORS_GRAVITY_STANDARD, raw)
@@ -417,9 +420,12 @@ class LSM9DS1_I2C(I2CDevice):
 			device = self._xg_device
 		with device as i2c:
 			current_addr &= 0xFF
+                        buffer = []
 			for x in range(0,count):
-				self._BUFFER[x] = (i2c.read_from(current_addr)).to_bytes(1, byteorder='little', signed='False')
+				#self._BUFFER[x] = (i2c.read_from(current_addr)).to_bytes(1, byteorder='little', signed='False')
+                                buffer.append(i2c.read_from(current_addr)) # adds new int to end of list
 				current_addr += 0x01
+                return buffer
 
 	def _write_u8(self, sensor_type, address, value):
 		# Write an 8-bit unsigned value to the specified 8-bit address.
