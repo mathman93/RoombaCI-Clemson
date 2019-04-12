@@ -94,12 +94,12 @@ GYROSCALE_500DPS    = (0b01 << 3)  # +/- 500 degrees/s rotation
 GYROSCALE_2000DPS   = (0b11 << 3)  # +/- 2000 degrees/s rotation
 
 
-# def _twos_comp(val, bits):
+def _twos_comp(val, bits):
     # Convert an unsigned integer in 2's complement form of the specified bit
     # length to its signed integer value and return it.
-    #if val & (1 << (bits - 1)) != 0:
-    #   return val - (1 << bits)
-    #return val
+    if val & (1 << (bits - 1)) != 0:
+        return val - (1 << bits)
+    return val
 
 class ContextManaged:
     # An object that automatically deinitializes hardware with a context manager.
@@ -368,22 +368,23 @@ class LSM9DS1_I2C(I2CDevice):
         raw = self.read_gyro_raw()
         return map(lambda x: x * self._gyro_dps_digit, raw)
 
-    #def read_temp_raw(self):
+    # These functions still need to be fixed and tested. 
+    def read_temp_raw(self):
         # Read the raw temperature sensor value and return it as a
         # 12-bit signed value. If you want the temperature in nice units,
         # you probably want to use the temperature property!
 
         # read temp sensor
-        #self._read_bytes(_XGTYPE, _LSM9DS1_REGISTER_TEMP_OUT_L, 2)
-        #temp = ((self._BUFFER[1] << 8) | self._BUFFER[0]) >> 4 
-        #return _twos_comp(temp, 12)
+        buf = self._read_bytes(_XGTYPE, _LSM9DS1_REGISTER_TEMP_OUT_L, 2)
+        temp = ((buf[1] << 8) | (buf[0]) >> 4
+        return _twos_comp(temp, 12)
 
     #@property
-    #def temperature(self):
+    def temperature(self):
         # The temperature of the sensor in degrees Celsius.
-        #temp = self.read_temp_raw()
-        #temp = 27.5 + temp/16
-        #return temp
+        temp = self.read_temp_raw()
+        temp = 27.5 + temp/16
+        return temp
 
     def _read_u8(self, sensor_type, address):
         # Read an 8-bit unsigned value from the specified 8-bit address.
