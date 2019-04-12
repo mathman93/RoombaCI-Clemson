@@ -7,14 +7,13 @@
 # imports
 # NOTE: The RaspberryPi will need to have the smbus2 module installed.
 #       To check, use pip3 list. If smbus2 is not currently installed,
-#       type pip3 install smbus2.
+#       type 'pip3 install smbus2'.
 import time
 try:
     import struct
 except ImportError:
     import ustruct as struct
 import smbus2
-#from smbus import SMBus
 
 
 # Internal constants and register values:
@@ -152,8 +151,6 @@ class I2CDevice(Lockable):
 
             try:
                 self._i2c_bus = smbus2.SMBus(bus_num)
-                #self._i2c_bus = SMBus(bus_num)
-                print("_i2c_bus made")
             except FileNotFoundError:
                 raise RuntimeError("I2C Bus #%d not found!" % bus_num)
 
@@ -177,7 +174,8 @@ class I2CDevice(Lockable):
             del self._i2c_bus
             del self._device_address
         except AttributeError:
-            print("Test")
+            #print("Test")
+            pass
 
     def try_bus(self, device_address):
         while not self.try_lock():  # check lock
