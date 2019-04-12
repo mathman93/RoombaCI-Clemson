@@ -327,9 +327,9 @@ class LSM9DS1_I2C(I2CDevice):
         # read the accelerometer
         buf = self._read_bytes(_XGTYPE, _LSM9DS1_REGISTER_OUT_X_L_XL, 6)
         #raw_x, raw_y, raw_z = struct.unpackfrom('<hhh', self._BUFFER[0:6])
-                raw_x = (buf[1] << 8) + buf[0]
-                raw_y = (buf[3] << 8) + buf[2]
-                raw_z = (buf[5] << 8) + buf[4]
+        raw_x = (buf[1] << 8) + buf[0]
+        raw_y = (buf[3] << 8) + buf[2]
+        raw_z = (buf[5] << 8) + buf[4]
         return [raw_x, raw_y, raw_z]
 
     @property
@@ -423,7 +423,7 @@ class LSM9DS1_I2C(I2CDevice):
                         buffer = []
             for x in range(0,count):
                 #self._BUFFER[x] = (i2c.read_from(current_addr)).to_bytes(1, byteorder='little', signed='False')
-                                buffer.append(i2c.read_from(current_addr)) # adds new int to end of list
+                buffer.append(i2c.read_from(current_addr)) # adds new int to end of list
                 current_addr += 0x01
                 return buffer
 
