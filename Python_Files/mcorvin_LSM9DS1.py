@@ -365,7 +365,7 @@ class LSM9DS1_I2C(I2CDevice):
         # use the gyroscope property!
 
         # Read the gyroscope
-        self._read_bytes(_XGTYPE, _LSM9DS1_REGISTER_OUT_X_L_G, 6)
+        buf = self._read_bytes(_XGTYPE, _LSM9DS1_REGISTER_OUT_X_L_G, 6)
         raw_x = (buf[1] << 8) + buf[0]
         raw_y = (buf[3] << 8) + buf[2]
         raw_z = (buf[5] << 8) + buf[4]
