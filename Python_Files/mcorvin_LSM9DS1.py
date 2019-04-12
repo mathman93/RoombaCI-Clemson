@@ -326,7 +326,6 @@ class LSM9DS1_I2C(I2CDevice):
 
         # read the accelerometer
         buf = self._read_bytes(_XGTYPE, _LSM9DS1_REGISTER_OUT_X_L_XL, 6)
-        #raw_x, raw_y, raw_z = struct.unpackfrom('<hhh', self._BUFFER[0:6])
         raw_x = (buf[1] << 8) + buf[0]
         raw_y = (buf[3] << 8) + buf[2]
         raw_z = (buf[5] << 8) + buf[4]
@@ -341,18 +340,20 @@ class LSM9DS1_I2C(I2CDevice):
 
     def read_mag_raw(self):
         # Read the raw magnetometer sensor values and return it as
-        # a 3-tuple of X, Y, Z axis values that are 16-bit unsigned values.
+        # a list of X, Y, Z axis values that are 16-bit unsigned values.
         # If you want the magnetometer in nice units, you probably want to
         # use the magnetometer property!
     
         # read the magnetometer
-        self._read_bytes(_MAGTYPE, _LSM9DS1_REGISTER_OUT_X_L_M, 6)
-        raw_x, raw_y, raw_z = struct.unpackfrom('<hhh', self._BUFFER[0:6])
-        return (raw_x, raw_y, raw_z)
+        buf = self._read_bytes(_MAGTYPE, _LSM9DS1_REGISTER_OUT_X_L_M, 6)
+        raw_x = (buf[1] << 8) + buf[0]
+        raw_y = (buf[3] << 8) + buf[2]
+        raw_z = (buf[5] << 8) + buf[4]
+        return [raw_x, raw_y, raw_]
 
     @property
     def magnetic(self):
-        # The magnetometer X, Y, Z axis values as a 3-tuple of
+        # The magnetometer X, Y, Z axis values as a list of
         # gauss values.
         raw = self.read_mag_raw()
         return map(lambda x: x * self._mag_mgauss_lsb / 1000.0, raw)
@@ -365,8 +366,10 @@ class LSM9DS1_I2C(I2CDevice):
 
         # Read the gyroscope
         self._read_bytes(_XGTYPE, _LSM9DS1_REGISTER_OUT_X_L_G, 6)
-        raw_x, raw_y, raw_z = struct.unpackfrom('<hhh', self._BUFFER[0:6])
-        return (raw_x, raw_y, raw_z)
+        raw_x = (buf[1] << 8) + buf[0]
+        raw_y = (buf[3] << 8) + buf[2]
+        raw_z = (buf[5] << 8) + buf[4]
+        return [raw_x, raw_y, raw_z]
 
     @property
     def gyro(self):
