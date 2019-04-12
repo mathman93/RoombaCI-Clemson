@@ -425,7 +425,7 @@ class LSM9DS1_I2C(I2CDevice):
                 #self._BUFFER[x] = (i2c.read_from(current_addr)).to_bytes(1, byteorder='little', signed='False')
                 buffer.append(i2c.read_from(current_addr)) # adds new int to end of list
                 current_addr += 0x01
-                return buffer
+            return buffer
 
     def _write_u8(self, sensor_type, address, value):
         # Write an 8-bit unsigned value to the specified 8-bit address.
