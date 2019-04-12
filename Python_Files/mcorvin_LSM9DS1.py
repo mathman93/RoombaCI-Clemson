@@ -13,8 +13,8 @@ try:
     import struct
 except ImportError:
     import ustruct as struct
-#import smbus2
-from smbus import SMBus
+import smbus2
+#from smbus import SMBus
 
 
 # Internal constants and register values:
@@ -151,8 +151,8 @@ class I2CDevice(Lockable):
                 self._mode = self.MASTER
 
             try:
-                #self._i2c_bus = smbus2.SMBus(bus_num)
-                self._i2c_bus = SMBus(bus_num)
+                self._i2c_bus = smbus2.SMBus(bus_num)
+                #self._i2c_bus = SMBus(bus_num)
                 print("_i2c_bus made")
             except FileNotFoundError:
                 raise RuntimeError("I2C Bus #%d not found!" % bus_num)
