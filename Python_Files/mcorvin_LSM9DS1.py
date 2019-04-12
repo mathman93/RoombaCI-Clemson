@@ -368,7 +368,6 @@ class LSM9DS1_I2C(I2CDevice):
         raw = self.read_gyro_raw()
         return map(lambda x: x * self._gyro_dps_digit, raw)
 
-    # These functions still need to be fixed and tested. 
     def read_temp_raw(self):
         # Read the raw temperature sensor value and return it as a
         # 12-bit signed value. If you want the temperature in nice units,
