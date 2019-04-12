@@ -199,9 +199,6 @@ class I2CDevice(Lockable):
 
     def read_from(self, reg_address):
         buf = bytearray(1)
-        print(self._device_address)
-        print(reg_address)
-        #buf[0] = self._i2c_bus.read_byte_data(self._device_address, reg_address)
         return self._i2c_bus.read_byte_data(self._device_address, reg_address)
     
     def write(self, reg_address, value):
@@ -211,9 +208,6 @@ class I2CDevice(Lockable):
 class LSM9DS1_I2C(I2CDevice):
     # Driver for the LSM9DS1 accelerometer, gyroscope, and magnetometer,
     # connecting over I2C.  
-
-    # Class level buffer for reading and writing data with the sensor.
-    #_BUFFER = bytearray(1)
 
     def __init__(self):
         # create attributes and set default ranges for sensors
@@ -359,8 +353,8 @@ class LSM9DS1_I2C(I2CDevice):
         return map(lambda x: x * self._mag_mgauss_lsb / 1000.0, raw)
 
     def read_gyro_raw(self):
-        # Read the raw gyroscope sensro values and return it as
-        # a 3-tuple of X, Y, Z axis values that are 16-bit unsigned values.
+        # Read the raw gyroscope sensor values and return it as
+        # a list of X, Y, Z axis values that are 16-bit unsigned values.
         # If you want the gyroscope in nice units, you probably want to 
         # use the gyroscope property!
 
@@ -406,13 +400,10 @@ class LSM9DS1_I2C(I2CDevice):
             device = self._xg_device
         with device as i2c:
             address &= 0xFF
-            #self._BUFFER[0] = i2c.read_from(address)
         return i2c.read_from(address)
-        #return self._BUFFER[0]
         
-
     def _read_bytes(self, sensor_type, address, count):
-        # Read a count number of bytes into _BUFFER starting from the
+        # Read a count number of bytes into a buffer starting from the
         # provided address. The sensor_type boolean should be _MAGTYPE
         # when talking to the magnetometer and should be _XGTYPE when
         # talking to the accel or gyro.
@@ -425,7 +416,6 @@ class LSM9DS1_I2C(I2CDevice):
             current_addr &= 0xFF
             buffer = []
             for x in range(0,count):
-                #self._BUFFER[x] = (i2c.read_from(current_addr)).to_bytes(1, byteorder='little', signed='False')
                 buffer.append(i2c.read_from(current_addr)) # adds new int to end of list
                 current_addr += 0x01
         return buffer
