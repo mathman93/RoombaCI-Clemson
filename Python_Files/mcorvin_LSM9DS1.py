@@ -376,7 +376,7 @@ class LSM9DS1_I2C(I2CDevice):
 
         # read temp sensor
         buf = self._read_bytes(_XGTYPE, _LSM9DS1_REGISTER_TEMP_OUT_L, 2)
-        temp = ((buf[1] << 8) | (buf[0]) >> 4
+        temp = ((buf[1] << 8) | (buf[0])) >> 4
         return (_twos_comp(temp,12))
 
     @property
