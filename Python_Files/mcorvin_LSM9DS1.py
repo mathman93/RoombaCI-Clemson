@@ -134,7 +134,8 @@ class Lockable(ContextManaged):
             raise ValueError("Not locked")
 
 
-class I2CDevice(Lockable):
+#class I2CDevice(Lockable):
+class I2CDevice():
     MASTER = 0
     SLAVE = 1
     SDA = 3  # I2C SDA pin on the Raspberry Pi 3B
@@ -142,7 +143,6 @@ class I2CDevice(Lockable):
     BUS = 1  # Using I2C bus 1 on the Pi
 
     def __init__(self, sensor_type, sda=SDA, scl=SCL, freq=400000, bus_num=BUS, mode=MASTER):
-        #self.deinit()
         if scl == self.SCL and sda == self.SDA:
             if mode != self.MASTER:
                 raise NotImplementedError("Only I2C Master supported!")
@@ -157,21 +157,13 @@ class I2CDevice(Lockable):
         else:
             raise NotImplementedError("No hardware I2C on ports!")
         
-        # test bus connection
+        # set device address
         if sensor_type == _MAGTYPE:
             device_address = _LSM9DS1_ADDRESS_MAG
         else:
             device_address = _LSM9DS1_ADDRESS_ACCELGYRO
 
         self._device_address = device_address
-
-    #def deinit(self):
-     #   try:
-      #      del self._mode
-       #     del self._i2c_bus
-        #    del self._device_address
-        #except AttributeError:
-        #    pass
 
     def read_from(self, reg_address):
         buf = bytearray(1)
