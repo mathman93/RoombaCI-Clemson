@@ -135,7 +135,7 @@ class Lockable(ContextManaged):
 
 
 #class I2CDevice(Lockable):
-class I2CDevice():
+class I2CDevice(ContextManaged):
     MASTER = 0
     SLAVE = 1
     SDA = 3  # I2C SDA pin on the Raspberry Pi 3B
