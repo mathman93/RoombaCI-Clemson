@@ -171,26 +171,7 @@ class I2CDevice(Lockable):
             del self._i2c_bus
             del self._device_address
         except AttributeError:
-            #print("Test")
             pass
-
-    #def try_bus(self, device_address):
-        #while not self.try_lock():  # check lock
-           # pass
-       # try:
-            # Try to read a byte from the device...
-            # If you get an OSError, it means the device is not there
-            #self._i2c_bus.write_byte(device_address, int.from_bytes(b' ', byteorder='little', signed='False'));
-        #except OSError:
-            # Some devices don't like writing an empty bytesting...
-            # Retry by reading a byte
-            #try:
-                #result = bytearray(1)
-                #result[0] = self._i2c_bus.read_byte(device_address)
-           # except OSError:
-                #raise ValueError("No I2C Device at address: %x" % device_address)
-        #finally:
-            #self.unlock()
 
     def read_from(self, reg_address):
         buf = bytearray(1)
