@@ -165,13 +165,13 @@ class I2CDevice(Lockable):
 
         self._device_address = device_address
 
-    def deinit(self):
-        try:
-            del self._mode
-            del self._i2c_bus
-            del self._device_address
-        except AttributeError:
-            pass
+    #def deinit(self):
+     #   try:
+      #      del self._mode
+       #     del self._i2c_bus
+        #    del self._device_address
+        #except AttributeError:
+        #    pass
 
     def read_from(self, reg_address):
         buf = bytearray(1)
