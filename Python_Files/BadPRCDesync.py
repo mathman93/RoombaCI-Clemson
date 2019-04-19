@@ -519,7 +519,7 @@ while True:
 			# Print data to monitor
 			print("{0}, {1:.6f}, {2:.6f}, {3:.6f}, {4}, {5}, {6:0>8b}, {7:.6f}, {8:.6f}".format(data_counter, data_time, angle, counter, l_counts, r_counts, bumper_byte, desired_heading, bad_heading))
 			# Write data values to a text file
-			datafile.write("{0} {1:.6f} {2:.6f} {3:.6f} {4} {5} {6:0>8b} {7:.6f}\n".format(data_counter, data_time, angle, counter, l_counts, r_counts, bumper_byte, desired_heading))
+			datafile.write("{0} {1:.6f} {2:.6f} {3:.6f} {4} {5} {6:0>8b} {7:.6f} {8:.6f}\n".format(data_counter, data_time, angle, counter, l_counts, r_counts, bumper_byte, desired_heading, bad_heading))
 			
 			data_counter += 1 # Increment counter for the next data sample
 			data_base += data_timer
