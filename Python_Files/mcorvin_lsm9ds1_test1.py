@@ -26,6 +26,6 @@ while True:
 	print('Gyroscope (degrees/sec): ({0:0.3f},{1:0.3f},{2:0.3f})'.format(gyro_x, gyro_y, gyro_z))
 	print('Temperature: {0:0.3f}C'.format(temp))
 	# print('\n')
-
-    #Delay
-    time.sleep(1.0)
+	
+	#Delay
+	time.sleep(1.0)
