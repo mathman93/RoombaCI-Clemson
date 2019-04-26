@@ -34,19 +34,36 @@ resutl - result normalized
 micDist = 5;
 
 %% Generate Microphone Coordinates
-micLoc(1,1) = 0;
-micLoc(1,2) = micDist;
+micLoc(1,1) = -17/2; % x
+micLoc(1,2) = 16; % y
 
-micLoc(2,1) = micDist * cosd(30);
-micLoc(2,2) = -1 * micDist * sind(30);
+micLoc(2,1) = 17/2;
+micLoc(2,2) = 16;
 
-micLoc(3,1) = -1 * micDist * cosd(30);
-micLoc(3,2) = -1 * micDist * sind(30);
+micLoc(3,1) = 0;
+micLoc(3,2) = 0;
+
+micLoc = micLoc .* 0.0254; % inches to meters
 
 %% MicData
 
 speedOfSound = 340; % m/s
 [ t1, t2, t3, xLoc, yLoc] = MicData(speedOfSound, micLoc, micDist);
+% 180
+t1 = 0;
+t2 = 0.00153265;
+t3 =   0.0011325;
+% 90
+t1 = 7.884e-05;
+t2 = 0;
+t3 = 0.00105996;
+% out from 3
+t1 = 0;
+t2 = 0.00140732;
+t3 = 0.00140732;
+
+xLoc = 0;
+yLoc = 0;
 
 %% Plot
 

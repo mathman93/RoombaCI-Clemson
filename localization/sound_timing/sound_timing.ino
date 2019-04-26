@@ -21,6 +21,8 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   unsigned long i = 0;
+  unsigned long t1;
+  unsigned long t2;
 
 digitalRead(M1);
 Serial.println("1");
@@ -36,7 +38,7 @@ delay(500);
   m1[0] = digitalRead(M1);
   m2[0] = digitalRead(M2);
   m3[0] = digitalRead(M3);
-  
+  t1 = micros();
   if (m1[0] == HIT)
   {
     for (i = 0; i < SIZE; i++)
@@ -46,6 +48,7 @@ delay(500);
       //Serial.println(i);
       //delay(100);
     }
+    t2 = micros();
     for (i = 0; i < SIZE; i++)
     {
       m1[i] = 1;
@@ -61,6 +64,7 @@ delay(500);
       //Serial.println(i);
       //delay(100);
     }
+    t2 = micros();
     for (i = 0; i < SIZE; i++)
     {
       m2[i] = 1;
@@ -76,6 +80,7 @@ delay(500);
       //Serial.println(i);
       //delay(100);
     }
+    t2 = micros();
     Serial.println("3 hit first.");
     for (i = 0; i < SIZE; i++)
     {
@@ -93,6 +98,7 @@ delay(500);
     Serial.print(" ");
     Serial.println(m3[i]);
   }
-  
+  Serial.println(t1);
+  Serial.println(t2);
   while(1);
 }
