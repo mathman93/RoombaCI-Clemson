@@ -339,6 +339,15 @@ class LSM9DS1_I2C(I2CDevice):
         temp = ((buf[1] << 8) | (buf[0])) >> 4
         return (_twos_comp(temp,12))
 
+    def read_accelgyro_raw(self):
+        # Possible function to read both the accelerometer and gyroscope
+        # raw data. The raw gyroscope sensor output is stored in
+        # addresses 0x18 to 0x1D, and the raw accelerometer sensor 
+        # output is stored in addresses 0x28 to 0x2D.         
+        # Not fully implemented/tested yet.
+
+        # read the accel and gyro into same buffer
+
     @property
     def temperature(self):
         # The temperature of the sensor in degrees Celsius.
@@ -364,6 +373,8 @@ class LSM9DS1_I2C(I2CDevice):
         # provided address. The sensor_type boolean should be _MAGTYPE
         # when talking to the magnetometer and should be _XGTYPE when
         # talking to the accel or gyro.
+        # NOTE: this function assumes that the bytes it is reading are
+        # in consecutive addresses. 
         current_addr = address
         if sensor_type == _MAGTYPE:
             device = self._mag_device
