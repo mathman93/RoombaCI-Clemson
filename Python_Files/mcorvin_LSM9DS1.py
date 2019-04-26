@@ -373,6 +373,8 @@ class LSM9DS1_I2C(I2CDevice):
         # provided address. The sensor_type boolean should be _MAGTYPE
         # when talking to the magnetometer and should be _XGTYPE when
         # talking to the accel or gyro.
+        # NOTE: this function assumes that the bytes it is reading are
+        # in consecutive addresses. 
         current_addr = address
         if sensor_type == _MAGTYPE:
             device = self._mag_device
