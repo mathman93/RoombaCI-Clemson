@@ -269,8 +269,11 @@ class LSM9DS1_I2C(I2CDevice):
         # read the accelerometer
         buf = self._read_bytes(_XGTYPE, _LSM9DS1_REGISTER_OUT_X_L_XL, 6)
         raw_x = (buf[1] << 8) + buf[0]
+        raw_x = _twos_comp(raw_x, 16)
         raw_y = (buf[3] << 8) + buf[2]
+        raw_y = _twos_comp(raw_y, 16)
         raw_z = (buf[5] << 8) + buf[4]
+        raw_z = _twos_comp(raw_z, 16)
         return [raw_x, raw_y, raw_z]
 
     @property
@@ -289,8 +292,11 @@ class LSM9DS1_I2C(I2CDevice):
         # read the magnetometer
         buf = self._read_bytes(_MAGTYPE, _LSM9DS1_REGISTER_OUT_X_L_M, 6)
         raw_x = (buf[1] << 8) + buf[0]
+        raw_x = _twos_comp(raw_x, 16)
         raw_y = (buf[3] << 8) + buf[2]
+        raw_y = _twos_comp(raw_y, 16)
         raw_z = (buf[5] << 8) + buf[4]
+        raw_z = _twos_comp(raw_z, 16)
         return [raw_x, raw_y, raw_z]
 
     @property
@@ -309,8 +315,11 @@ class LSM9DS1_I2C(I2CDevice):
         # Read the gyroscope
         buf = self._read_bytes(_XGTYPE, _LSM9DS1_REGISTER_OUT_X_L_G, 6)
         raw_x = (buf[1] << 8) + buf[0]
+        raw_x = _twos_comp(raw_x, 16)
         raw_y = (buf[3] << 8) + buf[2]
+        raw_y = _twos_comp(raw_y, 16)
         raw_z = (buf[5] << 8) + buf[4]
+        raw_z = _twos_comp(raw_z, 16)
         return [raw_x, raw_y, raw_z]
 
     @property
@@ -329,6 +338,15 @@ class LSM9DS1_I2C(I2CDevice):
         buf = self._read_bytes(_XGTYPE, _LSM9DS1_REGISTER_TEMP_OUT_L, 2)
         temp = ((buf[1] << 8) | (buf[0])) >> 4
         return (_twos_comp(temp,12))
+
+    def read_accelgyro_raw(self):
+        # Possible function to read both the accelerometer and gyroscope
+        # raw data. The raw gyroscope sensor output is stored in
+        # addresses 0x18 to 0x1D, and the raw accelerometer sensor 
+        # output is stored in addresses 0x28 to 0x2D.         
+        # Not fully implemented/tested yet.
+
+        # read the accel and gyro into same buffer
 
     @property
     def temperature(self):
@@ -355,6 +373,8 @@ class LSM9DS1_I2C(I2CDevice):
         # provided address. The sensor_type boolean should be _MAGTYPE
         # when talking to the magnetometer and should be _XGTYPE when
         # talking to the accel or gyro.
+        # NOTE: this function assumes that the bytes it is reading are
+        # in consecutive addresses. 
         current_addr = address
         if sensor_type == _MAGTYPE:
             device = self._mag_device
