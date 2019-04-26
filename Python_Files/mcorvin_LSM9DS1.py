@@ -339,6 +339,15 @@ class LSM9DS1_I2C(I2CDevice):
         temp = ((buf[1] << 8) | (buf[0])) >> 4
         return (_twos_comp(temp,12))
 
+    def read_accelgyro_raw(self):
+        # Possible function to read both the accelerometer and gyroscope
+        # raw data. The raw gyroscope sensor output is stored in
+        # addresses 0x18 to 0x1D, and the raw accelerometer sensor 
+        # output is stored in addresses 0x28 to 0x2D.         
+        # Not fully implemented/tested yet.
+
+        # read the accel and gyro into same buffer
+
     @property
     def temperature(self):
         # The temperature of the sensor in degrees Celsius.
