@@ -46,6 +46,10 @@ delay(500);
       //Serial.println(i);
       //delay(100);
     }
+    for (i = 0; i < SIZE; i++)
+    {
+      m1[i] = 1;
+    }
     Serial.println("1 hit first.");
   }
   else if (m2[0] == HIT)
@@ -56,6 +60,10 @@ delay(500);
       m3[i] = digitalRead(M3);
       //Serial.println(i);
       //delay(100);
+    }
+    for (i = 0; i < SIZE; i++)
+    {
+      m2[i] = 1;
     }
     Serial.println("2 hit first.");
   }
@@ -69,6 +77,10 @@ delay(500);
       //delay(100);
     }
     Serial.println("3 hit first.");
+    for (i = 0; i < SIZE; i++)
+    {
+      m3[i] = 1;
+    }
   }
 
   //Serial.print("START TIME: ");
