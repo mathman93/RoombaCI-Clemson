@@ -23,7 +23,7 @@ gled = 13
 
 # Timing Counter Parameters
 data_timer = (2*0.015625) # seconds until new data point (1/64 = 0.015625)
-reset_timer = 300 # seconds until oscillators reset
+stop_timer = 300 # seconds until oscillators reset
 
 # Counter Parameters
 cycle_threshold = 360.0 # Threshold for phase of PCO
@@ -293,6 +293,19 @@ while True:
 	else:
 		# The Roomba ID number is good.
 		break # Leave while loop
+		
+while True:
+	# Set the timer so that the program will automatically stop - makes testing easier.
+	try:
+		stop_timer = int(input("How long do you want to run the test in seconds? "))
+	except ValueError:
+		print("Not a valid number. Try again.")
+		continue
+	if stop_timer < 1:
+		print("Please enter a positive time number. Try again.")
+		continue
+	else:
+		break
 
 while True:
 	try:
@@ -535,11 +548,9 @@ while True:
 			data_counter += 1 # Increment counter for the next data sample
 			data_base += data_timer
 
-		# Reset counters of all Roombas after 5 minutes
-		if (time.time() - reset_base) >= reset_timer: # After 5 minutes
-			SendResetPulse() # Send reset_pulse
-			# Reset all counters
-			ResetCounters()
+		# Reset counters of all Roombas after set time
+		if (time.time() - reset_base) >= stop_timer: # After set time
+			break
 
 	except KeyboardInterrupt:
 		print('') # Print new line

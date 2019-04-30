@@ -1,0 +1,17 @@
+NOTE: ALL TIMES ARE IN MICROSECONDS
+T1: reading 1 digital pin
+T2: reading 2 digital pins
+T3: reading 3 digital pins
+
+START
+t1 - 188680
+Time Per - 3.77
+Start - 64
+
+t2 - 377280
+Time Per - 7.55
+Start - 188748
+
+t3 - 587932
+Time Per - 11.76
+Start - 566032

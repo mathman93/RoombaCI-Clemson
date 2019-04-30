@@ -4,3 +4,4 @@ __pycache__
 /.vs/slnx.sqlite
 /.vs/RoombaCI-Clemson/v16/.suo
 *.json
+/.vs
