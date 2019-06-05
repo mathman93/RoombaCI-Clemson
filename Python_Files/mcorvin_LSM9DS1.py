@@ -95,8 +95,8 @@ GYROSCALE_2000DPS   = (0b11 << 3)  # +/- 2000 degrees/s rotation
 
 
 def _twos_comp(val, bits):
-    # Convert an unsigned integer in 2's complement form of the specified bit
-    # length to its signed integer value and return it.
+    # Convert an unsigned integer, val, of the specified bit length, bits,
+    # to its signed integer value in 2's complement form and return it.
     if val & (1 << (bits - 1)) != 0:
         return val - (1 << bits)
     return val

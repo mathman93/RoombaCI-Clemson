@@ -25,13 +25,13 @@ data_counter = 0 # Initialize data_counter
 #global A # Accelerometer transformation matrix
 
 move_dict = {
-	1: [2.0, 0, 0],
-	2: [10.0, 0, 0],
-	3: [2.0, 0, 0],
-	4: [5.0, 0, 0],
-	5: [2.0, 0, 0],
-	6: [10.0, 0, 0],
-	7: [2.0, 0, 0]
+	0: [2.0, 0, 0],
+	1: [10.0, 75, 0],
+	2: [2.0, 0, 0],
+	3: [5.0, 0, 75],
+	4: [2.0, 0, 0],
+	5: [10.0, 75, 0],
+	6: [2.0, 0, 0]
 	}
 
 ## Functions and Definitions ##
@@ -134,19 +134,23 @@ print(" ROOMBA Setup Complete")
 GPIO.output(yled, GPIO.HIGH) # Indicate within setup sequence
 # Initialize IMU
 print(" Starting IMU...")
-imu = RoombaCI_lib.LSM9DS1_IMU() # Initialize IMU
-time.sleep(0.5)
+imu = RoombaCI_lib.LSM9DS1_I2C() # Initialize IMU
+time.sleep(0.1)
+# Clear out first reading from all sensors
+x = imu.magnetic
+x = imu.acceleration
+x = imu.gyro
 # Calibrate IMU
 print(" Calibrating IMU...")
-#Roomba.Move(0,75) # Start Roomba spinning
-#imu.CalibrateMag() # Calculate magnetometer offset values
-#Roomba.Move(0,0) # Stop Roomba spinning
-#time.sleep(0.5)
-imu.CalibrateAccelGyro() # Calculate accelerometer and gyroscope offset values
+Roomba.Move(0,75) # Start Roomba spinning
+imu.CalibrateMag() # Calculate magnetometer offset values
+Roomba.Move(0,0) # Stop Roomba spinning
+time.sleep(0.5)
+#imu.CalibrateAccelGyro() # Calculate accelerometer and gyroscope offset values
 # Display offset values
-#print("mx_offset = {:f}; my_offset = {:f}; mz_offset = {:f}".format(imu.mx_offset, imu.my_offset, imu.mz_offset))
-print("ax_offset = {:f}; ay_offset = {:f}; az_offset = {:f}".format(imu.ax_offset, imu.ay_offset, imu.az_offset))
-print("gx_offset = {:f}; gy_offset = {:f}; gz_offset = {:f}".format(imu.gx_offset, imu.gy_offset, imu.gz_offset))
+print("mx_offset = {:f}; my_offset = {:f}; mz_offset = {:f}".format(imu.m_offset[0], imu.m_offset[1], imu.m_offset[2]))
+#print("ax_offset = {:f}; ay_offset = {:f}; az_offset = {:f}".format(imu.ax_offset, imu.ay_offset, imu.az_offset))
+#print("gx_offset = {:f}; gy_offset = {:f}; gz_offset = {:f}".format(imu.gx_offset, imu.gy_offset, imu.gz_offset))
 print(" IMU Setup Complete")
 time.sleep(3) # Gives time to read offset values before continuing
 GPIO.output(yled, GPIO.LOW) # Indicate setup sequence is complete
@@ -158,7 +162,7 @@ if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 # Main Code #
 # Open a text file for data retrieval
 file_name_input = input("Name for data file: ")
-dir_path = "/home/pi/RoombaCI-Clemson/Data_Files/2019_Spring/" # Directory path to save file
+dir_path = "/home/pi/RoombaCI-Clemson/Data_Files/2019_Summer/" # Directory path to save file
 file_name = os.path.join(dir_path, file_name_input+".txt") # text file extension
 datafile = open(file_name, "w") # Open a text file for storing data
 	# Will overwrite anything that was in the text file previously
@@ -170,17 +174,20 @@ Roomba.Move(0,0)
 # Read in initial values
 [r_speed,l_speed,l_counts,r_counts] = Roomba.Query(41,42,43,44) # Read Roomba data stream
 data_time = 0.0
-[ax,ay,az] = ReadAccelNew() # Read accelerometer component values
-[gx,gy,gz] = ReadGyroNew() # Read gyroscope component values
+[ax,ay,az] = imu.acceleration # Read accelerometer component values
+[gx,gy,gz] = imu.gyro # Read gyroscope component values
+[mx,my,mz] = imu.magnetic # Read magnetometer component values
 # Write data values to a text file
-datafile.write("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}, {7}, {8}, {9}, {10}\n".format(data_time, ax, ay, az, gx, gy, gz, l_speed, r_speed, l_counts, r_counts))
-print("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}".format(data_time, ax, ay, az, gx, gy, gz))
+datafile.write("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}, {7:.6f}, {8:.6f}, {9:.6f}, {10}, {11}, {12}, {13}\n"\
+	.format(data_time, ax, ay, az, gx, gy, gz, mx, my, mz, l_speed, r_speed, l_counts, r_counts))
+print("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}, {7:.6f}, {8:.6f}, {9:.6f}"\
+	.format(data_time, ax, ay, az, gx, gy, gz, mx, my, mz))
 
 # Start up Roomba query stream
 Roomba.StartQueryStream(41,42,43,44) # Start query stream with specific sensor packets
 time_base = time.time() # Set data timer base
 
-for i in range(1, len(move_dict.keys())+1):
+for i in range(0, len(move_dict.keys())):
 	[movetime_offset, forward, spin] = move_dict[i] # Read values from dictionary
 	Roomba.Move(forward, spin)
 	movetime_base = time.time()
@@ -189,11 +196,14 @@ for i in range(1, len(move_dict.keys())+1):
 			# Retrieve data values (Happens every ~1/64 seconds)
 			data_time = time.time() - time_base # Time that data is received
 			[r_speed,l_speed,l_counts,r_counts] = Roomba.ReadQueryStream(41,42,43,44) # Read Roomba data stream
-			[ax,ay,az] = ReadAccelNew() # Read accelerometer component values
-			[gx,gy,gz] = ReadGyroNew() # Read gyroscope component values
+			[ax,ay,az] = imu.acceleration # Read accelerometer component values
+			[gx,gy,gz] = imu.gyro # Read gyroscope component values
+			[mx,my,mz] = imu.magnetic # Read magnetometer component values
 			# Write data values to a text file
-			datafile.write("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}, {7}, {8}, {9}, {10}\n".format(data_time, ax, ay, az, gx, gy, gz, l_speed, r_speed, l_counts, r_counts))
-			print("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}".format(data_time, ax, ay, az, gx, gy, gz))
+			datafile.write("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}, {7:.6f}, {8:.6f}, {9:.6f}, {10}, {11}, {12}, {13}\n"\
+				.format(data_time, ax, ay, az, gx, gy, gz, mx, my, mz, l_speed, r_speed, l_counts, r_counts))
+			print("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}, {7:.6f}, {8:.6f}, {9:.6f}"\
+				.format(data_time, ax, ay, az, gx, gy, gz, mx, my, mz))
 		# End if Roomba.Available() > 0
 		
 	# End while (time.time() - movetime_base) < movetime_offset
