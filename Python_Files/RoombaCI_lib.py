@@ -118,7 +118,6 @@ class ContextManaged:
 		# Free any hardware used by the object.
 		return
 
-
 class I2CDevice(ContextManaged):
 	MASTER = 0
 	SLAVE = 1
@@ -190,12 +189,6 @@ class LSM9DS1_I2C(I2CDevice):
 		self._write_u8(_MAGTYPE, _LSM9DS1_REGISTER_CTRL_REG3_M, 0x00)
 		# Calibration offset variables
 		self.m_offset = [0.0, 0.0, 0.0]
-		self.ax_offset = 0.0
-		self.ay_offset = 0.0
-		self.az_offset = 0.0
-		self.gx_offset = 0.0
-		self.gy_offset = 0.0
-		self.gz_offset = 0.0
 
 	@property
 	def accel_range(self):
@@ -281,8 +274,11 @@ class LSM9DS1_I2C(I2CDevice):
 		# read the accelerometer
 		buf = self._read_bytes(_XGTYPE, _LSM9DS1_REGISTER_OUT_X_L_XL, 6)
 		raw_x = (buf[1] << 8) + buf[0]
+		raw_x = _twos_comp(raw_x, 16)
 		raw_y = (buf[3] << 8) + buf[2]
+		raw_y = _twos_comp(raw_y, 16)
 		raw_z = (buf[5] << 8) + buf[4]
+		raw_z = _twos_comp(raw_z, 16)
 		return [raw_x, raw_y, raw_z]
 	
 	@property
@@ -301,8 +297,11 @@ class LSM9DS1_I2C(I2CDevice):
 		# read the magnetometer
 		buf = self._read_bytes(_MAGTYPE, _LSM9DS1_REGISTER_OUT_X_L_M, 6)
 		raw_x = (buf[1] << 8) + buf[0]
+		raw_x = _twos_comp(raw_x, 16)
 		raw_y = (buf[3] << 8) + buf[2]
+		raw_y = _twos_comp(raw_y, 16)
 		raw_z = (buf[5] << 8) + buf[4]
+		raw_z = _twos_comp(raw_z, 16)
 		return [raw_x, raw_y, raw_z]
 	
 	@property
@@ -322,8 +321,11 @@ class LSM9DS1_I2C(I2CDevice):
 		# Read the gyroscope
 		buf = self._read_bytes(_XGTYPE, _LSM9DS1_REGISTER_OUT_X_L_G, 6)
 		raw_x = (buf[1] << 8) + buf[0]
+		raw_x = _twos_comp(raw_x, 16)
 		raw_y = (buf[3] << 8) + buf[2]
+		raw_y = _twos_comp(raw_y, 16)
 		raw_z = (buf[5] << 8) + buf[4]
+		raw_z = _twos_comp(raw_z, 16)
 		return [raw_x, raw_y, raw_z]
 	
 	@property
