@@ -180,7 +180,7 @@ def ResetCounters():
 	counter_base = time.time() # Initialize counter
 	data_base = time.time() # Initialize data timer
 	reset_base = time.time() # Initialize reset timer
-	counter = 0 # Reset phase counter
+	counter = 0.0 # Reset phase counter
 	data_counter = 0 # Reset data point counter
 	angle = initial_angle # Reset initial angle value (without IMU)
 	#angle = imu.CalculateHeading() # Reset initial angle value (using IMU)
@@ -417,10 +417,11 @@ angle = initial_angle # Reset initial angle value (without IMU)
 print("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts, Bumper Byte, Desired Heading")
 # Write data values to a text file
 #datafile.write("Data Counter, Data Time, Angle, Counter, Left Encoder Counts, Right Encoder Counts, Bumper Byte, Desired Heading\n")
-			
+
 # Ready to begin PRCSync Loop
 SendResetPulse() # Send reset pulse
 ResetCounters() # Reset counter values
+bad_heading = angle ########## Bad implementation
 # Request data packets from Roomba (Stream)
 Roomba.StartQueryStream(7,43,44,45) # Start query stream with specific sensor packets
 
@@ -447,12 +448,14 @@ while True:
 			# Calculate the turn angle change since the last counts
 			angle_change = TURN_CONSTANT * (delta_l_count - delta_r_count)
 			angle += angle_change # Update angle of Roomba and correct for overflow
+			########## HERE: Bad implementation of algorithm
 			if angle >= cycle_threshold:
 				angle -= cycle_threshold
-				counter_base -= counter_adjust
+				#counter_base -= counter_adjust
 			elif angle < 0:
 				angle += cycle_threshold
-				counter_base += counter_adjust
+				#counter_base += counter_adjust
+			##########
 			# Value needed to turn to desired heading point
 			if method_opt == 1: # Choose CFM
 				spin = spin_CFM # Use for Constant Frequency Method
@@ -477,19 +480,20 @@ while True:
 		counter = (time.time() - counter_base)*counter_ratio
 		# Send sync_pulse
 		########## HERE: Bad implementation of algorithm
-		if (desired_heading + counter) > cycle_threshold: # If (angle + counter) is greater than 360 degrees...
+		if (bad_heading + counter) > cycle_threshold: # If (angle + counter) is greater than 360 degrees...
 			SendSyncPulse()
 			counter_base += counter_adjust
 		##########
 		# Receive pulse
 		message = ReceivePulse()
-			
+		
 		if message == reset_pulse: 
 			#print("Reset Pulse Received.") # Include for debugging
 			GPIO.output(gled, GPIO.HIGH) # Notify that reset_pulse received
 			GPIO.output(rled, GPIO.HIGH)
 			datafile.close() # Close the file to reset the data in it.
 			ResetCounters() # Reset counters
+			bad_heading = angle ########## Bad implementation
 			datafile = open(file_name, "w") # Open a text file for storing data
 				# Will overwrite anything that was in the text file previously
 			# Write data values to a text file
@@ -499,10 +503,17 @@ while True:
 		elif message in connected:
 			#print("Sync Pulse Received.") # Include for debugging
 			########## HERE: Bad implementation of algorithm
-			d_angle = PRCSync(angle + counter) # Calculate desired change in heading
+			d_angle = PRCSync(bad_heading + counter) # Calculate desired change in heading
 			if method_opt == 2: # If using CTM for phase continuity
 				spin_CTM = DHMagnitudeTime(d_angle * coupling_ratio) # Set spin rate using Constant Time Method
-			desired_heading += (d_angle * coupling_ratio) # Update desired heading
+			desired_heading = angle + (d_angle * coupling_ratio) # Update desired heading
+			bad_heading += (d_angle * coupling_ratio) # Update bad heading
+			if bad_heading >= cycle_threshold:
+				bad_heading -= cycle_threshold
+				counter_base -= counter_adjust
+			elif bad_heading < 0:
+				bad_heading += cycle_threshold
+				counter_base += counter_adjust
 			##########
 			# Normalize desired_heading to range [0,360)
 			if desired_heading >= cycle_threshold or desired_heading < 0:
@@ -511,9 +522,9 @@ while True:
 		# Print heading data to monitor so often
 		if (time.time() - data_base) > data_timer: # After value of data_timer...
 			# Print data to monitor
-			print("{0}, {1:.6f}, {2:.6f}, {3:.6f}, {4}, {5}, {6:0>8b}, {7:.6f}".format(data_counter, data_time, angle, counter, l_counts, r_counts, bumper_byte, desired_heading))
+			print("{0}, {1:.6f}, {2:.6f}, {3:.6f}, {4}, {5}, {6:0>8b}, {7:.6f}, {8:.6f}".format(data_counter, data_time, angle, counter, l_counts, r_counts, bumper_byte, desired_heading, bad_heading))
 			# Write data values to a text file
-			datafile.write("{0} {1:.6f} {2:.6f} {3:.6f} {4} {5} {6:0>8b} {7:.6f}\n".format(data_counter, data_time, angle, counter, l_counts, r_counts, bumper_byte, desired_heading))
+			datafile.write("{0} {1:.6f} {2:.6f} {3:.6f} {4} {5} {6:0>8b} {7:.6f} {8:.6f}\n".format(data_counter, data_time, angle, counter, l_counts, r_counts, bumper_byte, desired_heading, bad_heading))
 			
 			data_counter += 1 # Increment counter for the next data sample
 			data_base += data_timer
@@ -523,6 +534,7 @@ while True:
 			SendResetPulse() # Send reset_pulse
 			# Reset all counters
 			ResetCounters()
+			bad_heading = angle ########## Bad implementation
 		
 	except KeyboardInterrupt:
 		print('') # Print new line
