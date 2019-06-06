@@ -335,9 +335,9 @@ class LSM9DS1_I2C(I2CDevice):
 		# The gyroscope X, Y, Z axis as a 3-tuple of
 		# degrees/second values.
 		raw = self.read_gyro_raw()
-		g = map(lambda x: x * self._gyro_dps_digit, raw)
-		c_g = [i-j for i,j in zip(g, self.g_offset)]
-		return g
+		gyr = map(lambda x: x * self._gyro_dps_digit, raw)
+		c_gyr = [i-j for i,j in zip(g, self.g_offset)]
+		return c_gyr
 	
 	def read_temp_raw(self):
 		# Read the raw temperature sensor value and return it as a
