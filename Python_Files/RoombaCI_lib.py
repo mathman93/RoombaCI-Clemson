@@ -3,7 +3,7 @@ Purpose: Python Library with LSM9DS1 class and specific functions
 	and iRobot Create 2 (Roomba) class and specific functions
 Import this file in main Python file to access functions
 Made by: Timothy Anglea, Joshua Harvey, Madeline Corvin
-Last Modified: 06/05/2019
+Last Modified: 06/06/2019
 '''
 ## Import Libraries ##
 from ctypes import * # May not need this anymore
@@ -188,7 +188,8 @@ class LSM9DS1_I2C(I2CDevice):
 		# enable mag continuous
 		self._write_u8(_MAGTYPE, _LSM9DS1_REGISTER_CTRL_REG3_M, 0x00)
 		# Calibration offset variables
-		self.m_offset = [0.0, 0.0, 0.0]
+		self.m_offset = [0.0, 0.0, 0.0] # Magnetometer offsets
+		self.g_offset = [0.0, 0.0, 0.0] # Gyroscope offsets
 
 	@property
 	def accel_range(self):
@@ -309,8 +310,9 @@ class LSM9DS1_I2C(I2CDevice):
 		# The magnetometer X, Y, Z axis values as a list of
 		# gauss values.
 		raw = self.read_mag_raw()
-		corrected = [i-j for i,j in zip(raw, self.m_offset)]
-		return map(lambda x: x * self._mag_mgauss_lsb / 1000.0, corrected)
+		mag = map(lambda x: x * self._mag_mgauss_lsb / 1000.0, raw)
+		c_mag = [i-j for i,j in zip(mag, self.m_offset)]
+		return c_mag
 	
 	def read_gyro_raw(self):
 		# Read the raw gyroscope sensor values and return it as
@@ -333,7 +335,9 @@ class LSM9DS1_I2C(I2CDevice):
 		# The gyroscope X, Y, Z axis as a 3-tuple of
 		# degrees/second values.
 		raw = self.read_gyro_raw()
-		return map(lambda x: x * self._gyro_dps_digit, raw)
+		g = map(lambda x: x * self._gyro_dps_digit, raw)
+		c_g = [i-j for i,j in zip(g, self.g_offset)]
+		return g
 	
 	def read_temp_raw(self):
 		# Read the raw temperature sensor value and return it as a
@@ -357,7 +361,7 @@ class LSM9DS1_I2C(I2CDevice):
 		Make sure Roomba/IMU spins 2-3 times during calibration. '''
 	def CalibrateMag(self):
 		# Initial max and min values
-		self.m_offset = [0.0, 0.0, 0.0]
+		self.m_offset = [0.0, 0.0, 0.0] # Reset offsets
 		[mx,my,mz] = self.magnetic # Read in magnetometer data
 		x_min = mx
 		x_max = mx
@@ -387,6 +391,51 @@ class LSM9DS1_I2C(I2CDevice):
 		# Calculate offset parameters for each component
 		self.m_offset = [(x_min + x_max)/2, (y_min + y_max)/2, (z_min + z_max)/2]
 	
+	''' Determines offset parameters for gyroscope
+		Roomba/IMU should be still when this is called '''
+	def CalibrateGyro(self):
+		self.g_offset = [0.0, 0.0, 0.0] # Reset offsets
+		gx_avg = 0
+		gy_avg = 0
+		gz_avg = 0
+		for i in range(0,1000): # Average 1000 readings
+			[gx,gy,gz] = self.gyro # Read in uncorrected gyroscope data
+			gx_avg = (gx + (i * gx_avg))/(i+1)
+			gy_avg = (gy + (i * gy_avg))/(i+1)
+			gz_avg = (gz + (i * gz_avg))/(i+1)
+		# Set offset parameter
+		self.g_offset = [gx_avg, gy_avg, gz_avg]
+	
+	''' Calculates cardinal heading in degrees from Magnetometer data
+		Reads in the data from the magnetometer to determine the heading
+		Returns:
+			yaw = float; cardinal direction from magnetic North (degrees)
+				(i.e., North = 0 (360); East = 90; South = 180; West = 270
+		Important that you calibrate the magnetometer first. '''
+	def CalculateHeading(self):
+		[mx,my,mz] = self.magnetic # Get magnetometer x and y values
+		# Assume z-axis is oriented vertically up
+		yaw = (math.degrees(math.atan2(-my,mx))) # Calculate heading
+		if yaw < 0: # Normalize heading value to [0,360)
+			yaw += 360
+		return yaw
+
+	''' Calculates cardinal heading in degrees from given x, y magnetometer values
+		Saves time by passing in magnetometer values to the function
+		Parameters:
+			x = float; x value from the magnetometer
+			y = float; y value from the magnetometer
+		Returns:
+			yaw = float; cardinal direction from magnetic North (degrees)
+				(i.e., North = 0 (360); East = 90; South = 180; West = 270
+		Important that you calibrate the magnetometer first. '''
+	def CalculateHeadingXY(self, x, y):
+		# Assume z-axis is oriented vertically up
+		yaw = (math.degrees(math.atan2(-y,-x))) # Calculate heading
+		if yaw < 0: # Normalize heading value to [0,360)
+			yaw += 360
+		return yaw
+
 	def _read_u8(self, sensor_type, address):
 		# Read an 8-bit unsigned value from the specified 8-bit address.
 		# The sensor_type boolean should be _MAGTYPE when talking to the
