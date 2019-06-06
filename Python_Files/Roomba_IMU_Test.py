@@ -146,11 +146,13 @@ Roomba.Move(0,75) # Start Roomba spinning
 imu.CalibrateMag() # Calculate magnetometer offset values
 Roomba.Move(0,0) # Stop Roomba spinning
 time.sleep(0.5)
-#imu.CalibrateAccelGyro() # Calculate accelerometer and gyroscope offset values
+imu.CalibrateGyro() # Calculate gyroscope offset values
 # Display offset values
-#print("mx_offset = {:f}; my_offset = {:f}; mz_offset = {:f}".format(imu.m_offset[0], imu.m_offset[1], imu.m_offset[2]))
+print("mx_offset = {:f}; my_offset = {:f}; mz_offset = {:f}"\
+	.format(imu.m_offset[0], imu.m_offset[1], imu.m_offset[2]))
 #print("ax_offset = {:f}; ay_offset = {:f}; az_offset = {:f}".format(imu.ax_offset, imu.ay_offset, imu.az_offset))
-#print("gx_offset = {:f}; gy_offset = {:f}; gz_offset = {:f}".format(imu.gx_offset, imu.gy_offset, imu.gz_offset))
+print("gx_offset = {:f}; gy_offset = {:f}; gz_offset = {:f}"\
+	.format(imu.g_offset[0], imu.g_offset[1], imu.g_offset[2]))
 print(" IMU Setup Complete")
 #time.sleep(3) # Gives time to read offset values before continuing
 GPIO.output(yled, GPIO.LOW) # Indicate setup sequence is complete
