@@ -2,7 +2,7 @@
 Purpose: Testing communication between Roomba and LSM9DS1 IMU
 	Form basis of Roomba code for other tests.
 IMPORTANT: Must be run using Python 3 (python3)
-Last Modified: 11/20/2018
+Last Modified: 6/6/2019
 '''
 ## Import libraries ##
 import serial
@@ -150,7 +150,6 @@ imu.CalibrateGyro() # Calculate gyroscope offset values
 # Display offset values
 print("mx_offset = {:f}; my_offset = {:f}; mz_offset = {:f}"\
 	.format(imu.m_offset[0], imu.m_offset[1], imu.m_offset[2]))
-#print("ax_offset = {:f}; ay_offset = {:f}; az_offset = {:f}".format(imu.ax_offset, imu.ay_offset, imu.az_offset))
 print("gx_offset = {:f}; gy_offset = {:f}; gz_offset = {:f}"\
 	.format(imu.g_offset[0], imu.g_offset[1], imu.g_offset[2]))
 print(" IMU Setup Complete")

@@ -2,7 +2,7 @@
 Purpose: Navigate to desired goal point by detecting and avoiding obstacles
 	Uses a node-based graph to map possible waypoints and obstacles
 IMPORTANT: Must be run using Python 3 (python3)
-Last Modified: 7/30/2018
+Last Modified: 6/6/2019
 Originally coded by Jay and Akhil A., Tres Y.
 Updated by Timothy A.
 STILL NEEDS COMMENTING (do not remove this too soon!)
@@ -300,14 +300,26 @@ print(" ROOMBA Setup Complete")
 GPIO.output(yled, GPIO.HIGH) # Indicate within setup sequence
 # Initialize IMU
 print(" Starting IMU...")
-IMU = RoombaCI_lib.LSM9DS1_IMU() # Initialize IMU
-time.sleep(0.5)
+imu = RoombaCI_lib.LSM9DS1_I2C() # Initialize IMU
+time.sleep(0.1)
+# Clear out first reading from all sensors
+x = imu.magnetic
+x = imu.acceleration
+x = imu.gyro
 # Calibrate IMU
 print(" Calibrating IMU...")
 Roomba.Move(0,75) # Start Roomba spinning
-IMU.CalibrateMag() # Calculate magnetometer offset values
+imu.CalibrateMag() # Calculate magnetometer offset values
 Roomba.Move(0,0) # Stop Roomba spinning
 time.sleep(0.5)
+imu.CalibrateGyro() # Calculate gyroscope offset values
+# Display offset values
+print("mx_offset = {:f}; my_offset = {:f}; mz_offset = {:f}"\
+	.format(imu.m_offset[0], imu.m_offset[1], imu.m_offset[2]))
+print("gx_offset = {:f}; gy_offset = {:f}; gz_offset = {:f}"\
+	.format(imu.g_offset[0], imu.g_offset[1], imu.g_offset[2]))
+print(" IMU Setup Complete")
+time.sleep(3) # Gives time to read offset values before continuing
 GPIO.output(yled, GPIO.LOW) # Indicate setup sequence is complete
 
 # Main Code #
@@ -319,7 +331,7 @@ neighbors = {} # A dictionary; keys are each point in world_points;
 # values are a list of points in world_points to which the Roomba can travel directly from key (i.e., neighbors)
 
 # Set initial direction of Roomba using the IMU
-angle = IMU.CalculateHeading()
+angle = imu.CalculateHeading()
 
 # Initial Wheel Encoder values
 l_counts_current, r_counts_current = Roomba.Query(43,44)

@@ -8,7 +8,6 @@ Last Modified: 6/6/2018
 import serial
 import time
 import RPi.GPIO as GPIO
-
 import RoombaCI_lib
 
 ## Variables and Constants ##
@@ -55,21 +54,26 @@ print(" ROOMBA Setup Complete")
 GPIO.output(yled, GPIO.HIGH) # Indicate within setup sequence
 # Initialize IMU
 print(" Starting IMU...")
-imu = RoombaCI_lib.LSM9DS1_IMU() # Initialize IMU
-time.sleep(0.5)
+imu = RoombaCI_lib.LSM9DS1_I2C() # Initialize IMU
+time.sleep(0.1)
+# Clear out first reading from all sensors
+x = imu.magnetic
+x = imu.acceleration
+x = imu.gyro
 # Calibrate IMU
 print(" Calibrating IMU...")
 Roomba.Move(0,75) # Start Roomba spinning
 imu.CalibrateMag() # Calculate magnetometer offset values
 Roomba.Move(0,0) # Stop Roomba spinning
 time.sleep(0.5)
-imu.CalibrateAccelGyro() # Calculate accelerometer and gyroscope offset values
+imu.CalibrateGyro() # Calculate gyroscope offset values
 # Display offset values
-print("mx_offset = {:f}; my_offset = {:f}; mz_offset = {:f}".format(imu.mx_offset, imu.my_offset, imu.mz_offset))
-print("ax_offset = {:f}; ay_offset = {:f}; az_offset = {:f}".format(imu.ax_offset, imu.ay_offset, imu.az_offset))
-print("gx_offset = {:f}; gy_offset = {:f}; gz_offset = {:f}".format(imu.gx_offset, imu.gy_offset, imu.gz_offset))
+print("mx_offset = {:f}; my_offset = {:f}; mz_offset = {:f}"\
+	.format(imu.m_offset[0], imu.m_offset[1], imu.m_offset[2]))
+print("gx_offset = {:f}; gy_offset = {:f}; gz_offset = {:f}"\
+	.format(imu.g_offset[0], imu.g_offset[1], imu.g_offset[2]))
 print(" IMU Setup Complete")
-time.sleep(1) # Gives time to read offset values before continuing
+time.sleep(3) # Gives time to read offset values before continuing
 GPIO.output(yled, GPIO.LOW) # Indicate setup sequence is complete
 
 if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer

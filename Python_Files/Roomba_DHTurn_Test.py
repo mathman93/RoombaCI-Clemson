@@ -1,8 +1,7 @@
 ''' Roomba_DHTurn_Test.py
-Purpose: Synchronize heading of Roomba network using PCO model
-	Based off Arduino code from previous semester
+Purpose: Test DHTurn() function using IMU magnetometer data
 IMPORTANT: Must be run using Python 3 (python3)
-Last Modified: 6/19/2018
+Last Modified: 6/6/2019
 '''
 ## Import libraries ##
 import serial
@@ -29,15 +28,6 @@ epsilon = 1.0 # (Ideally) smallest resolution of magnetometer
 data_counter = 0 # Data number counter
 
 ## Functions and Definitions ##
-''' Prints global variables to monitor
-	Increments data_counter
-	Will need to include magnetometer data '''
-def PrintData(*argv):
-	global data_counter
-	# Print data to console in MATLAB format
-	print(data_counter, *argv, sep=', ', end=';\n')
-	data_counter += 1 # Increment data counter
-
 ''' Displays current date and time to the screen
 	'''
 def DisplayDateTime():
@@ -73,21 +63,26 @@ print(" ROOMBA Setup Complete")
 GPIO.output(yled, GPIO.HIGH) # Indicate within setup sequence
 # Initialize IMU
 print(" Starting IMU...")
-imu = RoombaCI_lib.LSM9DS1_IMU() # Initialize IMU
-time.sleep(0.5)
+imu = RoombaCI_lib.LSM9DS1_I2C() # Initialize IMU
+time.sleep(0.1)
+# Clear out first reading from all sensors
+x = imu.magnetic
+x = imu.acceleration
+x = imu.gyro
 # Calibrate IMU
 print(" Calibrating IMU...")
 Roomba.Move(0,75) # Start Roomba spinning
 imu.CalibrateMag() # Calculate magnetometer offset values
 Roomba.Move(0,0) # Stop Roomba spinning
 time.sleep(0.5)
-imu.CalibrateAccelGyro() # Calculate accelerometer and gyroscope offset values
+imu.CalibrateGyro() # Calculate gyroscope offset values
 # Display offset values
-print("mx_offset = %f; my_offset = %f; mz_offset = %f"%(imu.mx_offset, imu.my_offset, imu.mz_offset))
-print("ax_offset = %f; ay_offset = %f; az_offset = %f"%(imu.ax_offset, imu.ay_offset, imu.az_offset))
-print("gx_offset = %f; gy_offset = %f; gz_offset = %f"%(imu.gx_offset, imu.gy_offset, imu.gz_offset))
+print("mx_offset = {:f}; my_offset = {:f}; mz_offset = {:f}"\
+	.format(imu.m_offset[0], imu.m_offset[1], imu.m_offset[2]))
+print("gx_offset = {:f}; gy_offset = {:f}; gz_offset = {:f}"\
+	.format(imu.g_offset[0], imu.g_offset[1], imu.g_offset[2]))
 print(" IMU Setup Complete")
-time.sleep(1) # Gives time to read offset values before continuing
+time.sleep(3) # Gives time to read offset values before continuing
 GPIO.output(yled, GPIO.LOW) # Indicate setup sequence is complete
 
 if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
@@ -124,15 +119,13 @@ while True:
 		
 		# Print heading data to monitor every second
 		if (time.time() - data_base) > data_timer: # After one second
-			[mx,my,mz] = imu.ReadMag() # Read magnetometer component values
+			[mx,my,mz] = imu.magnetic # Read magnetometer component values
 			angle = imu.CalculateHeading() # Calculate heading
 			# Note: angle may not correspond to mx, my, mz
-			#[ax,ay,az] = imu.ReadAccel() # Read accelerometer component values
-			#[gx,gy,gz] = imu.ReadGyro() # Read gyroscope component values
+			#[ax,ay,az] = imu.acceleration # Read accelerometer component values
+			#[gx,gy,gz] = imu.gyro # Read gyroscope component values
 			
-			#print("%f, %f, %f, %f, %f;"%(angle,desired_heading,mx,my,mz))
 			print("{0:.4f}, {1:.4f}, {2:.5f}, {3:.5f}, {4:.5f}".format(angle,desired_heading,mx,my,mz))
-			#PrintData(angle, desired_heading, mx, my, mz)
 			data_base += data_timer
 				
 	except KeyboardInterrupt:
