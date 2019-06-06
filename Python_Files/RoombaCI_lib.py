@@ -336,7 +336,7 @@ class LSM9DS1_I2C(I2CDevice):
 		# degrees/second values.
 		raw = self.read_gyro_raw()
 		gyr = map(lambda x: x * self._gyro_dps_digit, raw)
-		c_gyr = [i-j for i,j in zip(g, self.g_offset)]
+		c_gyr = [i-j for i,j in zip(gyr, self.g_offset)]
 		return c_gyr
 	
 	def read_temp_raw(self):
