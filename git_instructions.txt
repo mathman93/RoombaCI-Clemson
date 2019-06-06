@@ -1,35 +1,34 @@
-Git has a lot of features that are useful for anyone working in code development, but if all you care about is trying to get the code on your computer onto the raspberry pis and vice versa here is the basic process:
+Git has a lot of features that are useful for anyone working in code development.
+A simple web search will show a lot of the capabilities of a online code repository.
+Below is a basic guide for simple git commands to get code/files from your computer to the raspberry pis and vice versa.
 
-For all code changes, you should be on branch "testing". This is necessary when you push or pull anything. To get on this branch type "git checkout testing".
+Preferably, if you are going to make changes to the repository, you should make a branch of the responsitory.
+This allows the "master" branch to stay intact for others while you make and test changes to the code.
+To determine what branch of the repository you are currently on from the command line, use the following command.
+	git status
+To change which branch of the repository you are on from the command line, use the following command.
+	git checkout [branchname] (e.g., git checkout master)
+Once you are on the desired branch, you can proceed to make and test any changes that you need.
 
-[make changes]
+After making your desired changes to the repository branch, you will need to commit the changes to the git repository.
+Use git status to check the status of any files that have been change since the last commit.
+Before you commit, you must first "stage" the files that you want to commit using the following command. This allows you to commit some files while leaving others off of the commit.
+	git add [filename] (git status will display the full path name for any changed files)
+Alternatively, if you want to stage all changed files, use the following command.
+	git add --all (or you can use git add *)
+Once you have staged all desired files, use the following command to commit those changes to the local repository.
+	git commit -am "[message]"
+The message should be contained in quotes, and be a helpful summary of what changes are made in the commit.
+After making the commit, use the following command to "push" those changes to the online repository (the one that everyone has acces to).
+	git push
+Note: For the first time that you push changes to the repository from a raspberry pi, you will be asked to enter you GitHub username and password to proceed.
+Now all changes that you have made, staged, committed, and pushed are on the online repository.
 
-git commit -am "[message here]"
+To update your local repository with any new changes that have been made to the online repository, use the following command.
+	git pull
+This will "pull" down all updates from the most recent commit to your current branch of the repository.
+After performing a pull, the git status command should show you local repository is up-to-date with the online repository.
+NOTE: Make sure that you have the latest changes from the online repository ("git pull") before you try to push commits.
 
-git status
-
-git push
-
-[changes have been updated on the server]
-
-
-To get all of the changes from the server since you last updated:
-
-git pull
-
-
-These commands can be used on the raspberry pis or your computer from a terminal with git bash. You can also do all of this from the "GitHub for Desktop" application and only use the command line on the pis.
-
--the git commit -am line is committing your local changes to the git stored on the local machine
--the git status should show that everything is up to date...IF THERE ARE STILL CHANGES THAT HAVE NOT BEEN COMMITTED YOU NEED TO TYPE "git add [filename]" FOR EACH FILE (or "git add *")
--git push sends your changes up to the remote server
-
--git pull gets the changes from the remote server
-
-NOTE: you should make sure that you have the latest changes from the remote server ("git pull") before you try to push files
-
-rp1 works
-rp5 works
-rp4 works
-rp6 works
-rp2 works
+These commands can be used on the raspberry pis or your computer from a terminal with git bash.
+You can also do all of this from the "GitHub for Desktop" application and only use the command line on the pis.
