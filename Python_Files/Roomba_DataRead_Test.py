@@ -88,7 +88,7 @@ query_time_offset = (5/64) # Set time offset for query
 # smallest time offset for query is 15.625 ms.
 data_counter = 0 # Initialize data counter
 
-Roomba.Move(0,0) # Start Roomba moving
+Roomba.Move(0,50) # Start Roomba moving
 
 Roomba.StartQueryStream(7, 43, 44, 45, 41, 42) # Start query stream with specific sensor packets
 #datafile = open("data_test.txt", "w") # Open a text file for storing data
