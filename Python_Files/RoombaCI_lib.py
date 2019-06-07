@@ -415,7 +415,7 @@ class LSM9DS1_I2C(I2CDevice):
 	def CalculateHeading(self):
 		[mx,my,mz] = self.magnetic # Get magnetometer x and y values
 		# Assume z-axis is oriented vertically up
-		yaw = (math.degrees(math.atan2(-my,mx))) # Calculate heading
+		yaw = (math.degrees(math.atan2(-my,-mx))) # Calculate heading
 		if yaw < 0: # Normalize heading value to [0,360)
 			yaw += 360
 		return yaw
