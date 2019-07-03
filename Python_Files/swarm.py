@@ -41,6 +41,8 @@ GPIO.setup(micTwo, GPIO.IN, pull_up_down= GPIO.PUD_UP)
 GPIO.setup(micThree, GPIO.IN, pull_up_down= GPIO.PUD_UP)
 GPIO.setup(reset, GPIO.OUT, initial=GPIO.LOW)
 
+
+GPIO.output(reset,GPIO.HIGH)
 while True:
 	try:
 		statusOne=GPIO.input(micOne)
@@ -50,8 +52,9 @@ while True:
 		print("Mic Two: {0}".format(statusTwo))
 		print("Mic Three: {0}".format(statusThree))
 		
-	except KeyboardInterupt:
+	except KeyboardInterrupt:
 		break
+GPIO.output(reset,GPIO.LOW)
 
 '''
 # Wake Up Roomba Sequence
