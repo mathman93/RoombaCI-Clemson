@@ -735,7 +735,7 @@ class Create_2:
 		while num > 0: # Go until we reach the checksum
 			# The first byte is the packet ID
 			packetID = int.from_bytes(self.conn.read(1), byteorder='big', signed=False)
-			byte, sign = self.packet_dict[packetID] # Get packet info
+			byte, sign = self.packet_dict.get(packetID, [0, False]) #Get packet info
 			# Determine the value of the current packet
 			value = int.from_bytes(self.conn.read(byte), byteorder='big', signed=sign)
 			value_dict[packetID] = value # Create new entry in the dictionary
