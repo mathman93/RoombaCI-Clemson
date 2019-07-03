@@ -52,7 +52,7 @@ while True:
 		print("Mic Two: {0}".format(statusTwo))
 		print("Mic Three: {0}".format(statusThree))
 		
-	except KeyboardInterupt:
+	except KeyboardInterrupt:
 		break
 GPIO.output(reset,GPIO.LOW)
 
