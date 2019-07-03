@@ -47,7 +47,7 @@ while True:
 	try:
 		statusOne=GPIO.input(micOne)
 		statusTwo=GPIO.input(micTwo)
-		statusThee=GPIO.input(micThree)
+		statusThree=GPIO.input(micThree)
 		print("Mic One: {0}".format(statusOne))
 		print("Mic Two: {0}".format(statusTwo))
 		print("Mic Three: {0}".format(statusThree))
