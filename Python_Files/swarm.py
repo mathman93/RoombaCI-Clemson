@@ -41,6 +41,15 @@ GPIO.setup(micTwo, GPIO.IN, pull_up_down= GPIO.PUD_UP)
 GPIO.setup(micThree, GPIO.IN, pull_up_down= GPIO.PUD_UP)
 GPIO.setup(reset, GPIO.OUT, initial=GPIO.LOW)
 
+while Truw:
+	try:
+		print("Mic One: {0}".format(micOne))
+		print("Mic Two: {0}".format(micTwo))
+		print("Mic Three: {0}".format(micTwo))
+		
+	except KeyboardInterupt:
+		break
+
 '''
 # Wake Up Roomba Sequence
 GPIO.output(gled, GPIO.HIGH) # Turn on green LED to say we are alive
