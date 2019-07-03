@@ -36,7 +36,7 @@ DisplayDateTime() # Display current date and time
 GPIO.setup(yled, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(rled, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(gled, GPIO.OUT, initial=GPIO.LOW)
-GPIO.setup(micOne, GPIO.IN)##Check for initial later
+GPIO.setup(micOne, GPIO.IN, pull_up_down= GPIO.PUD_DOWN)##Check for initial later
 GPIO.setup(micTwo, GPIO.IN)
 GPIO.setup(micThree, GPIO.IN)
 GPIO.setup(reset, GPIO.OUT, initial=GPIO.LOW)
