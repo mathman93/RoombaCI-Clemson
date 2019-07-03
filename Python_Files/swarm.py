@@ -51,6 +51,7 @@ while True:
 		print("Mic One: {0}".format(statusOne))
 		print("Mic Two: {0}".format(statusTwo))
 		print("Mic Three: {0}".format(statusThree))
+		time.sleep(0.1)
 		
 		
 	except KeyboardInterrupt:
