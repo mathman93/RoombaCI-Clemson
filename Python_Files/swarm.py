@@ -41,11 +41,14 @@ GPIO.setup(micTwo, GPIO.IN, pull_up_down= GPIO.PUD_UP)
 GPIO.setup(micThree, GPIO.IN, pull_up_down= GPIO.PUD_UP)
 GPIO.setup(reset, GPIO.OUT, initial=GPIO.LOW)
 
-while Truw:
+while True:
 	try:
-		print("Mic One: {0}".format(micOne))
-		print("Mic Two: {0}".format(micTwo))
-		print("Mic Three: {0}".format(micTwo))
+		statusOne=input(micOne)
+		statusTwo=input(micTwo)
+		statusThee=input(micThree)
+		print("Mic One: {0}".format(statusOne))
+		print("Mic Two: {0}".format(statusTwo))
+		print("Mic Three: {0}".format(statusThree))
 		
 	except KeyboardInterupt:
 		break
