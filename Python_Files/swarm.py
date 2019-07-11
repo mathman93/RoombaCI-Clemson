@@ -40,7 +40,7 @@ def triangulate(t12,t23,t13,c):
     
     a23=0.5*343*t23
     b23=math.sqrt(c**2-a23**2)
-    
+     
     
     
     a13=0.5*343*t13
