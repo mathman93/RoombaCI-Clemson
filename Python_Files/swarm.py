@@ -40,18 +40,82 @@ GPIO.setup(micOne, GPIO.IN, pull_up_down= GPIO.PUD_UP)##Check for initial later
 GPIO.setup(micTwo, GPIO.IN,  pull_up_down= GPIO.PUD_UP)
 GPIO.setup(micThree, GPIO.IN, pull_up_down= GPIO.PUD_UP)
 GPIO.setup(reset, GPIO.OUT, initial=GPIO.LOW)
+statusOneTwo=0
+statusTwoTwo=0
+statusThreeTwo=0
+
 
 
 GPIO.output(reset,GPIO.LOW)
+startTime=time.time()
 while True:
 	try:
 		statusOne=GPIO.input(micOne)
-		statusTwo=GPIO.input(micTwo)
+        statusTwo=GPIO.input(micTwo)
 		statusThree=GPIO.input(micThree)
-		print("Mic One: {0}".format(statusOne))
-		print("Mic Two: {0}".format(statusTwo))
-		print("Mic Three: {0}".format(statusThree))
-		time.sleep(0.1)
+        if statusOne>statusOneTwo:
+            timeOne= time.time()-startTime
+            while True:
+                try:
+                    statusTwo=GPIO.input(micTwo)
+                    statusThree=GPIO.input(micThree)
+                    if statusTwo>statusTwoTwo:
+                        timeTwo=time.time()-startTime
+                        while True:
+                            try:
+                                statusThree=GPIO.input(micThree)
+                                if statusThree>statusThreeTwo:
+                                    timeThree=time.time()-startTime
+                                    break
+                        break
+                    if statusThree>statusThreeTwo:
+                        timeThree=time.time()-startTime
+                         while True:
+                            try:
+                                statusTwo=GPIO.input(micTwo)
+                                if statusTwo>statusTwoTwo:
+                                    timeTwo=time.time()-startTime
+                                    break
+                        break
+        elif statusTwo>statusTwoTwo:
+            timeTwo=time.time()-startTime
+            while True:
+                try:
+                    statusOne=GPIO.input(micOne)
+                    statusThree=GPIO.input(micThree)
+                    if statusOne>statusOneTwo:
+                        timeOne=time.time()-startTime
+                        while True:
+                            try:
+                                statusThree=GPIO.input(micThree)
+                                if statusThree>statusThreeTwo:
+                                    timeThree=time.time()-startTime
+                                    break
+                        break
+                    if statusThree>statusThreeTwo:
+                        timeThree=time.time()-startTime
+                         while True:
+                            try:
+                                statusOne=GPIO.input(micOne)
+                                if statusOne>statusOneTwo:
+                                    timeOne=time.time()-startTime
+                                    break
+                        break
+        elif statusThree>statusThreeTwo:
+            timeThree=time.time()-startTime
+        if statusOne=1 and statusTwo=1 and statusThree=1:
+            GPIO.output(reset,GPIO.HIGH)
+            time.sleep(1)
+            print("T1-T2: %d"%timeOne-timeTwo)
+            print("T2-T3: %d"%timeTwo-timeThree)
+            print("T1-T3: %d"%timeOne-timeThree)
+        statusOneTwo=statusOne
+        statusTwoTwo=statusTwo
+        statusThreeTwo=statusThree
+	#	print("Mic One: {0}".format(statusOne))
+	#	print("Mic Two: {0}".format(statusTwo))
+	#	print("Mic Three: {0}".format(statusThree))
+	#	time.sleep(0.1)
 		
 		
 	except KeyboardInterrupt:
