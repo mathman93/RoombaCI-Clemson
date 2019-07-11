@@ -47,6 +47,9 @@ while True:
 		if statusOne>statusTwo:
 			#print("Mic One: {0}".format(statusOne))
 			print (time.time()-startTime)
+			GPIO.output(reset,GPIO.LOW)
+			time.sleep(0.1)
+			GPIO.output(reset,GPIO.LOW)
 		statusTwo=statusOne
 		#time.sleep(0.1)
 
