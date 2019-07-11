@@ -36,14 +36,19 @@ GPIO.setup(rled, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(gled, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(micOne, GPIO.IN, pull_up_down= GPIO.PUD_UP)##Check for initial later
 GPIO.setup(reset, GPIO.OUT, initial=GPIO.LOW)
+statusTwo=0
 
 time.sleep(0.5)
 GPIO.output(reset,GPIO.HIGH)
+startTime=time.time()
 while True:
 	try:
 		statusOne=GPIO.input(micOne)
-		print("Mic One: {0}".format(statusOne))
-		time.sleep(0.1)
+		if statusOne>statusTwo:
+			#print("Mic One: {0}".format(statusOne))
+			print (time.time()-startTime)
+		statusTwo=statusOne
+		#time.sleep(0.1)
 
 
 	except KeyboardInterrupt:
