@@ -18,6 +18,7 @@ micOne=17
 micTwo=22
 micThree=27
 reset=24
+notHeard=0.00003
 
 ## Functions and Definitions ##
 ''' Displays current date and time to the screen
@@ -26,6 +27,12 @@ def DisplayDateTime():
 	# Month day, Year, Hour:Minute:Seconds
 	date_time = time.strftime("%B %d, %Y, %H:%M:%S", time.gmtime())
 	print("Program run: ", date_time)
+
+def timedReset():
+    GPIO.output(reset,GPIO.LOW)
+    time.sleep(0.01)
+    GPIO.output(reset,GPIO.HIGH)
+    
 
 ## -- Code Starts Here -- ##
 # Setup Code #
@@ -59,11 +66,15 @@ while True:
                 try:
                     statusTwo=GPIO.input(micTwo)
                     statusThree=GPIO.input(micThree)
+                    if time.time()-timeOne>notHeard:
+                        break
                     if statusTwo>statusTwoTwo:
                         timeTwo=time.time()-startTime
                         while True:
                             try:
                                 statusThree=GPIO.input(micThree)
+                                if time.time()-timeOne>notHeard:
+                                    break
                                 if statusThree>statusThreeTwo:
                                     timeThree=time.time()-startTime
                                     break
@@ -73,6 +84,8 @@ while True:
                          while True:
                             try:
                                 statusTwo=GPIO.input(micTwo)
+                                if time.time()-timeOne>notHeard:
+                                    break
                                 if statusTwo>statusTwoTwo:
                                     timeTwo=time.time()-startTime
                                     break
@@ -83,11 +96,15 @@ while True:
                 try:
                     statusOne=GPIO.input(micOne)
                     statusThree=GPIO.input(micThree)
+                    if time.time()-timeTwo>notHeard:
+                        break
                     if statusOne>statusOneTwo:
                         timeOne=time.time()-startTime
                         while True:
                             try:
                                 statusThree=GPIO.input(micThree)
+                                if time.time()-timeTwo>notHeard:
+                                    break
                                 if statusThree>statusThreeTwo:
                                     timeThree=time.time()-startTime
                                     break
@@ -97,18 +114,41 @@ while True:
                          while True:
                             try:
                                 statusOne=GPIO.input(micOne)
+                                if time.time()-timeTwo>notHeard:
+                                    break
                                 if statusOne>statusOneTwo:
                                     timeOne=time.time()-startTime
                                     break
                         break
         elif statusThree>statusThreeTwo:
             timeThree=time.time()-startTime
+            while True:
+                try:
+                    statusOne=GPIO.input(micOne)
+                    statusTwo=GPIO.input(micTwo)
+                    if statusOne>statusOneTwo:
+                        timeOne=time.time()-startTime
+                        while True:
+                            try:
+                                statusTwo=GPIO.input(micTwo)
+                                if statusTwo>statusTwoTwo:
+                                    timeTwo=time.time()-startTime
+                                    break
+                        break
+                    if statusTwo>statusTwoTwo:
+                        timeTwo=time.time()-startTime
+                         while True:
+                            try:
+                                statusOne=GPIO.input(micOne)
+                                if statusOne>statusOneTwo:
+                                    timeOne=time.time()-startTime
+                                    break
+                        break
         if statusOne=1 and statusTwo=1 and statusThree=1:
-            GPIO.output(reset,GPIO.HIGH)
-            time.sleep(1)
-            print("T1-T2: %d"%timeOne-timeTwo)
+            print("T1-T2: "+'{0:.6g}'.format(timeOne-timeTwo))
             print("T2-T3: %d"%timeTwo-timeThree)
             print("T1-T3: %d"%timeOne-timeThree)
+            timedReset()
         statusOneTwo=statusOne
         statusTwoTwo=statusTwo
         statusThreeTwo=statusThree
