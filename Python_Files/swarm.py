@@ -20,6 +20,9 @@ micTwo=22
 micThree=27
 reset=24
 notHeard=0.5
+timeOne=0
+timeTwo=0
+timeThree=0
 
 ## Functions and Definitions ##
 ''' Displays current date and time to the screen
@@ -75,6 +78,7 @@ startTime=time.time()
 timeOne=0
 timeTwo=0
 timeThree=0
+GPIO.output(reset, GPIO.HIGH)
 while True:
     try:
         statusOne=GPIO.input(micOne)
