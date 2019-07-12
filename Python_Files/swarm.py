@@ -80,6 +80,7 @@ startTime=time.time()
 timeOne=0
 timeTwo=0
 timeThree=0
+timeBase=0
 GPIO.output(reset, GPIO.HIGH)
 while True:
     startloop=time.time()
@@ -209,9 +210,10 @@ while True:
     #    print("Mic Two: {0}".format(statusTwo))
     #    print("Mic Three: {0}".format(statusThree))
         #time.sleep(0.1)
-        
-        print(time.time()-startloop)
-        time.sleep(1)
+        if time.time()-timeBase>1:
+            print(time.time()-startloop)
+            timeBase=timeBase+1
+    #    time.sleep(1)
     except KeyboardInterrupt:
         break
 GPIO.output(reset,GPIO.LOW)
