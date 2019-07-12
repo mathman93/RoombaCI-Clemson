@@ -198,7 +198,6 @@ while True:
             print("T2-T3: {0:.7f}".format(1000*(timeTwo-timeThree)))
             print("T1-T3: {0:.7f}".format(1000*(timeOne-timeThree)))
             #calculations go here
-            print(time.time()-startloop)
             timedReset()
         elif stuck:
             print("I've fallen and I can't get up")
