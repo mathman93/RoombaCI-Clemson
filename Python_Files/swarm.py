@@ -31,7 +31,7 @@ def DisplayDateTime():
 
 def timedReset():
     GPIO.output(reset,GPIO.LOW)
-    time.sleep(0.01)
+    time.sleep(1)
     GPIO.output(reset,GPIO.HIGH)
 def triangulate(t12,t23,t13,c):
     a12=0.5*343*t12
