@@ -68,6 +68,9 @@ stuck=False
 
 GPIO.output(reset,GPIO.LOW)
 startTime=time.time()
+timeOne=0
+timeTwo=0
+timeThree=0
 while True:
     try:
         statusOne=GPIO.input(micOne)
