@@ -87,10 +87,10 @@ while True:
                         statusThree=GPIO.input(micThree)
                         if time.time()-timeOne>notHeard:
                             stuck=True
-                                break
-                            if statusThree>statusThreeTwo:
-                                timeThree=time.time()-startTime
-                                break
+                            break
+                        if statusThree>statusThreeTwo:
+                            timeThree=time.time()-startTime
+                            break
                     break
                 if statusThree>statusThreeTwo:
                     timeThree=time.time()-startTime
