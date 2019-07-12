@@ -23,11 +23,11 @@ notHeard=0.00003
 
 ## Functions and Definitions ##
 ''' Displays current date and time to the screen
-	'''
+    '''
 def DisplayDateTime():
-	# Month day, Year, Hour:Minute:Seconds
-	date_time = time.strftime("%B %d, %Y, %H:%M:%S", time.gmtime())
-	print("Program run: ", date_time)
+    # Month day, Year, Hour:Minute:Seconds
+    date_time = time.strftime("%B %d, %Y, %H:%M:%S", time.gmtime())
+    print("Program run: ", date_time)
 
 def timedReset():
     GPIO.output(reset,GPIO.LOW)
@@ -69,7 +69,7 @@ stuck=False
 GPIO.output(reset,GPIO.LOW)
 startTime=time.time()
 while True:
-	try:
+    try:
         statusOne=GPIO.input(micOne)
         statusTwo=GPIO.input(micTwo)
         statusThree=GPIO.input(micThree)
@@ -184,14 +184,14 @@ while True:
         statusOneTwo=statusOne
         statusTwoTwo=statusTwo
         statusThreeTwo=statusThree
-	#	print("Mic One: {0}".format(statusOne))
-	#	print("Mic Two: {0}".format(statusTwo))
-	#	print("Mic Three: {0}".format(statusThree))
-	#	time.sleep(0.1)
-		
-		
-	except KeyboardInterrupt:
-		break
+    #    print("Mic One: {0}".format(statusOne))
+    #    print("Mic Two: {0}".format(statusTwo))
+    #    print("Mic Three: {0}".format(statusThree))
+        #time.sleep(0.1)
+        
+        
+    except KeyboardInterrupt:
+        break
 GPIO.output(reset,GPIO.LOW)
 
 '''
@@ -236,8 +236,8 @@ time.sleep(3) # Gives time to read offset values before continuing
 GPIO.output(yled, GPIO.LOW) # Indicate setup sequence is complete
 
 if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
-	x = Xbee.read(Xbee.inWaiting()).decode() # Clear out Xbee input buffer
-	#print(x) # Include for debugging
+    x = Xbee.read(Xbee.inWaiting()).decode() # Clear out Xbee input buffer
+    #print(x) # Include for debugging
 
 # Main Code #
 
