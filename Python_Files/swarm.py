@@ -80,7 +80,7 @@ startTime=time.time()
 timeOne=0
 timeTwo=0
 timeThree=0
-timeBase=0
+timeBase=time.time()
 GPIO.output(reset, GPIO.HIGH)
 while True:
     startloop=time.time()
@@ -210,7 +210,7 @@ while True:
     #    print("Mic Two: {0}".format(statusTwo))
     #    print("Mic Three: {0}".format(statusThree))
         #time.sleep(0.1)
-        if time.time()-timeBase>1:
+        if time.time()-timeBase>1.0:
             print(time.time()-startloop)
             timeBase=timeBase+1
     #    time.sleep(1)
