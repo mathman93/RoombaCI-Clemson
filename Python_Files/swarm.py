@@ -77,6 +77,7 @@ while True:
         statusTwo=GPIO.input(micTwo)
         statusThree=GPIO.input(micThree)
         if statusOne>statusOneTwo:
+            print("micOne Heard")
             timeOne= time.time()-startTime
             while True:
                 statusTwo=GPIO.input(micTwo)
