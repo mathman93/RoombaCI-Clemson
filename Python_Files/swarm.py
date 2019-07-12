@@ -211,7 +211,7 @@ while True:
         #time.sleep(0.1)
         
         print(time.time()-startloop)
-       time.sleep(1)
+        time.sleep(1)
     except KeyboardInterrupt:
         break
 GPIO.output(reset,GPIO.LOW)
