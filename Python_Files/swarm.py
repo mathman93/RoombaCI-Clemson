@@ -19,7 +19,7 @@ micOne=17
 micTwo=22
 micThree=27
 reset=24
-notHeard=0.01
+notHeard=0.1
 
 ## Functions and Definitions ##
 ''' Displays current date and time to the screen
