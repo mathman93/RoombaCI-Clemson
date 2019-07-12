@@ -195,10 +195,10 @@ while True:
             print("T1-T3: {0:.7f}".format(timeOne-timeThree))
             #calculations go here
             timedReset()
-        # if stuck:
-            # print("I've fallen and I can't get up")
-            # timedReset()
-            # stuck=False
+        if stuck:
+            print("I've fallen and I can't get up")
+            timedReset()
+            stuck=False
         statusOneTwo=statusOne
         statusTwoTwo=statusTwo
         statusThreeTwo=statusThree
