@@ -166,7 +166,7 @@ while True:
         if statusOne==1 and statusTwo==1 and statusThree==1:
             print("T1-T2: {0:.7f}".format(timeOne-timeTwo))
             print("T2-T3: {0:.7f}".format(timeTwo-timeThree))
-            print("T1-T3: {0:.7f}".(timeOne-timeThree))
+            print("T1-T3: {0:.7f}".format(timeOne-timeThree))
             #calculations go here
             timedReset()
         if stuck:
