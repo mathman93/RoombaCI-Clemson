@@ -33,6 +33,10 @@ def timedReset():
     GPIO.output(reset,GPIO.LOW)
     time.sleep(1)
     GPIO.output(reset,GPIO.HIGH)
+    timeOne=0
+    timeTwo=0
+    timeThree=0
+    
 def triangulate(t12,t23,t13,c):
     a12=0.5*343*t12
     b12=math.sqrt(c**2-a12**2)
