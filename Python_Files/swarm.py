@@ -71,6 +71,8 @@ statusOneTwo=0
 statusTwoTwo=0
 statusThreeTwo=0
 stuck=False
+startloop=0
+
 
 
 GPIO.output(reset,GPIO.LOW)
@@ -80,6 +82,7 @@ timeTwo=0
 timeThree=0
 GPIO.output(reset, GPIO.HIGH)
 while True:
+    startloop=time.time()
     try:
         statusOne=GPIO.input(micOne)
         statusTwo=GPIO.input(micTwo)
@@ -190,9 +193,9 @@ while True:
                             break
                     break
         if statusOne==1 and statusTwo==1 and statusThree==1:
-            print("T1-T2: {0:.7f}".format(timeOne-timeTwo))
-            print("T2-T3: {0:.7f}".format(timeTwo-timeThree))
-            print("T1-T3: {0:.7f}".format(timeOne-timeThree))
+            print("T1-T2: {0:.7f}".format(1000*(timeOne-timeTwo)))
+            print("T2-T3: {0:.7f}".format(1000*(timeTwo-timeThree)))
+            print("T1-T3: {0:.7f}".format(1000*(timeOne-timeThree)))
             #calculations go here
             timedReset()
         elif stuck:
@@ -207,7 +210,8 @@ while True:
     #    print("Mic Three: {0}".format(statusThree))
         #time.sleep(0.1)
         
-        
+        print(time.time()-startloop)
+        sleep(1)
     except KeyboardInterrupt:
         break
 GPIO.output(reset,GPIO.LOW)
