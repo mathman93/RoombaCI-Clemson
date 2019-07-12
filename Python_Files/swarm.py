@@ -70,9 +70,9 @@ GPIO.output(reset,GPIO.LOW)
 startTime=time.time()
 while True:
 	try:
-		statusOne=GPIO.input(micOne)
+        statusOne=GPIO.input(micOne)
         statusTwo=GPIO.input(micTwo)
-		statusThree=GPIO.input(micThree)
+        statusThree=GPIO.input(micThree)
         if statusOne>statusOneTwo:
             timeOne= time.time()-startTime
             while True:
