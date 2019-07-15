@@ -58,7 +58,7 @@ def makeNoise():
 Roomba.DirectWrite(140) # Header Opcode
 Roomba.DirectWrite(0)   # Song number (0-3)
 Roomba.DirectWrite(1)
-Roomba.DirectWrite(85)
+Roomba.DirectWrite(84)
 Roomba.DirectWrite(128)
 
 time.sleep(0.05) # Wait
