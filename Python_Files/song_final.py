@@ -55,5 +55,6 @@ def makeNoise():
     
 prepNoise()
 makeNoise()
+time.sleep(1)
 Roomba.ShutDown()
 GPIO.cleanup()
