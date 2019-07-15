@@ -24,6 +24,7 @@ print(" Starting ROOMBA... ")
 Roomba = RoombaCI_lib.Create_2("/dev/ttyS0", 115200)
 Roomba.ddPin = 23 # Set Roomba dd pin number
 GPIO.setup(Roomba.ddPin, GPIO.OUT, initial=GPIO.LOW)
+
 Roomba.WakeUp(131) # Start up Roomba in Safe Mode
 # 131 = Safe Mode; 132 = Full Mode (Be ready to catch it!)
 Roomba.BlinkCleanLight() # Blink the Clean light on Roomba
