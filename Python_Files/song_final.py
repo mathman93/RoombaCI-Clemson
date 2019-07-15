@@ -55,5 +55,5 @@ def makeNoise():
     
 prepNoise()
 makeNoise()
-Roomba.ShutDown()
+#Roomba.ShutDown()
 GPIO.cleanup()
