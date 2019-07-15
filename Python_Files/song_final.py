@@ -63,9 +63,11 @@ while True:
         note4=int(input("Fourth Note:"))
         note5=int(input("Fifth Note:"))
         note6=int(input("Sixth Note:"))
+        note7=int(input("Seventh Note:"))
+        note8=int(input("Eight Note:"))
         Roomba.DirectWrite(140) # Header Opcode
         Roomba.DirectWrite(0)   # Song number (0-3)
-        Roomba.DirectWrite(6)
+        Roomba.DirectWrite(8)
         Roomba.DirectWrite(note1)
         Roomba.DirectWrite(6)
         Roomba.DirectWrite(note2)
@@ -77,6 +79,10 @@ while True:
         Roomba.DirectWrite(note5)
         Roomba.DirectWrite(6)
         Roomba.DirectWrite(note6)
+        Roomba.DirectWrite(6)
+        Roomba.DirectWrite(note7)
+        Roomba.DirectWrite(6)
+        Roomba.DirectWrite(note8)
         Roomba.DirectWrite(6)
 
         time.sleep(0.05) # Wait
