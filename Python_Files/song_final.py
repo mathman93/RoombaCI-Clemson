@@ -47,11 +47,11 @@ def prepNoise():
     
 def makeNoise():
     while True:
-                if keyboard.is_pressed('q'):
-                    Roomba.DirectWrite(141)
-                    Roomba.DirectWrite(0)
-                else:
-                    break
+                #if keyboard.is_pressed('q'):
+        Roomba.DirectWrite(141)
+        Roomba.DirectWrite(0)
+               # else:
+               #    break
     
 prepNoise()
 makeNoise()
