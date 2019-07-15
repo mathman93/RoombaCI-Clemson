@@ -55,18 +55,28 @@ def makeNoise():
 #prepNoise()
 #makeNoise()
     # SuperStar Theme (16 notes)
-Roomba.DirectWrite(140) # Header Opcode
-Roomba.DirectWrite(0)   # Song number (0-3)
-Roomba.DirectWrite(1)
-Roomba.DirectWrite(84)
-Roomba.DirectWrite(128)
+while True:
+    try:
+        note1=input("First Note:")
+        note2=input("Second Note:")
+        note3=input("Third Note:")
+        Roomba.DirectWrite(140) # Header Opcode
+        Roomba.DirectWrite(0)   # Song number (0-3)
+        Roomba.DirectWrite(3)
+        Roomba.DirectWrite(64)
+        Roomba.DirectWrite(16)
+        Roomba.DirectWrite(72)
+        Roomba.DirectWrite(16)
+        Roomba.DirectWrite(84)
+        Roomba.DirectWrite(16)
 
-time.sleep(0.05) # Wait
-GPIO.output(gled, GPIO.LOW)
-time.sleep(1) # Wait
-Roomba.DirectWrite(141)
-Roomba.DirectWrite(0)
-GPIO.output(gled, GPIO.HIGH)
-time.sleep(1)
+        time.sleep(0.05) # Wait
+        GPIO.output(gled, GPIO.LOW)
+        time.sleep(1) # Wait
+        Roomba.DirectWrite(141)
+        Roomba.DirectWrite(0)
+        GPIO.output(gled, GPIO.HIGH)
+        time.sleep(1)
+    except KeyboardInterrupt
 Roomba.ShutDown()
 GPIO.cleanup()
