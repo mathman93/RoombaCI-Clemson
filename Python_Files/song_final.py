@@ -57,7 +57,7 @@ def makeNoise():
     # SuperStar Theme (16 notes)
 Roomba.DirectWrite(140) # Header Opcode
 Roomba.DirectWrite(0)   # Song number (0-3)
-Roomba.DirectWrite(100)
+Roomba.DirectWrite(72)
 Roomba.DirectWrite(128)
 
 time.sleep(0.05) # Wait
