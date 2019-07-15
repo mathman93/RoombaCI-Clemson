@@ -7,7 +7,7 @@ Last Modified: 6/28/2018
 ## Import libraries ##
 import serial
 import time
-import keyboard
+#import keyboard
 import RPi.GPIO as GPIO
 
 import RoombaCI_lib
