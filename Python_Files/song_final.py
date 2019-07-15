@@ -63,11 +63,11 @@ while True:
         Roomba.DirectWrite(140) # Header Opcode
         Roomba.DirectWrite(0)   # Song number (0-3)
         Roomba.DirectWrite(3)
-        Roomba.DirectWrite(64)
+        Roomba.DirectWrite(note1)
         Roomba.DirectWrite(16)
-        Roomba.DirectWrite(72)
+        Roomba.DirectWrite(note2)
         Roomba.DirectWrite(16)
-        Roomba.DirectWrite(84)
+        Roomba.DirectWrite(note3)
         Roomba.DirectWrite(16)
 
         time.sleep(0.05) # Wait
