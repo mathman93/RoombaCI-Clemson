@@ -38,10 +38,10 @@ if Roomba.Available() > 0: # If anything is in the Roomba receive buffer
 print(" ROOMBA Setup Complete")
 
 def prepNoise():
-    # SuperStar Theme (10 notes)
+    # SuperStar Theme (4 notes)
     Roomba.DirectWrite(140) # Header Opcode
     Roomba.DirectWrite(0)   # Song number (0-3)
-    Roomba.DirectWrite(100)
+    Roomba.DirectWrite(40)
     Roomba.DirectWrite(128)
 
     time.sleep(0.05) # Wait
@@ -54,7 +54,7 @@ def makeNoise():
     
 #prepNoise()
 #makeNoise()
-    # SuperStar Theme (10 notes)
+    # SuperStar Theme (4 notes)
 while True:
     #try:
         note1=int(input("First Note:"))
@@ -67,17 +67,17 @@ while True:
         Roomba.DirectWrite(0)   # Song number (0-3)
         Roomba.DirectWrite(5)
         Roomba.DirectWrite(note1)
-        Roomba.DirectWrite(10)
+        Roomba.DirectWrite(4)
         Roomba.DirectWrite(note2)
-        Roomba.DirectWrite(10)
+        Roomba.DirectWrite(4)
         Roomba.DirectWrite(note3)
-        Roomba.DirectWrite(10)
+        Roomba.DirectWrite(4)
         Roomba.DirectWrite(note4)
-        Roomba.DirectWrite(10)
+        Roomba.DirectWrite(4)
         Roomba.DirectWrite(note5)
-        Roomba.DirectWrite(10)
+        Roomba.DirectWrite(4)
         Roomba.DirectWrite(note6)
-        Roomba.DirectWrite(10)
+        Roomba.DirectWrite(4)
 
         time.sleep(0.05) # Wait
         GPIO.output(gled, GPIO.LOW)
