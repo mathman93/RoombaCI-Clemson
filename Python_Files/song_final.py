@@ -62,7 +62,7 @@ Roomba.DirectWrite(128)
 
 time.sleep(0.05) # Wait
 GPIO.output(gled, GPIO.LOW)
-time.sleep(0.05) # Wait
+time.sleep(3) # Wait
 Roomba.DirectWrite(141)
 Roomba.DirectWrite(0)
 GPIO.output(gled, GPIO.HIGH)
