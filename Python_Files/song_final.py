@@ -57,14 +57,14 @@ def makeNoise():
     # SuperStar Theme (4 notes)
 while True:
     #try:
-        note1=int(input("First Note:"))
-        note2=int(input("Second Note:"))
-        note3=int(input("Third Note:"))
-        note4=int(input("Fourth Note:"))
-        note5=int(input("Fifth Note:"))
-        note6=int(input("Sixth Note:"))
-        note7=int(input("Seventh Note:"))
-        note8=int(input("Eight Note:"))
+        note1=60#int(input("First Note:"))
+        note2=67#int(input("Second Note:"))
+        note3=72#int(input("Third Note:"))
+        note4=76#int(input("Fourth Note:"))
+        note5=79#int(input("Fifth Note:"))
+        note6=84#int(input("Sixth Note:"))
+        note7=91#int(input("Seventh Note:"))
+        note8=96#int(input("Eight Note:"))
         Roomba.DirectWrite(140) # Header Opcode
         Roomba.DirectWrite(0)   # Song number (0-3)
         Roomba.DirectWrite(8)
