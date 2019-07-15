@@ -34,7 +34,7 @@ if Roomba.Available() > 0: # If anything is in the Roomba receive buffer
 
 print(" ROOMBA Setup Complete")
 
-def makeNoise()
+def prepNoise():
     # SuperStar Theme (16 notes)
     Roomba.DirectWrite(140) # Header Opcode
     Roomba.DirectWrite(1)   # Song number (0-3)
@@ -73,3 +73,17 @@ def makeNoise()
     Roomba.DirectWrite(12)
 
     time.sleep(0.05) # Wait
+    
+def makeNoise():
+    while True:
+        try:
+            Roomba.DirectWrite(141)
+            Roomba.DirectWrite(0)
+            time.sleep(4)
+        except KeyboardInterrupt:
+            break
+    
+prepNoise()
+makeNoise()
+Roomba.ShutDown()
+GPIO.cleanup()
