@@ -16,11 +16,12 @@ import RoombaCI_lib
 # Setup Code #
 GPIO.setmode(GPIO.BCM) # Use BCM pin numbering for GPIO
 
+gled=13
 # LED Pin setup
-#GPIO.setup(gled, GPIO.OUT, initial=GPIO.LOW)
+GPIO.setup(gled, GPIO.OUT, initial=GPIO.LOW)
 
 # Wake Up Roomba Sequence
-#GPIO.output(gled, GPIO.HIGH) # Turn on green LED to say we are alive
+GPIO.output(gled, GPIO.HIGH) # Turn on green LED to say we are alive
 print(" Starting ROOMBA... ")
 Roomba = RoombaCI_lib.Create_2("/dev/ttyS0", 115200)
 Roomba.ddPin = 23 # Set Roomba dd pin number
@@ -46,8 +47,10 @@ def prepNoise():
     time.sleep(0.05) # Wait
     
 def makeNoise():
+    GPIO.output(gled, GPIO.LOW)
     Roomba.DirectWrite(141)
     Roomba.DirectWrite(0)
+    GPIO.output(gled, GPIO.HIGH)
     
 prepNoise()
 makeNoise()
