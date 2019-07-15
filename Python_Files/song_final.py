@@ -76,7 +76,7 @@ while True:
         Roomba.DirectWrite(10)
         Roomba.DirectWrite(note5)
         Roomba.DirectWrite(10)
-         Roomba.DirectWrite(note6)
+        Roomba.DirectWrite(note6)
         Roomba.DirectWrite(10)
 
         time.sleep(0.05) # Wait
