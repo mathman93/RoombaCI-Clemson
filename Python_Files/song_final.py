@@ -77,6 +77,7 @@ while True:
         Roomba.DirectWrite(0)
         GPIO.output(gled, GPIO.HIGH)
         time.sleep(1)
-    except KeyboardInterrupt
+    except KeyboardInterrupt:
+        break
 Roomba.ShutDown()
 GPIO.cleanup()
