@@ -58,12 +58,12 @@ def makeNoise():
 Roomba.DirectWrite(140) # Header Opcode
 Roomba.DirectWrite(0)   # Song number (0-3)
 Roomba.DirectWrite(1)
-Roomba.DirectWrite(107)
+Roomba.DirectWrite(84)
 Roomba.DirectWrite(128)
 
 time.sleep(0.05) # Wait
 GPIO.output(gled, GPIO.LOW)
-time.sleep(3) # Wait
+time.sleep(1) # Wait
 Roomba.DirectWrite(141)
 Roomba.DirectWrite(0)
 GPIO.output(gled, GPIO.HIGH)
