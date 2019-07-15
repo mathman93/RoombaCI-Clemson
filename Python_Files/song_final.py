@@ -40,7 +40,7 @@ def prepNoise():
     # SuperStar Theme (16 notes)
     Roomba.DirectWrite(140) # Header Opcode
     Roomba.DirectWrite(0)   # Song number (0-3)
-    Roomba.DirectWrite(107)
+    Roomba.DirectWrite(100)
     Roomba.DirectWrite(32)
 
     time.sleep(0.05) # Wait
