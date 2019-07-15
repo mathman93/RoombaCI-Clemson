@@ -52,8 +52,20 @@ def makeNoise():
     Roomba.DirectWrite(0)
     GPIO.output(gled, GPIO.HIGH)
     
-prepNoise()
-makeNoise()
+#prepNoise()
+#makeNoise()
+    # SuperStar Theme (16 notes)
+Roomba.DirectWrite(140) # Header Opcode
+Roomba.DirectWrite(0)   # Song number (0-3)
+Roomba.DirectWrite(100)
+Roomba.DirectWrite(128)
+
+time.sleep(0.05) # Wait
+GPIO.output(gled, GPIO.LOW)
+time.sleep(0.05) # Wait
+Roomba.DirectWrite(141)
+Roomba.DirectWrite(0)
+GPIO.output(gled, GPIO.HIGH)
 time.sleep(1)
 Roomba.ShutDown()
 GPIO.cleanup()
