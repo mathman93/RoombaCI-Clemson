@@ -17,7 +17,7 @@ import RoombaCI_lib
 GPIO.setmode(GPIO.BCM) # Use BCM pin numbering for GPIO
 
 # LED Pin setup
-GPIO.setup(gled, GPIO.OUT, initial=GPIO.LOW)
+#GPIO.setup(gled, GPIO.OUT, initial=GPIO.LOW)
 
 # Wake Up Roomba Sequence
 GPIO.output(gled, GPIO.HIGH) # Turn on green LED to say we are alive
