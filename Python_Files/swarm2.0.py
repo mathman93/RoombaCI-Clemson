@@ -36,6 +36,9 @@ def DisplayDateTime():
     print("Program run: ", date_time)
 
 def timedReset():
+    oneNotHeard=True
+    twoNotHeard=True
+    threeNotHeard=True
     GPIO.output(reset,GPIO.LOW)
     time.sleep(1)
     GPIO.output(reset,GPIO.HIGH)
@@ -91,15 +94,18 @@ while True:
         if oneNotHeard and statusOne==1:
             print("micOne")
             oneNotHeard=False
-            lastHeard=time.time()
+            timeOne=time.time()
+            lastHeard=timeOne
         if twoNotHeard and statusTwo==1:
             print("micTwo")
             twoNotHeard=False
-            lastHeard=time.time()
+            timeTwo=time.time()
+            lastHeard=timeTwo
         if threeNotHeard and statusThree==1:
             print("micThree")
             threeNotHeard=False
-            lastHeard=time.time()
+            timeThree=time.time()
+            lastHeard=timeThree
         if statusOne==1 and statusTwo==1 and statusThree==1:
             print("T1-T2: {0:.7f}".format(1000*(timeOne-timeTwo)))
             print("T2-T3: {0:.7f}".format(1000*(timeTwo-timeThree)))
