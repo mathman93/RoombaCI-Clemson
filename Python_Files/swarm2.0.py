@@ -24,6 +24,10 @@ oneNotHeard=True
 twoNotHeard=True
 threeNotHeard=True
 lastHeard=-1
+statusOne=0
+statusTwo=0
+statusThree=0
+
 
 ## Functions and Definitions ##
 ''' Displays current date and time to the screen
