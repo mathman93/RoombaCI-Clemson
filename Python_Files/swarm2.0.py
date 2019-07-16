@@ -112,6 +112,9 @@ while True:
             oneNotHeard=True
             twoNotHeard=True
             threeNotHeard=True
+            statusOne=0
+            statusTwo=0
+            statusThree=0
             lastHeard=-1
             timedReset()
         elif (not lastHeard<0) and time.time()-lastHeard>0.005 and (not (oneNotHeard and twoNotHeard and threeNotHeard)):
