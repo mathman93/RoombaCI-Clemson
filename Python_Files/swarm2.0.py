@@ -120,6 +120,9 @@ while True:
             twoNotHeard=True
             threeNotHeard=True
             lastHeard=-1
+            statusOne=0
+            statusTwo=0
+            statusThree=0
             timedReset()
             #stuck=False 
     #    print("Mic One: {0}".format(statusOne))
