@@ -80,10 +80,10 @@ while True:
         # Roomba.DirectWrite(6)
         # Roomba.DirectWrite(note6)
         # Roomba.DirectWrite(6)
-        # Roomba.DirectWrite(note7)
-        # Roomba.DirectWrite(6)
-        Roomba.DirectWrite(note8)
+        Roomba.DirectWrite(note7)
         Roomba.DirectWrite(16)
+        # Roomba.DirectWrite(note8)
+        # Roomba.DirectWrite(16)
 
         time.sleep(0.05) # Wait
         GPIO.output(gled, GPIO.LOW)
