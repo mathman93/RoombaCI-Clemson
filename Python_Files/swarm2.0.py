@@ -78,8 +78,8 @@ startTime=time.time()
 timeBase=time.time()
 GPIO.output(reset, GPIO.HIGH)
 while True:
-    startloop=time.time()
     try:
+        startloop=time.time()
         statusOne=GPIO.input(micOne)
         statusTwo=GPIO.input(micTwo)
         statusThree=GPIO.input(micThree)
