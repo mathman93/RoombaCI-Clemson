@@ -102,6 +102,7 @@ while True:
             print("T1-T2: {0:.7f}".format(1000*(timeOne-timeTwo)))
             print("T2-T3: {0:.7f}".format(1000*(timeTwo-timeThree)))
             print("T1-T3: {0:.7f}".format(1000*(timeOne-timeThree)))
+            time.sleep(0.5)
             #calculations go here
             oneNotHeard=True
             twoNotHeard=True
