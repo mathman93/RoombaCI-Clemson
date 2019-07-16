@@ -56,7 +56,7 @@ def makeNoise():
 #makeNoise()
     # SuperStar Theme (4 notes)
 while True:
-    #try:
+    try:
         # note1=60#int(input("First Note:"))
         # note2=67#int(input("Second Note:"))
         # note3=72#int(input("Third Note:"))
@@ -92,7 +92,7 @@ while True:
         Roomba.DirectWrite(0)
         GPIO.output(gled, GPIO.HIGH)
         time.sleep(1)
-    #except KeyboardInterrupt:
-     #   break
+    except KeyboardInterrupt:
+        break
 Roomba.ShutDown()
 GPIO.cleanup()
