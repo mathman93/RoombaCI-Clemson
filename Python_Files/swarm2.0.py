@@ -18,15 +18,12 @@ gled = 13
 micOne=17
 micTwo=22
 micThree=27
-reset=24
-notHeard=0.01
+global reset=24
+#notHeard=0.01
 oneNotHeard=True
 twoNotHeard=True
 threeNotHeard=True
 lastHeard=-1
-timeOne=0
-timeTwo=0
-timeThree=0
 
 ## Functions and Definitions ##
 ''' Displays current date and time to the screen
@@ -78,9 +75,6 @@ startloop=0
 
 GPIO.output(reset,GPIO.LOW)
 startTime=time.time()
-timeOne=0
-timeTwo=0
-timeThree=0
 timeBase=time.time()
 GPIO.output(reset, GPIO.HIGH)
 while True:
