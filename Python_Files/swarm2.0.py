@@ -23,7 +23,7 @@ notHeard=0.01
 oneNotHeard=True
 twoNotHeard=True
 threeNotHeard=True
-lastHeard=0
+lastHeard=-1
 timeOne=0
 timeTwo=0
 timeThree=0
@@ -40,7 +40,7 @@ def timedReset():
     oneNotHeard=True
     twoNotHeard=True
     threeNotHeard=True
-    lastHeard=0
+    lastHeard=-1
     GPIO.output(reset,GPIO.LOW)
     time.sleep(1)
     GPIO.output(reset,GPIO.HIGH)
@@ -114,7 +114,7 @@ while True:
             print("T1-T3: {0:.7f}".format(1000*(timeOne-timeThree)))
             #calculations go here
             timedReset()
-        elif not lastHeard==0 and time.time()-lastHeard>0.005 and (not (oneNotHeard and twoNotHeard and threeNotHeard)):
+        elif (not lastHeard<0) and time.time()-lastHeard>0.005 and (not (oneNotHeard and twoNotHeard and threeNotHeard)):
             print("I've fallen and I can't get up")
             timedReset()
             #stuck=False 
