@@ -63,8 +63,8 @@ while True:
         # note4=76#int(input("Fourth Note:"))
         # note5=79#int(input("Fifth Note:"))
         # note6=84#int(input("Sixth Note:"))
-        # note7=91#int(input("Seventh Note:"))
-        note8=96#int(input("Eight Note:"))
+        note7=91#int(input("Seventh Note:"))
+        #note8=96#int(input("Eight Note:"))
         Roomba.DirectWrite(140) # Header Opcode
         Roomba.DirectWrite(0)   # Song number (0-3)
         Roomba.DirectWrite(1)
