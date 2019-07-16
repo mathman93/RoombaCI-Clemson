@@ -112,7 +112,7 @@ while True:
             print("T1-T3: {0:.7f}".format(1000*(timeOne-timeThree)))
             #calculations go here
             timedReset()
-        elif time.time()-startloop>0.05 and (not (oneNotHeard and twoNotHeard and threeNotHeard)):
+        elif time.time()-lastHeard>0.005 and (not (oneNotHeard and twoNotHeard and threeNotHeard)):
             print("I've fallen and I can't get up")
             timedReset()
             #stuck=False 
