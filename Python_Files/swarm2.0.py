@@ -115,7 +115,7 @@ while True:
         elif time.time()-startloop>0.05 and (not (oneNotHeard and twoNotHeard and threeNotHeard)):
             print("I've fallen and I can't get up")
             timedReset()
-            stuck=False 
+            #stuck=False 
     #    print("Mic One: {0}".format(statusOne))
     #    print("Mic Two: {0}".format(statusTwo))
     #    print("Mic Three: {0}".format(statusThree))
