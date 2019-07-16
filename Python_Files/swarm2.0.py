@@ -37,10 +37,6 @@ def DisplayDateTime():
     print("Program run: ", date_time)
 
 def timedReset():
-    oneNotHeard=True
-    twoNotHeard=True
-    threeNotHeard=True
-    lastHeard=-1
     GPIO.output(reset,GPIO.LOW)
     time.sleep(1)
     GPIO.output(reset,GPIO.HIGH)
@@ -113,9 +109,17 @@ while True:
             print("T2-T3: {0:.7f}".format(1000*(timeTwo-timeThree)))
             print("T1-T3: {0:.7f}".format(1000*(timeOne-timeThree)))
             #calculations go here
+            oneNotHeard=True
+            twoNotHeard=True
+            threeNotHeard=True
+            lastHeard=-1
             timedReset()
         elif (not lastHeard<0) and time.time()-lastHeard>0.005 and (not (oneNotHeard and twoNotHeard and threeNotHeard)):
             print("I've fallen and I can't get up")
+            oneNotHeard=True
+            twoNotHeard=True
+            threeNotHeard=True
+            lastHeard=-1
             timedReset()
             #stuck=False 
     #    print("Mic One: {0}".format(statusOne))
