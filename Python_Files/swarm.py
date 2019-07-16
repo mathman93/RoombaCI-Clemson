@@ -39,6 +39,9 @@ def timedReset():
     timeOne=0
     timeTwo=0
     timeThree=0
+    statusOne=0
+    statusTwo=0
+    statusThree=0
     
 def triangulate(t12,t23,t13,c):
     a12=0.5*343*t12
