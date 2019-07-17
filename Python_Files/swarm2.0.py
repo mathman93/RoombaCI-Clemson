@@ -91,17 +91,17 @@ while True:
         statusTwo=GPIO.input(micTwo)
         statusThree=GPIO.input(micThree)
         if oneNotHeard and statusOne==1:
-            print("micOne")
+            #print("micOne")
             oneNotHeard=False
             timeOne=time.time()
             lastHeard=timeOne
         if twoNotHeard and statusTwo==1:
-            print("micTwo")
+            #print("micTwo")
             twoNotHeard=False
             timeTwo=time.time()
             lastHeard=timeTwo
         if threeNotHeard and statusThree==1:
-            print("micThree")
+            #print("micThree")
             threeNotHeard=False
             timeThree=time.time()
             lastHeard=timeThree
@@ -109,7 +109,22 @@ while True:
             print("T1-T2: {0:.7f}".format(1000*(timeOne-timeTwo)))
             print("T2-T3: {0:.7f}".format(1000*(timeTwo-timeThree)))
             print("T1-T3: {0:.7f}".format(1000*(timeOne-timeThree)))
-            time.sleep(0.5)
+            if timeOne<timeTwo and timeOne<timeThree:
+                if timeTwo<timeThree:
+                    print("123")
+                else:
+                    print("132")
+            elif timeTwo<timeOne and timeTwo<timeThree:
+                if timeOne<timeThree:
+                    print("213")
+                else:
+                    print("231")
+            elif timeThree<timeTwo and timeThree<timeOne:
+                if timeTwo<timeOne:
+                    print("321")
+                else:
+                    print("312")
+            #time.sleep(0.5)
             #calculations go here
             oneNotHeard=True
             twoNotHeard=True
