@@ -115,12 +115,12 @@ for t in threads:
 # for t in threads:
     # t.join()
 while 0 in times:
-    GPIO.output(gled,HIGH)
-    GPIO.output(yled,HIGH)
-    GPIO.output(rled,HIGH)
-GPIO.output(gled,LOW)
-GPIO.output(yled,LOW)
-GPIO.output(rled,LOW)
+    GPIO.output(gled,GPIO.HIGH)
+    GPIO.output(yled,GPIO.HIGH)
+    GPIO.output(rled,GPIO.HIGH)
+GPIO.output(gled,GPIO.LOW)
+GPIO.output(yled,GPIO.LOW)
+GPIO.output(rled,GPIO.LOW)
 if max(times)-min(times)>0.001:
     print("Nah fam")
     times=[0,0,0]
