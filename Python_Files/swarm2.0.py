@@ -31,6 +31,7 @@ lastHeard=-1
 statusOne=0
 statusTwo=0
 statusThree=0
+times=[0,0,0]
 
 
 ## Functions and Definitions ##
@@ -59,13 +60,11 @@ def triangulate(t12,t23,t13,c):
     a13=0.5*343*t13
     b13=math.sqrt(c**2-a13**2)
     
-def checkMic(micStatus, micNum):
-    global notHeards
-    if notHeards[micNum-1] and micStatus==1:
-        global lastHeard
-        lastHeard=time.time()
-        notHeards[micNum-1]=False
-        #notHeard=False
+def checkMic(pin, mic):
+    global times
+    status=0
+    while status==0:
+        status=GPIO.input(pin)
         #micTime=time.time()
         #recentHeard=micTime
 
