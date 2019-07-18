@@ -120,7 +120,7 @@ while True:
             GPIO.output(rled,GPIO.HIGH)
             start=time.time()
             while time.time()-1<start:
-                
+                x=1
             GPIO.output(gled,GPIO.LOW)
             GPIO.output(yled,GPIO.LOW)
             GPIO.output(rled,GPIO.LOW))
