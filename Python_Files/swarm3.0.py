@@ -102,58 +102,58 @@ GPIO.output(reset, GPIO.HIGH)
 # threads.append(one)
 # threads.append(two)
 # threads.append(three)
-while True:
-    try:
-        global times
-        one=threading.Thread(target=checkMic, args=(micOne, 1,times), daemon=False)
-        two=threading.Thread(target=checkMic, args=(micTwo, 2,times), daemon=False)
-        three=threading.Thread(target=checkMic, args=(micThree, 3,times), daemon=False)
-        threads=[]
-        threads.append(one)
-        threads.append(two)
-        threads.append(three)
-        startloop=time.time()
-        for t in threads:
-            t.start()
-        for t in threads:
-            t.join()
-        if max(times)-min(times)>0.001:
-            print("Nah fam")
-            times=[0,0,0]
+# while True:
+    # try:
+global times
+one=threading.Thread(target=checkMic, args=(micOne, 1,times), daemon=False)
+two=threading.Thread(target=checkMic, args=(micTwo, 2,times), daemon=False)
+three=threading.Thread(target=checkMic, args=(micThree, 3,times), daemon=False)
+threads=[]
+threads.append(one)
+threads.append(two)
+threads.append(three)
+startloop=time.time()
+for t in threads:
+    t.start()
+for t in threads:
+    t.join()
+if max(times)-min(times)>0.001:
+    print("Nah fam")
+    times=[0,0,0]
+else:
+    print("T1-T2: {0:.7f}".format(1000*(times[0]-times[1])))
+    print("T2-T3: {0:.7f}".format(1000*(times[1]-times[2])))
+    print("T1-T3: {0:.7f}".format(1000*(times[0]-times[2])))
+    if times[0]<times[1] and times[0]<times[2]:
+        if times[1]<times[2]:
+            print("123")
         else:
-            print("T1-T2: {0:.7f}".format(1000*(times[0]-times[1])))
-            print("T2-T3: {0:.7f}".format(1000*(times[1]-times[2])))
-            print("T1-T3: {0:.7f}".format(1000*(times[0]-times[2])))
-            if times[0]<times[1] and times[0]<times[2]:
-                if times[1]<times[2]:
-                    print("123")
-                else:
-                    print("132")
-            elif times[1]<times[0] and times[1]<times[2]:
-                if times[0]<times[2]:
-                    print("213")
-                else:
-                    print("231")
-            elif times[2]<times[1] and times[2]<times[0]:
-                if times[1]<times[0]:
-                    print("321")
-                else:
-                    print("312")
-            times=[0,0,0]
-            #time.sleep(0.5)
-            #calculations go here
-            timedReset()
-            #stuck=False 
-    #    print("Mic One: {0}".format(statusOne))
-    #    print("Mic Two: {0}".format(statusTwo))
-    #    print("Mic Three: {0}".format(statusThree))
-        #time.sleep(0.1)
-        if time.time()-timeBase>1.0:
-            print(time.time()-startloop)
-            timeBase=timeBase+1
+            print("132")
+    elif times[1]<times[0] and times[1]<times[2]:
+        if times[0]<times[2]:
+            print("213")
+        else:
+            print("231")
+    elif times[2]<times[1] and times[2]<times[0]:
+        if times[1]<times[0]:
+            print("321")
+        else:
+            print("312")
+    times=[0,0,0]
+    #time.sleep(0.5)
+    #calculations go here
+    timedReset()
+    #stuck=False 
+#    print("Mic One: {0}".format(statusOne))
+#    print("Mic Two: {0}".format(statusTwo))
+#    print("Mic Three: {0}".format(statusThree))
+#time.sleep(0.1)
+if time.time()-timeBase>1.0:
+    print(time.time()-startloop)
+    timeBase=timeBase+1
     #    time.sleep(1)
-    except KeyboardInterrupt:
-        break
+    # except KeyboardInterrupt:
+        # break
 GPIO.output(reset,GPIO.LOW)
 
 '''
