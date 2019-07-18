@@ -115,8 +115,8 @@ while True:
         startloop=time.time()
         for t in threads:
             t.start()
-        for t in threads:
-            t.join()
+        # for t in threads:
+            # t.join()
         if max(times)-min(times)>0.001:
             print("Nah fam")
             times=[0,0,0]
