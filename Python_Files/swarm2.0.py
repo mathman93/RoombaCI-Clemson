@@ -84,8 +84,8 @@ GPIO.setup(reset, GPIO.OUT, initial=GPIO.LOW)
 #stuck=False
 startloop=0
 
-with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
-        executor.map(thread_function, range(3))
+#with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+#        executor.map(thread_function, range(3))
 
 GPIO.output(reset,GPIO.LOW)
 startTime=time.time()
