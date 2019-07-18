@@ -157,7 +157,6 @@ while True:
                     print("321")
                 else:
                     print("312")
-            times=[0,0,0]
             #time.sleep(0.5)
             #calculations go here
             timedReset()
@@ -166,10 +165,11 @@ while True:
         #    print("Mic Two: {0}".format(statusTwo))
         #    print("Mic Three: {0}".format(statusThree))
         #time.sleep(0.1)
-        if time.time()-timeBase>1.0:
-            print(time.time()-startloop)
-            timeBase=timeBase+1
+        # if time.time()-timeBase>1.0:
+            # print(time.time()-startloop)
+            # timeBase=timeBase+1
             #   time.sleep(1)
+        times=[0,0,0]
     except KeyboardInterrupt:
         break
 GPIO.output(reset,GPIO.LOW)
