@@ -9,6 +9,9 @@ import math
 import time
 import RPi.GPIO as GPIO
 import RoombaCI_lib
+import microprocessing
+import threading
+import concurrent.futures
 
 ## Variables and Constants ##
 # LED pin numbers
@@ -55,6 +58,12 @@ def triangulate(t12,t23,t13,c):
     a13=0.5*343*t13
     b13=math.sqrt(c**2-a13**2)
     
+def checkMic(notHeard, micStatus):
+    if notHeard and micStatus==1:
+        return False, time.time()
+        #notHeard=False
+        #micTime=time.time()
+        #recentHeard=micTime
 
 ## -- Code Starts Here -- ##
 # Setup Code #
@@ -75,12 +84,17 @@ GPIO.setup(reset, GPIO.OUT, initial=GPIO.LOW)
 #stuck=False
 startloop=0
 
-
+with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+        executor.map(thread_function, range(3))
 
 GPIO.output(reset,GPIO.LOW)
 startTime=time.time()
 timeBase=time.time()
 GPIO.output(reset, GPIO.HIGH)
+# a = multiprocessing.Process(name='daemon', target=checkMic)
+ #   d.daemon = True
+#  n = multiprocessing.Process(name='non-daemon', target=non_daemon)
+# n.daemon = False
 while True:
     try:
         startloop=time.time()
