@@ -9,7 +9,7 @@ import math
 import time
 import RPi.GPIO as GPIO
 import RoombaCI_lib
-import microprocessing
+#import microprocessing
 import threading
 import concurrent.futures
 
