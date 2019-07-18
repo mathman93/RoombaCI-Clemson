@@ -102,7 +102,6 @@ GPIO.output(reset, GPIO.HIGH)
 # threads.append(three)
 # while True
 # try:
-global times
 one=threading.Thread(target=checkMic, args=(micOne, 1,times), daemon=False)
 two=threading.Thread(target=checkMic, args=(micTwo, 2,times), daemon=False)
 three=threading.Thread(target=checkMic, args=(micThree, 3,times), daemon=False)
