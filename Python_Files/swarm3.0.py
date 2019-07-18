@@ -114,18 +114,27 @@ while True:
             t.start()
         # for t in threads:
             # t.join()
+        start=time.time()
+        lights=False
         while 0 in times:
-            start=time.time()
             GPIO.output(gled,GPIO.HIGH)
             GPIO.output(yled,GPIO.HIGH)
             GPIO.output(rled,GPIO.HIGH)
             # start=time.time()
             # while time.time()-1<start:
-            if (time.time()-start)/4>1:
-                start=start-4
+            if (time.time()-start)>4.0:
+                start=start+4
+            if lights:
                 GPIO.output(gled,GPIO.LOW)
                 GPIO.output(yled,GPIO.LOW)
                 GPIO.output(rled,GPIO.LOW)
+            else:
+                GPIO.output(gled,GPIO.HIGH)
+                GPIO.output(yled,GPIO.HIGH)
+                GPIO.output(rled,GPIO.HIGH)
+        GPIO.output(gled,GPIO.LOW)
+        GPIO.output(yled,GPIO.LOW)
+        GPIO.output(rled,GPIO.LOW)
         if max(times)-min(times)>0.002:
             print("Nah fam")
             times=[0,0,0]
