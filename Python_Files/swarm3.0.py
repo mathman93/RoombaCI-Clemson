@@ -123,7 +123,7 @@ while True:
                 x=1
             GPIO.output(gled,GPIO.LOW)
             GPIO.output(yled,GPIO.LOW)
-            GPIO.output(rled,GPIO.LOW))
+            GPIO.output(rled,GPIO.LOW)
         if max(times)-min(times)>0.002:
             print("Nah fam")
             times=[0,0,0]
