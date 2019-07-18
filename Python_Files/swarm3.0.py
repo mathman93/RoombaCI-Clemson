@@ -64,7 +64,7 @@ def checkMic(pin, mic, times):
     status=0
     while status==0:
         status=GPIO.input(pin)
-        print(time.time()-startloop)
+        #print(time.time()-startloop)
     times[mic-1]=time.time()
 
 ## -- Code Starts Here -- ##
