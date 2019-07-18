@@ -104,7 +104,8 @@ while True:
         # print(statusOne)
         # print (statusTwo)
         # print (statusThree)
-        global statusOne=GPIO.input(micOne)
+        global statusOne
+        statusOne=GPIO.input(micOne)
         global statusTwo=GPIO.input(micTwo)
         global statusThree=GPIO.input(micThree)
         if oneNotHeard and statusOne==1:
