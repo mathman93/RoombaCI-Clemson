@@ -115,9 +115,9 @@ while True:
             print("Nah fam")
             times=[0,0,0]
         else:
-            print("T1-T2: {0:.7f}".format(1000*(times[1]-times[2])))
-            print("T2-T3: {0:.7f}".format(1000*(times[2]-times[3])))
-            print("T1-T3: {0:.7f}".format(1000*(times[1]-times[3])))
+            print("T1-T2: {0:.7f}".format(1000*(times[0]-times[1])))
+            print("T2-T3: {0:.7f}".format(1000*(times[1]-times[2])))
+            print("T1-T3: {0:.7f}".format(1000*(times[0]-times[2])))
             if times[0]<times[1] and times[0]<times[2]:
                 if times[1]<times[2]:
                     print("123")
