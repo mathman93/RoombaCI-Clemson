@@ -91,19 +91,22 @@ GPIO.output(reset,GPIO.LOW)
 startTime=time.time()
 timeBase=time.time()
 GPIO.output(reset, GPIO.HIGH)
-# a = multiprocessing.Process(name='daemon', target=checkMic)
- #   d.daemon = True
-#  n = multiprocessing.Process(name='non-daemon', target=non_daemon)
-# n.daemon = False
+one=threading.Thread(target=checkMic, args=(global statusOne, global oneNotHeard), daemon=False)
+two=threading.Thread(target=checkMic, args=(global statusTwo, global twoNotHeard), daemon=False)
+three=threading.Thread(target=checkMic, args=(global statusThree, global threeNotHeard), daemon=False)
+threads=[]
+threads.append(one)
+threads.append(two)
+threads.append(three)
 while True:
     try:
         startloop=time.time()
         # print(statusOne)
         # print (statusTwo)
         # print (statusThree)
-        statusOne=GPIO.input(micOne)
-        statusTwo=GPIO.input(micTwo)
-        statusThree=GPIO.input(micThree)
+        global statusOne=GPIO.input(micOne)
+        global statusTwo=GPIO.input(micTwo)
+        global statusThree=GPIO.input(micThree)
         if oneNotHeard and statusOne==1:
             #print("micOne")
             oneNotHeard=False
@@ -140,12 +143,12 @@ while True:
                     print("312")
             #time.sleep(0.5)
             #calculations go here
-            oneNotHeard=True
-            twoNotHeard=True
-            threeNotHeard=True
-            statusOne=0
-            statusTwo=0
-            statusThree=0
+            global oneNotHeard=True
+            global twoNotHeard=True
+            global threeNotHeard=True
+            global statusOne=0
+            global statusTwo=0
+            global statusThree=0
             lastHeard=-1
             timedReset()
         elif (not lastHeard<0) and time.time()-lastHeard>0.005 and (not (oneNotHeard and twoNotHeard and threeNotHeard)):
