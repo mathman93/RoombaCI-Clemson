@@ -66,9 +66,6 @@ def checkMic(pin, mic, times):
         status=GPIO.input(pin)
     times[mic-1]=time.time()
     print(timt.tim()-startloop
-    
-        #micTime=time.time()
-        #recentHeard=micTime
 
 ## -- Code Starts Here -- ##
 # Setup Code #
