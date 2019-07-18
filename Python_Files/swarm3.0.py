@@ -114,7 +114,7 @@ while True:
         if max(times)-min(times)>0.001:
             print("Nah fam")
             times=[0,0,0]
-        else
+        else:
             print("T1-T2: {0:.7f}".format(1000*(times[1]-times[2])))
             print("T2-T3: {0:.7f}".format(1000*(times[2]-times[3])))
             print("T1-T3: {0:.7f}".format(1000*(times[1]-times[3])))
