@@ -118,9 +118,11 @@ while 0 in times:
     GPIO.output(gled,GPIO.HIGH)
     GPIO.output(yled,GPIO.HIGH)
     GPIO.output(rled,GPIO.HIGH)
-GPIO.output(gled,GPIO.LOW)
-GPIO.output(yled,GPIO.LOW)
-GPIO.output(rled,GPIO.LOW)
+    start=time.time()
+    while time.time()-1<start:
+    GPIO.output(gled,GPIO.LOW)
+    GPIO.output(yled,GPIO.LOW)
+    GPIO.output(rled,GPIO.LOW))
 if max(times)-min(times)>0.002:
     print("Nah fam")
     times=[0,0,0]
