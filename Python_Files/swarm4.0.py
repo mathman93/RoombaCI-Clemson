@@ -101,7 +101,7 @@ GPIO.output(reset, GPIO.HIGH)
 # threads.append(three)
 one=multiprocessing.Process(target=checkMic, args=(micOne,1,times,))
 two=multiprocessing.Process(target=checkMic, args=(micTwo,2,times,))
-three=multiprocessing.Proceess(target=checkMic, args=(micThree,3,times,))
+three=multiprocessing.Process(target=checkMic, args=(micThree,3,times,))
 mps=[]
 mps.append(one)
 mps.append(two)
@@ -160,7 +160,7 @@ while True:
             #calculations go here
         one=multiprocessing.Process(target=checkMic, args=(micOne,1,times,))
         two=multiprocessing.Process(target=checkMic, args=(micTwo,2,times,))
-        three=multiprocessing.Proceess(target=checkMic, args=(micThree,3,times,))
+        three=multiprocessing.Process(target=checkMic, args=(micThree,3,times,))
         mps=[]
         mps.append(one)
         mps.append(two)
