@@ -32,9 +32,9 @@ statusOne=0
 statusTwo=0
 statusThree=0
 times=[0,0,0]
-first=(0,0)
-second=(0,0)
-third=(0,0)
+first=[0,0]
+second=[0,0
+third=[0,0]
 
 ## Functions and Definitions ##
 ''' Displays current date and time to the screen
@@ -67,7 +67,7 @@ def checkMic(cue,pin, mic, times):
     while status==0:
         status=GPIO.input(pin)
         #print(time.time()-startloop)
-    cue.put(mic-1, time.time())
+    cue.put[mic-1, time.time()]
 
 ## -- Code Starts Here -- ##
 # Setup Code #
@@ -181,9 +181,9 @@ while True:
         mps.append(two)
         mps.append(three)
         times=[0,0,0]
-        first=(0,0)
-        second=(0,0)
-        third=(0,0)
+        first=[0,0]
+        second=[0,0]
+        third=[0,0]
         timedReset()
             #stuck=False 
         #    print("Mic One: {0}".format(statusOne))
@@ -227,7 +227,7 @@ x = imu.gyro
 print(" Calibrating IMU...")
 Roomba.Move(0,75) # Start Roomba spinning
 imu.CalibrateMag() # Calculate magnetometer offset values
-Roomba.Move(0,0) # Stop Roomba spinning
+Roomba.Move[0,0] # Stop Roomba spinning
 time.sleep(0.5)
 imu.CalibrateGyro() # Calculate gyroscope offset values
 # Display offset values
