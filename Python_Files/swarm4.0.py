@@ -33,7 +33,7 @@ statusTwo=0
 statusThree=0
 times=[0,0,0]
 first=[0,0]
-second=[0,0
+second=[0,0]
 third=[0,0]
 
 ## Functions and Definitions ##
