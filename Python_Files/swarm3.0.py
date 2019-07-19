@@ -131,6 +131,14 @@ while True:
         if max(times)-min(times)>0.002:
             print("Nah fam")
             times=[0,0,0]
+            one=threading.Thread(target=checkMic, args=(micOne, 1,times), daemon=False)
+            two=threading.Thread(target=checkMic, args=(micTwo, 2,times), daemon=False)
+            three=threading.Thread(target=checkMic, args=(micThree, 3,times), daemon=False)
+            threads=[]
+            threads.append(one)
+            threads.append(two)
+            threads.append(three)
+            timedReset()
         else:
             print("T1-T2: {0:.7f}".format(1000*(times[0]-times[1])))
             print("T2-T3: {0:.7f}".format(1000*(times[1]-times[2])))
@@ -159,6 +167,7 @@ while True:
             threads.append(one)
             threads.append(two)
             threads.append(three)
+            times=[0,0,0]
             timedReset()
             #stuck=False 
         #    print("Mic One: {0}".format(statusOne))
@@ -169,7 +178,6 @@ while True:
             # print(time.time()-startloop)
             # timeBase=timeBase+1
             #   time.sleep(1)
-        times=[0,0,0]
     except KeyboardInterrupt:
         break
 GPIO.output(reset,GPIO.LOW)
