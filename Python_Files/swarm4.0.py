@@ -99,15 +99,15 @@ GPIO.output(reset, GPIO.HIGH)
 # threads.append(one)
 # threads.append(two)
 # threads.append(three)
+one=multiprocessing.Process(target=checkMic, args(micOne,1,times,)
+two=multiprocessing.Process(target=checkMic, args(micTwo,2,times,)
+three=multiprocessing.Proceess(target=checkMic, args(micThree,3,times,)
+mps=[]
+mps.append(one)
+mps.append(two)
+mps.append(three)
 while True:
     try:
-        one=multiprocessing.Process(target=checkMic, args(micOne,1,times,)
-        two=multiprocessing.Process(target=checkMic, args(micTwo,2,times,)
-        three=multiprocessing.Proceess(target=checkMic, args(micThree,3,times,)
-        mps=[]
-        mps.append(one)
-        mps.append(two)
-        mps.append(three)
         startloop=time.time()
         for p in mps:
             p.start()
@@ -158,7 +158,15 @@ while True:
                     print("312")
             #time.sleep(0.5)
             #calculations go here
-            timedReset()
+        one=multiprocessing.Process(target=checkMic, args(micOne,1,times,)
+        two=multiprocessing.Process(target=checkMic, args(micTwo,2,times,)
+        three=multiprocessing.Proceess(target=checkMic, args(micThree,3,times,)
+        mps=[]
+        mps.append(one)
+        mps.append(two)
+        mps.append(three)
+        times=[0,0,0]
+        timedReset()
             #stuck=False 
         #    print("Mic One: {0}".format(statusOne))
         #    print("Mic Two: {0}".format(statusTwo))
@@ -168,7 +176,6 @@ while True:
             # print(time.time()-startloop)
             # timeBase=timeBase+1
             #   time.sleep(1)
-        times=[0,0,0]
     except KeyboardInterrupt:
         break
 GPIO.output(reset,GPIO.LOW)
