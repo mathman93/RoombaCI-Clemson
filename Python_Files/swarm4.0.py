@@ -1,3 +1,5 @@
+import multiprocessing
+
 ''' script.py
 Purpose: Code to test our roomba program;
 IMPORTANT: Must be run using Python 3 (python3)
@@ -9,9 +11,6 @@ import math
 import time
 import RPi.GPIO as GPIO
 import RoombaCI_lib
-#import microprocessing
-import threading
-import concurrent.futures
 
 ## Variables and Constants ##
 # LED pin numbers
@@ -93,18 +92,25 @@ GPIO.output(reset,GPIO.LOW)
 startTime=time.time()
 timeBase=time.time()
 GPIO.output(reset, GPIO.HIGH)
-one=threading.Thread(target=checkMic, args=(micOne, 1,times), daemon=False)
-two=threading.Thread(target=checkMic, args=(micTwo, 2,times), daemon=False)
-three=threading.Thread(target=checkMic, args=(micThree, 3,times), daemon=False)
-threads=[]
-threads.append(one)
-threads.append(two)
-threads.append(three)
+# one=threading.Thread(target=checkMic, args=(micOne, 1,times), daemon=False)
+# two=threading.Thread(target=checkMic, args=(micTwo, 2,times), daemon=False)
+# three=threading.Thread(target=checkMic, args=(micThree, 3,times), daemon=False)
+# threads=[]
+# threads.append(one)
+# threads.append(two)
+# threads.append(three)
 while True:
     try:
+        one=multiprocessing.Process(target=checkMic, args(micOne,1,times,)
+        two=multiprocessing.Process(target=checkMic, args(micTwo,2,times,)
+        three=multiprocessing.Proceess(target=checkMic, args(micThree,3,times,)
+        mps=[]
+        mps.append(one)
+        mps.append(two)
+        mps.append(three)
         startloop=time.time()
-        for t in threads:
-            t.start()
+        for p in mps:
+            p.start()
         # for t in threads:
             # t.join()
         start=time.time()
@@ -152,13 +158,6 @@ while True:
                     print("312")
             #time.sleep(0.5)
             #calculations go here
-            one=threading.Thread(target=checkMic, args=(micOne, 1,times), daemon=False)
-            two=threading.Thread(target=checkMic, args=(micTwo, 2,times), daemon=False)
-            three=threading.Thread(target=checkMic, args=(micThree, 3,times), daemon=False)
-            threads=[]
-            threads.append(one)
-            threads.append(two)
-            threads.append(three)
             timedReset()
             #stuck=False 
         #    print("Mic One: {0}".format(statusOne))
