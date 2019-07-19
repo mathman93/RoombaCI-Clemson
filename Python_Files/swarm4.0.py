@@ -111,11 +111,13 @@ while True:
         startloop=time.time()
         for p in mps:
             p.start()
+            print("started")
         # for t in threads:
             # t.join()
         start=time.time()
         lights=False
         while 0 in times:
+        print("in here")
             GPIO.output(gled,GPIO.HIGH)
             GPIO.output(yled,GPIO.HIGH)
             GPIO.output(rled,GPIO.HIGH)
