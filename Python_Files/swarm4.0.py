@@ -1,4 +1,5 @@
 import multiprocessing
+from multiprocessing import Queue
 
 ''' script.py
 Purpose: Code to test our roomba program;
