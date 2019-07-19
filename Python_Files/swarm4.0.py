@@ -31,7 +31,9 @@ statusOne=0
 statusTwo=0
 statusThree=0
 times=[0,0,0]
-
+first=(0,0)
+second=(0,0)
+third=(0,0)
 
 ## Functions and Definitions ##
 ''' Displays current date and time to the screen
@@ -64,9 +66,7 @@ def checkMic(cue,pin, mic, times):
     while status==0:
         status=GPIO.input(pin)
         #print(time.time()-startloop)
-    temp=cue.get()
-    temp[mic-1]=time.time()
-    cue.put(temp)
+    cue.put(mic-1, time.time())
 
 ## -- Code Starts Here -- ##
 # Setup Code #
@@ -102,7 +102,6 @@ GPIO.output(reset, GPIO.HIGH)
 # threads.append(two)
 # threads.append(three)
 q=Queue()
-q.put(times)
 one=multiprocessing.Process(target=checkMic, args=(q,micOne,1,times,))
 two=multiprocessing.Process(target=checkMic, args=(q,micTwo,2,times,))
 three=multiprocessing.Process(target=checkMic, args=(q,micThree,3,times,))
@@ -120,7 +119,7 @@ while True:
             # t.join()
         start=time.time()
         lights=False
-        while 0 in q.get():
+        while q.qsize() <3:
             GPIO.output(gled,GPIO.HIGH)
             GPIO.output(yled,GPIO.HIGH)
             GPIO.output(rled,GPIO.HIGH)
@@ -139,6 +138,15 @@ while True:
         GPIO.output(gled,GPIO.LOW)
         GPIO.output(yled,GPIO.LOW)
         GPIO.output(rled,GPIO.LOW)
+        first=q.get()
+        second=q.get()
+        third=q.get()
+    #if not first[0] ==-1:
+        times[first[0]]=first[1]
+    #if not second[0] ==-1:
+        times[second[0]]=second[1]
+    #if not third[0] ==-1:
+        times[third[0]]=third[1]
         if max(times)-min(times)>0.002:
             print("Nah fam")
             times=[0,0,0]
@@ -164,7 +172,6 @@ while True:
             #time.sleep(0.5)
             #calculations go here
         q=Queue()
-        q.put(times)
         one=multiprocessing.Process(q,target=checkMic, args=(micOne,1,times,))
         two=multiprocessing.Process(q,target=checkMic, args=(micTwo,2,times,))
         three=multiprocessing.Process(q,target=checkMic, args=(micThree,3,times,))
@@ -173,6 +180,9 @@ while True:
         mps.append(two)
         mps.append(three)
         times=[0,0,0]
+        first=(0,0)
+        second=(0,0)
+        third=(0,0)
         timedReset()
             #stuck=False 
         #    print("Mic One: {0}".format(statusOne))
