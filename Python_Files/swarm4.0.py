@@ -117,7 +117,6 @@ while True:
         start=time.time()
         lights=False
         while 0 in times:
-            print("in here")
             GPIO.output(gled,GPIO.HIGH)
             GPIO.output(yled,GPIO.HIGH)
             GPIO.output(rled,GPIO.HIGH)
