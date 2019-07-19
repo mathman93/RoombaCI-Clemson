@@ -59,13 +59,14 @@ def triangulate(t12,t23,t13,c):
     a13=0.5*343*t13
     b13=math.sqrt(c**2-a13**2)
     
-def checkMic(pin, mic, times):
+def checkMic(cue,pin, mic, times):
     status=0
     while status==0:
         status=GPIO.input(pin)
         #print(time.time()-startloop)
-    times[mic-1]=time.time()
-    print(times)
+    temp=cue.get()
+    temp[mic-1]=time.time()
+    cue.put(temp)
 
 ## -- Code Starts Here -- ##
 # Setup Code #
@@ -100,9 +101,11 @@ GPIO.output(reset, GPIO.HIGH)
 # threads.append(one)
 # threads.append(two)
 # threads.append(three)
-one=multiprocessing.Process(target=checkMic, args=(micOne,1,times,))
-two=multiprocessing.Process(target=checkMic, args=(micTwo,2,times,))
-three=multiprocessing.Process(target=checkMic, args=(micThree,3,times,))
+q=Queue()
+q.put(times)
+one=multiprocessing.Process(target=checkMic, args=(q,micOne,1,times,))
+two=multiprocessing.Process(target=checkMic, args=(q,micTwo,2,times,))
+three=multiprocessing.Process(target=checkMic, args=(q,micThree,3,times,))
 mps=[]
 mps.append(one)
 mps.append(two)
@@ -117,7 +120,7 @@ while True:
             # t.join()
         start=time.time()
         lights=False
-        while 0 in times:
+        while 0 in q.get():
             GPIO.output(gled,GPIO.HIGH)
             GPIO.output(yled,GPIO.HIGH)
             GPIO.output(rled,GPIO.HIGH)
@@ -160,9 +163,11 @@ while True:
                     print("312")
             #time.sleep(0.5)
             #calculations go here
-        one=multiprocessing.Process(target=checkMic, args=(micOne,1,times,))
-        two=multiprocessing.Process(target=checkMic, args=(micTwo,2,times,))
-        three=multiprocessing.Process(target=checkMic, args=(micThree,3,times,))
+        q=Queue()
+        q.put(times)
+        one=multiprocessing.Process(q,target=checkMic, args=(micOne,1,times,))
+        two=multiprocessing.Process(q,target=checkMic, args=(micTwo,2,times,))
+        three=multiprocessing.Process(q,target=checkMic, args=(micThree,3,times,))
         mps=[]
         mps.append(one)
         mps.append(two)
