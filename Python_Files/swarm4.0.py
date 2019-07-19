@@ -173,9 +173,9 @@ while True:
             #time.sleep(0.5)
             #calculations go here
         #q=Queue()
-        one=multiprocessing.Process(q,target=checkMic, args=(micOne,1,times,))
-        two=multiprocessing.Process(q,target=checkMic, args=(micTwo,2,times,))
-        three=multiprocessing.Process(q,target=checkMic, args=(micThree,3,times,))
+        one=multiprocessing.Process(target=checkMic, args=(q,micOne,1,times,))
+        two=multiprocessing.Process(target=checkMic, args=(q,micTwo,2,times,))
+        three=multiprocessing.Process(target=checkMic, args=(q,micThree,3,times,))
         mps=[]
         mps.append(one)
         mps.append(two)
