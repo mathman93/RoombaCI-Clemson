@@ -88,13 +88,19 @@ def triangulate(t12,t23,t13,c):#1-2=12
     y3=0
     
     a12=abs(0.5*c*t12)
+    if a12>y2:
+        print("INVALID"!)
     b12=math.sqrt(abs(y2**2-a12**2))
     
     
     a23=abs(0.5*c*t23)
+    if a23>y2:
+        print("INVALID"!)
     b23=math.sqrt(abs(y2**2-a23**2))
      
     a13=abs(0.5*c*t13)
+    if a12>y2:
+        print("INVALID"!)
     b13=math.sqrt(abs(y2**2-a13**2))
     
     if t12>=0:
