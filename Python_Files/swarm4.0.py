@@ -36,7 +36,7 @@ times=[0,0,0]
 first=[0,0]
 second=[0,0]
 third=[0,0]
-cSound=343
+cSound=343000
 x1=75
 x2=75
 x3=-150
@@ -87,15 +87,15 @@ def triangulate(t12,t23,t13,c):#1-2=12
     y2=129.9038
     y3=0
     
-    a12=0.5*343*t12
-    b12=math.sqrt(c**2-a12**2)
+    a12=0.5*c*t12
+    b12=math.sqrt(y2**2-a12**2)
     
     
-    a23=0.5*343*t23
-    b23=math.sqrt(c**2-a23**2)
+    a23=0.5*c*t23
+    b23=math.sqrt(y2**2-a23**2)
      
-    a13=0.5*343*t13
-    b13=math.sqrt(c**2-a13**2)
+    a13=0.5*c*t13
+    b13=math.sqrt(y2**2-a13**2)
     
     if t12>=0:
         if t13<=0:
@@ -204,7 +204,7 @@ def triangulate(t12,t23,t13,c):#1-2=12
         x=final[0][0]
         y=final[1][0]
         ansAngle=math.atan2(y,x)#angle to target
-    return ansAngle
+    return ansAngle,x,y
         
     
 # def matrixMath(ang1, ang2,x1,x2,x3,y1,y2,y3):
@@ -339,8 +339,10 @@ while True:
             angle,slope=matrixMethod(times[0]-times[1],times[1]-times[2],times[0]-times[2],cSound)
             print("slope matrix:",slope)
             print("angle matrix:",angle)
-            angle= triangulate(times[0]-times[1],times[1]-times[2],times[0]-times[2],cSound)
+            angle,x,y= triangulate(times[0]-times[1],times[1]-times[2],times[0]-times[2],cSound)
             print("angle hyperbola",angle)
+            print(x)
+            print(y)
         one=multiprocessing.Process(target=checkMic, args=(q,micOne,1,times,))
         two=multiprocessing.Process(target=checkMic, args=(q,micTwo,2,times,))
         three=multiprocessing.Process(target=checkMic, args=(q,micThree,3,times,))
