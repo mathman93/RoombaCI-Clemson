@@ -193,7 +193,7 @@ def triangulate(t12,t23,t13,c):#1-2=12
         y=final[1][0]
         ansAngle=math.atan2(y,x)#angle to target
     elif asyAngle3==0:
-        #matrixMath(ang1, ang2,x1,x2,x3,y1,y2,y3)
+        #matrixMath(asyAngle, asyAngle2,x1,x2,x3,y1,y2,y3)
         cos1=math.cos(asyAngle)
         cos2=math.cos(asyAngle2)
         sin1=math.sin(asyAngle)
@@ -213,24 +213,24 @@ def triangulate(t12,t23,t13,c):#1-2=12
     return ansAngle,x,y
         
     
-# def matrixMath(ang1, ang2,x1,x2,x3,y1,y2,y3):
-    # cos1=math.cos(ang1)
-    # cos2=math.cos(ang2)
-    # sin1=math.sin(ang1)
-    # sin2=math.sin(ang2)
-    # m1=np.array([[cos1,-cos2],[sin1,-sin2]])
-    # minv=np.linalg.inv(m1)
-    # m2=np.array([[(x2+x3)/2-(x1+x2)/2],[(y2+y3)/2-(y1+y2)/2]])
-    # m3=np.matmual(m2,minv)
-    # w1=m3[0][0]
-    # #w2=m3[1][0]
-    # m4=np.matrix([[w1*cos1],[w1*sin1]])
-    # m5=np.matrix([[(x1+x2)/2],[(y1+y2)/2]])
-    # final=np.matrix.sum(m4, m5)
-    # x=final[0][0]
-    # y=final[1][0]
-    # ansAngle=atan2(y,x)#angle to target
-    # return ansAngle
+def matrixMath(ang1, ang2,x1,x2,x3,y1,y2,y3):
+    cos1=math.cos(ang1)
+    cos2=math.cos(ang2)
+    sin1=math.sin(ang1)
+    sin2=math.sin(ang2)
+    m1=np.array([[cos1,-cos2],[sin1,-sin2]])
+    minv=np.linalg.inv(m1)
+    m2=np.array([[(x2+x3)/2-(x1+x2)/2],[(y2+y3)/2-(y1+y2)/2]])
+    m3=np.matmual(m2,minv)
+    w1=m3[0][0]
+    #w2=m3[1][0]
+    m4=np.matrix([[w1*cos1],[w1*sin1]])
+    m5=np.matrix([[(x1+x2)/2],[(y1+y2)/2]])
+    final=np.matrix.sum(m4, m5)
+    x=final[0][0]
+    y=final[1][0]
+    ansAngle=atan2(y,x)#angle to target
+    return ansAngle, x, y
 def checkMic(cue,pin, mic, times):
     status=0
     while status==0:
@@ -428,4 +428,7 @@ if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 Roomba.ShutDown() # Shutdown Roomba serial connection
 Xbee.close()
 '''
+one.terminate()
+two.terminate()
+three.terminate()
 GPIO.cleanup() # Reset GPIO pins for next program
