@@ -88,14 +88,14 @@ def triangulate(t12,t23,t13,c):#1-2=12
     y3=0
     
     a12=0.5*343*t12
-    b12=math.sqrt(c**2-a12**2)
+    b12=math.sqrt(cSound**2-a12**2)
     
     
     a23=0.5*343*t23
-    b23=math.sqrt(c**2-a23**2)
+    b23=math.sqrt(cSound**2-a23**2)
      
     a13=0.5*343*t13
-    b13=math.sqrt(c**2-a13**2)
+    b13=math.sqrt(cSound**2-a13**2)
     
     if t12>=0:
         if t13<=0:
