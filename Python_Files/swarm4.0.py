@@ -204,6 +204,7 @@ def triangulate(t12,t23,t13,c):#1-2=12
         x=final[0][0]
         y=final[1][0]
         ansAngle=math.atan2(y,x)#angle to target
+    return ansAngle
         
     
 # def matrixMath(ang1, ang2,x1,x2,x3,y1,y2,y3):
