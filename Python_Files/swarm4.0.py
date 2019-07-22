@@ -1,6 +1,3 @@
-import multiprocessing
-import numpy as np
-from multiprocessing import Queue
 
 ''' script.py
 Purpose: Code to test our roomba program;
@@ -13,6 +10,10 @@ import math
 import time
 import RPi.GPIO as GPIO
 import RoombaCI_lib
+import multiprocessing
+import numpy as np
+from multiprocessing import Queue
+
 
 ## Variables and Constants ##
 # LED pin numbers
@@ -23,12 +24,6 @@ micOne=17
 micTwo=22
 micThree=27
 reset=24
-#notHeard=0.01
-#oneNotHeard=True
-#twoNotHeard=True
-#threeNotHeard=True
-#notHeards=[True,True,True]
-#lastHeard=-1
 statusOne=0
 statusTwo=0
 statusThree=0
@@ -52,18 +47,15 @@ def DisplayDateTime():
     date_time = time.strftime("%B %d, %Y, %H:%M:%S", time.gmtime())
     print("Program run: ", date_time)
 
+    ###RESETS THE FLIP FLOP TO ALLOW FOR NEW SOUND
 def timedReset():
     GPIO.output(reset,GPIO.LOW)
     time.sleep(1)
     GPIO.output(reset,GPIO.HIGH)
     
+    ###CONCUCTS THE MATRIX METHOD TO GIVE US AN ANGLE
 def matrixMethod(t12, t23, t13, c):
-    x1=75
-    x2=75
-    x3=-150
-    y1=-129.9038
-    y2=129.9038
-    y3=0
+
     #m1=np.matrix0 y2-y1; x3-x1 y3-y1')
     m1=np.array([[0,y2-y1],[x3-x1, y3-y1]])
     minv=np.linalg.inv(m1)
@@ -77,15 +69,8 @@ def matrixMethod(t12, t23, t13, c):
     return ang,slope
     
     
-    
+    ###HYPERBOLA METHOD
 def triangulate(t12,t23,t13,c):#1-2=12
-    
-    x1=75
-    x2=75
-    x3=-150
-    y1=-129.9038
-    y2=129.9038
-    y3=0
     
     a12=abs(0.5*c*t12)
     if a12>y2:
@@ -103,6 +88,7 @@ def triangulate(t12,t23,t13,c):#1-2=12
         print("INVALID"!)
     b13=math.sqrt(abs(y2**2-a13**2))
     
+    ###WILL TELL BASED ON ORDER WHAT QUAD EACH MICROPHONE SEES FROM ITS POV
     if t12>=0:
         if t13<=0:
             quad=1
@@ -128,6 +114,8 @@ def triangulate(t12,t23,t13,c):#1-2=12
         quad=3.5
         quad2=2
         quad3=1
+        
+    ###WILL SET QUAD 0 IF NOT USING PAIR AND OTHERWISE FIND ANGLE
     asyAngle=0
     if quad==1:
         asyAngle=math.atan(a12/b12)
@@ -231,6 +219,11 @@ def matrixMath(ang1, ang2,x1,x2,x3,y1,y2,y3):
     y=final[1][0]
     ansAngle=atan2(y,x)#angle to target
     return ansAngle, x, y
+    
+def HyperCalc(ang1, ang2, mpx,mpy, mp2x, mp2y):
+    pass
+    
+    ###CHECKS A MIC AT A GIVEN PIN TO SEE IF THEY ARE HEARING
 def checkMic(cue,pin, mic, times):
     status=0
     while status==0:
@@ -251,27 +244,15 @@ GPIO.setup(micOne, GPIO.IN, pull_up_down= GPIO.PUD_UP)##Check for initial later
 GPIO.setup(micTwo, GPIO.IN,  pull_up_down= GPIO.PUD_UP)
 GPIO.setup(micThree, GPIO.IN, pull_up_down= GPIO.PUD_UP)
 GPIO.setup(reset, GPIO.OUT, initial=GPIO.LOW)
-#statusOneTwo=0
-#statusTwoTwo=0
-#statusThreeTwo=0
-#stuck=False
 startloop=0
 
-#with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
-#        executor.map(thread_function, range(3))
 
 GPIO.output(reset,GPIO.LOW)
 startTime=time.time()
 timeBase=time.time()
 GPIO.output(reset, GPIO.HIGH)
-# one=threading.Thread(target=checkMic, args=(micOne, 1,times), daemon=False)
-# two=threading.Thread(target=checkMic, args=(micTwo, 2,times), daemon=False)
-# three=threading.Thread(target=checkMic, args=(micThree, 3,times), daemon=False)
-# threads=[]
-# threads.append(one)
-# threads.append(two)
-# threads.append(three)
 q=Queue()
+###SETS UP THREE PROCESSES FOR MICS
 one=multiprocessing.Process(target=checkMic, args=(q,micOne,1,times,))
 two=multiprocessing.Process(target=checkMic, args=(q,micTwo,2,times,))
 three=multiprocessing.Process(target=checkMic, args=(q,micThree,3,times,))
@@ -285,16 +266,12 @@ while True:
         for p in mps:
             p.start()
             print("started")
-        # for t in threads:
-            # t.join()
         start=time.time()
         lights=False
-        while q.qsize() <3:
+        while q.qsize() <3:###WHILE ALL MICS NOT BACK TURN LIGHTS ON AND OFF
             GPIO.output(gled,GPIO.HIGH)
             GPIO.output(yled,GPIO.HIGH)
             GPIO.output(rled,GPIO.HIGH)
-            # start=time.time()
-            # while time.time()-1<start:
             if (time.time()-start)>4.0:
                 start=start+4
             if lights:
@@ -308,22 +285,24 @@ while True:
         GPIO.output(gled,GPIO.LOW)
         GPIO.output(yled,GPIO.LOW)
         GPIO.output(rled,GPIO.LOW)
+        ###GETS MIC VALUES AND NUMBERS IN ORDER FROM THE QUEUE
         first=q.get()
         second=q.get()
         third=q.get()
-    #if not first[0] ==-1:
+        ###USES MIC NUMBER TO CHOOSE INDEX IN TIMES AND ASSIGNS RETURNED TIME
         times[first[0]]=first[1]
-    #if not second[0] ==-1:
         times[second[0]]=second[1]
-    #if not third[0] ==-1:
         times[third[0]]=third[1]
+        ###PRINT NAH FAM IF NOT ALL THREE MICS ARE HEARD
         if max(times)-min(times)>0.002:
             print("Nah fam")
             times=[0,0,0]
+        ###PRINTS TIME DIFFERENCES
         else:
             print("T1-T2: {0:.7f}".format(1000*(times[0]-times[1])))
             print("T2-T3: {0:.7f}".format(1000*(times[1]-times[2])))
             print("T1-T3: {0:.7f}".format(1000*(times[0]-times[2])))
+            ###PRINT OUT ORDER THE MICS WERE HIT
             if times[0]<times[1] and times[0]<times[2]:
                 if times[1]<times[2]:
                     print("123")
@@ -339,9 +318,6 @@ while True:
                     print("321")
                 else:
                     print("312")
-            #time.sleep(0.5)
-            #calculations go here
-        #q=Queue()
             angle,slope=matrixMethod(times[0]-times[1],times[1]-times[2],times[0]-times[2],cSound)
             print("slope matrix:",slope)
             print("angle matrix:",angle)
@@ -349,6 +325,7 @@ while True:
             print("angle hyperbola",angle)
             print(x)
             print(y)
+        ###SETTING EVERYTHING BACK UP TO MULTIPROCESS AGAIN
         one=multiprocessing.Process(target=checkMic, args=(q,micOne,1,times,))
         two=multiprocessing.Process(target=checkMic, args=(q,micTwo,2,times,))
         three=multiprocessing.Process(target=checkMic, args=(q,micThree,3,times,))
@@ -361,15 +338,6 @@ while True:
         second=[0,0]
         third=[0,0]
         timedReset()
-            #stuck=False 
-        #    print("Mic One: {0}".format(statusOne))
-        #    print("Mic Two: {0}".format(statusTwo))
-        #    print("Mic Three: {0}".format(statusThree))
-        #time.sleep(0.1)  
-        # if time.time()-timeBase>1.0:
-            # print(time.time()-startloop)
-            # timeBase=timeBase+1
-            #   time.sleep(1)
     except KeyboardInterrupt:
         break
 GPIO.output(reset,GPIO.LOW)
