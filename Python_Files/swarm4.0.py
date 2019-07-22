@@ -37,6 +37,12 @@ first=[0,0]
 second=[0,0]
 third=[0,0]
 cSound=343
+x1=75
+x2=75
+x3=-150
+y1=-129.9038
+y2=129.9038
+y3=0
 
 ## Functions and Definitions ##
 ''' Displays current date and time to the screen
@@ -73,6 +79,14 @@ def matrixMethod(t12, t23, t13, c):
     
     
 def triangulate(t12,t23,t13,c):#1-2=12
+    
+    x1=75
+    x2=75
+    x3=-150
+    y1=-129.9038
+    y2=129.9038
+    y3=0
+    
     a12=0.5*343*t12
     b12=math.sqrt(c**2-a12**2)
     
@@ -80,11 +94,136 @@ def triangulate(t12,t23,t13,c):#1-2=12
     a23=0.5*343*t23
     b23=math.sqrt(c**2-a23**2)
      
-    
-    
     a13=0.5*343*t13
     b13=math.sqrt(c**2-a13**2)
     
+    if t12>=0:
+        if t13<=0:
+            quad=1
+            quad2=3.5
+            quad3=2
+        elif t23>=0:
+            quad=2
+            quad2=1
+            quad3=1.5
+        else: 
+            quad=1.5
+            quad2=4
+            quad3=3
+    elif t23<=0:
+        quad=4
+        quad2=3
+        quad3=1.5
+    elif t13>=0:
+        quad=3
+        quad2=1.5
+        quad3=4
+    else:
+        quad=3.5
+        quad2=2
+        quad3=1
+    asyAngle=0
+    if quad==1:
+        asyAngle=math.atan(a12/b12)
+    elif quad==2:
+        asyAngle=math.atan(-a12/b12)+math.pi
+    elif quad==3:
+        asyAngle=math.atan(a12/b12)+math.pi
+    elif quad==4:
+        asyAngle=math.atan(-a12/b12)
+    asyAngle2=0
+    if quad2==1:
+        asyAngle2=math.atan(a23/b23)+(2*math.pi/3)
+    elif quad2==2:
+        asyAngle2=math.atan(-a23/b23)+(5*math.p1/3)
+    elif:
+        asyAngle2=math.atan(a23/a23)+(5*math.pi/3)
+    elif:
+        asyAngle=math.atan(-a23/b23)+(2*math.pi/3)
+    asyAngle3=0
+    if quad3==1:
+        asyAngle3=math.atan(a13/b13)+(4*math.pi/3)
+    elif quad3==2:
+        asyAngle3=math.atan(-a13/b13)+(math.p1/3)
+    elif quad3==3:
+        asyAngle3=math.atan(a13/a13)+(math.pi/3)
+    elif quad3==4:
+        asyAngle3=math.atan(-a13/b13)+(4*math.pi/3)
+    
+    if asyAngle==0:
+        #matrixMath(ang1, ang2,x1,x2,x3,y1,y2,y3)
+        cos1=math.cos(ang2)
+        cos2=math.cos(ang3)
+        sin1=math.sin(ang2)
+        sin2=math.sin(ang3)
+        m1=np.array([[cos1,-cos2],[sin1,-sin2]])
+        minv=np.linalg.inv(m1)
+        m2=np.array([[(x1+x3)/2-(x2+x3)/2],[(y1+y3)/2-(y2+y3)/2]])
+        m3=np.matmual(m2,minv)
+        w1=m3[0][0]
+        #w2=m3[1][0]
+        m4=np.matrix([[w1*cos1],[w1*sin1]])
+        m5=np.matrix([(x2+x3)/2],[(y2+y3)/2]])
+        final=np.matrix.sum(m4, m5)
+        x=final[0][0]
+        y=final[1][0]
+        ansAngle=atan2(y,x)#angle to target
+    elif asyAngle2==0:
+        #matrixMath(ang1, ang2,x1,x2,x3,y1,y2,y3)
+        cos1=math.cos(ang3)
+        cos2=math.cos(ang1)
+        sin1=math.sin(ang3)
+        sin2=math.sin(ang1)
+        m1=np.array([[cos1,-cos2],[sin1,-sin2]])
+        minv=np.linalg.inv(m1)
+        m2=np.array([[(x1+x2)/2-(x1+x3)/2],[(y1+y2)/2-(y1+y3)/2]])
+        m3=np.matmual(m2,minv)
+        w1=m3[0][0]
+        #w2=m3[1][0]
+        m4=np.matrix([[w1*cos1],[w1*sin1]])
+        m5=np.matrix([(x1+x3)/2],[(y1+y3)/2]])
+        final=np.matrix.sum(m4, m5)
+        x=final[0][0]
+        y=final[1][0]
+        ansAngle=atan2(y,x)#angle to target
+    elif asyAngle3==0:
+        #matrixMath(ang1, ang2,x1,x2,x3,y1,y2,y3)
+        cos1=math.cos(ang1)
+        cos2=math.cos(ang2)
+        sin1=math.sin(ang1)
+        sin2=math.sin(ang2)
+        m1=np.array([[cos1,-cos2],[sin1,-sin2]])
+        minv=np.linalg.inv(m1)
+        m2=np.array([[(x2+x3)/2-(x1+x2)/2],[(y2+y3)/2-(y1+y2)/2]])
+        m3=np.matmual(m2,minv)
+        w1=m3[0][0]
+        #w2=m3[1][0]
+        m4=np.matrix([[w1*cos1],[w1*sin1]])
+        m5=np.matrix([(x1+x2)/2],[(y1+y2)/2]])
+        final=np.matrix.sum(m4, m5)
+        x=final[0][0]
+        y=final[1][0]
+        ansAngle=atan2(y,x)#angle to target
+        
+    
+def matrixMath(ang1, ang2,x1,x2,x3,y1,y2,y3)    
+    cos1=math.cos(ang1)
+    cos2=math.cos(ang2)
+    sin1=math.sin(ang1)
+    sin2=math.sin(ang2)
+    m1=np.array([[cos1,-cos2],[sin1,-sin2]])
+    minv=np.linalg.inv(m1)
+    m2=np.array([[(x2+x3)/2-(x1+x2)/2],[(y2+y3)/2-(y1+y2)/2]])
+    m3=np.matmual(m2,minv)
+    w1=m3[0][0]
+    #w2=m3[1][0]
+    m4=np.matrix([[w1*cos1],[w1*sin1]])
+    m5=np.matrix([(x1+x2)/2],[(y1+y2)/2]])
+    final=np.matrix.sum(m4, m5)
+    x=final[0][0]
+    y=final[1][0]
+    ansAngle=atan2(y,x)#angle to target
+    return ansAngle
 def checkMic(cue,pin, mic, times):
     status=0
     while status==0:
@@ -197,8 +336,10 @@ while True:
             #calculations go here
         #q=Queue()
             slope,angle=matrixMethod(times[0]-times[1],times[1]-times[2],times[0]-times[2],cSound)
-            print(slope)
-            print(angle)
+            print("slope matrix:",slope)
+            print("angle matrix:",angle)
+            angle= triangulate(times[0]-times[1],times[1]-times[2],times[0]-times[2],cSound))
+            print("angle hyperbola",angle)
         one=multiprocessing.Process(target=checkMic, args=(q,micOne,1,times,))
         two=multiprocessing.Process(target=checkMic, args=(q,micTwo,2,times,))
         three=multiprocessing.Process(target=checkMic, args=(q,micThree,3,times,))
