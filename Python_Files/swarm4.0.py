@@ -152,10 +152,10 @@ def triangulate(t12,t23,t13,c):#1-2=12
     
     if asyAngle==0:
         #matrixMath(ang1, ang2,x1,x2,x3,y1,y2,y3)
-        cos1=math.cos(ang2)
-        cos2=math.cos(ang3)
-        sin1=math.sin(ang2)
-        sin2=math.sin(ang3)
+        cos1=math.cos(asyAngle2)
+        cos2=math.cos(asyAngle3)
+        sin1=math.sin(asyAngle2)
+        sin2=math.sin(asyAngle3)
         m1=np.array([[cos1,-cos2],[sin1,-sin2]])
         minv=np.linalg.inv(m1)
         m2=np.array([[(x1+x3)/2-(x2+x3)/2],[(y1+y3)/2-(y2+y3)/2]])
@@ -170,10 +170,10 @@ def triangulate(t12,t23,t13,c):#1-2=12
         ansAngle=atan2(y,x)#angle to target
     elif asyAngle2==0:
         #matrixMath(ang1, ang2,x1,x2,x3,y1,y2,y3)
-        cos1=math.cos(ang3)
-        cos2=math.cos(ang1)
-        sin1=math.sin(ang3)
-        sin2=math.sin(ang1)
+        cos1=math.cos(asyAngle3)
+        cos2=math.cos(asyAngle)
+        sin1=math.sin(asyAngle3)
+        sin2=math.sin(asyAngle)
         m1=np.array([[cos1,-cos2],[sin1,-sin2]])
         minv=np.linalg.inv(m1)
         m2=np.array([[(x1+x2)/2-(x1+x3)/2],[(y1+y2)/2-(y1+y3)/2]])
@@ -188,10 +188,10 @@ def triangulate(t12,t23,t13,c):#1-2=12
         ansAngle=atan2(y,x)#angle to target
     elif asyAngle3==0:
         #matrixMath(ang1, ang2,x1,x2,x3,y1,y2,y3)
-        cos1=math.cos(ang1)
-        cos2=math.cos(ang2)
-        sin1=math.sin(ang1)
-        sin2=math.sin(ang2)
+        cos1=math.cos(asyAngle)
+        cos2=math.cos(asyAngle2)
+        sin1=math.sin(asyAngle)
+        sin2=math.sin(asyAngle2)
         m1=np.array([[cos1,-cos2],[sin1,-sin2]])
         minv=np.linalg.inv(m1)
         m2=np.array([[(x2+x3)/2-(x1+x2)/2],[(y2+y3)/2-(y1+y2)/2]])
