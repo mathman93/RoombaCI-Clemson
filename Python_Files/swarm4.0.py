@@ -167,7 +167,7 @@ def triangulate(t12,t23,t13,c):#1-2=12
         final=m4+m5
         x=final[0][0]
         y=final[1][0]
-        ansAngle=atan2(y,x)#angle to target
+        ansAngle=math.atan2(y,x)#angle to target
     elif asyAngle2==0:
         #matrixMath(ang1, ang2,x1,x2,x3,y1,y2,y3)
         cos1=math.cos(asyAngle3)
@@ -185,7 +185,7 @@ def triangulate(t12,t23,t13,c):#1-2=12
         final=m4+m5
         x=final[0][0]
         y=final[1][0]
-        ansAngle=atan2(y,x)#angle to target
+        ansAngle=math.atan2(y,x)#angle to target
     elif asyAngle3==0:
         #matrixMath(ang1, ang2,x1,x2,x3,y1,y2,y3)
         cos1=math.cos(asyAngle)
@@ -203,7 +203,7 @@ def triangulate(t12,t23,t13,c):#1-2=12
         final=m4+m5
         x=final[0][0]
         y=final[1][0]
-        ansAngle=atan2(y,x)#angle to target
+        ansAngle=math.atan2(y,x)#angle to target
         
     
 # def matrixMath(ang1, ang2,x1,x2,x3,y1,y2,y3):
