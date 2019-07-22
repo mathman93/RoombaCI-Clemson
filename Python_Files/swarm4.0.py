@@ -338,7 +338,7 @@ while True:
             slope,angle=matrixMethod(times[0]-times[1],times[1]-times[2],times[0]-times[2],cSound)
             print("slope matrix:",slope)
             print("angle matrix:",angle)
-            angle= triangulate(times[0]-times[1],times[1]-times[2],times[0]-times[2],cSound))
+            angle= triangulate(times[0]-times[1],times[1]-times[2],times[0]-times[2],cSound)
             print("angle hyperbola",angle)
         one=multiprocessing.Process(target=checkMic, args=(q,micOne,1,times,))
         two=multiprocessing.Process(target=checkMic, args=(q,micTwo,2,times,))
