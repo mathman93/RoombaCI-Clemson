@@ -67,7 +67,7 @@ def matrixMethod(t12, t23, t13, c):
     m3=np.matmul(m2,minv)
     #slope=list(m3).index(0)/list(m3).index(1)
     slope=m3[0][0]/m3[1][0]
-    ang=numpy.arctan(slope)
+    ang=math.atan2(m3[0][0], m3[1][0])
     return(ang,slope)
     
     
