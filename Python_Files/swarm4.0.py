@@ -136,10 +136,10 @@ def triangulate(t12,t23,t13,c):#1-2=12
         asyAngle2=math.atan(a23/b23)+(2*math.pi/3)
     elif quad2==2:
         asyAngle2=math.atan(-a23/b23)+(5*math.p1/3)
-    elif:
+    elif quad2==3:
         asyAngle2=math.atan(a23/a23)+(5*math.pi/3)
-    elif:
-        asyAngle=math.atan(-a23/b23)+(2*math.pi/3)
+    elif quad2==4:
+        asyAngle2=math.atan(-a23/b23)+(2*math.pi/3)
     asyAngle3=0
     if quad3==1:
         asyAngle3=math.atan(a13/b13)+(4*math.pi/3)
