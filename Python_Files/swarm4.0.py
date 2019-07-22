@@ -68,7 +68,7 @@ def matrixMethod(t12, t23, t13, c):
     m1=np.array([[0,y2-y1],[x3-x1, y3-y1]])
     minv=np.linalg.inv(m1)
     #m2=np.matrix('c*t12; c*t13')
-    m2=np.array([[c*t12],[c*t13]])
+    m2=np.array([[cSound*t12],[cSound*t13]])
     #m3=m2*minv
     m3=np.matmul(minv,m2)
     #slope=list(m3).index(0)/list(m3).index(1)
