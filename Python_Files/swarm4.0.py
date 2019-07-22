@@ -72,9 +72,9 @@ def matrixMethod(t12, t23, t13, c):
     #m3=m2*minv
     m3=np.matmul(minv,m2)
     #slope=list(m3).index(0)/list(m3).index(1)
-    slope=m3[0][0]/m3[1][0]
-    ang=math.atan2(m3[0][0], m3[1][0])
-    return(ang,slope)
+    slope=m3[1][0]/m3[0][0]
+    ang=math.atan2(m3[1][0], m3[0][0])
+    return ang,slope
     
     
     
@@ -135,7 +135,7 @@ def triangulate(t12,t23,t13,c):#1-2=12
     if quad2==1:
         asyAngle2=math.atan(a23/b23)+(2*math.pi/3)
     elif quad2==2:
-        asyAngle2=math.atan(-a23/b23)+(5*math.p1/3)
+        asyAngle2=math.atan(-a23/b23)+(5*math.pi/3)
     elif quad2==3:
         asyAngle2=math.atan(a23/a23)+(5*math.pi/3)
     elif quad2==4:
@@ -144,7 +144,7 @@ def triangulate(t12,t23,t13,c):#1-2=12
     if quad3==1:
         asyAngle3=math.atan(a13/b13)+(4*math.pi/3)
     elif quad3==2:
-        asyAngle3=math.atan(-a13/b13)+(math.p1/3)
+        asyAngle3=math.atan(-a13/b13)+(math.pi/3)
     elif quad3==3:
         asyAngle3=math.atan(a13/a13)+(math.pi/3)
     elif quad3==4:
@@ -335,7 +335,7 @@ while True:
             #time.sleep(0.5)
             #calculations go here
         #q=Queue()
-            slope,angle=matrixMethod(times[0]-times[1],times[1]-times[2],times[0]-times[2],cSound)
+            angle,slope=matrixMethod(times[0]-times[1],times[1]-times[2],times[0]-times[2],cSound)
             print("slope matrix:",slope)
             print("angle matrix:",angle)
             angle= triangulate(times[0]-times[1],times[1]-times[2],times[0]-times[2],cSound)
