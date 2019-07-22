@@ -1,4 +1,5 @@
 import multiprocessing
+import numpy as np
 from multiprocessing import Queue
 
 ''' script.py
@@ -35,6 +36,7 @@ times=[0,0,0]
 first=[0,0]
 second=[0,0]
 third=[0,0]
+cSound=343
 
 ## Functions and Definitions ##
 ''' Displays current date and time to the screen
@@ -49,7 +51,28 @@ def timedReset():
     time.sleep(1)
     GPIO.output(reset,GPIO.HIGH)
     
-def triangulate(t12,t23,t13,c):
+def matrixMethod(t12, t23, t13, c):
+    x1=75
+    x2=75
+    x3=-150
+    y1=-129.9038
+    y2=129.9038
+    y3=0
+    #m1=np.matrix0 y2-y1; x3-x1 y3-y1')
+    m1=np.array([[0,y2-y1],[x3-x1, y3-y1]])
+    minv=np.linalg.inv(m1)
+    #m2=np.matrix('c*t12; c*t13')
+    m2=np.array([[c*t12],[c*t13]])
+    #m3=m2*minv
+    m3=np.matmul(m2,minv)
+    #slope=list(m3).index(0)/list(m3).index(1)
+    slope=m3[0][0]/m3[1][0]
+    ang=numpy.arctan(slope)
+    return(ang,slope)
+    
+    
+    
+def triangulate(t12,t23,t13,c):#1-2=12
     a12=0.5*343*t12
     b12=math.sqrt(c**2-a12**2)
     
@@ -173,6 +196,9 @@ while True:
             #time.sleep(0.5)
             #calculations go here
         #q=Queue()
+            slope,angle=matrixMethod(times[0]-times[1],times[1]-times[2],times[0]-times[2],cSound)
+            print(slope)
+            print(angle)
         one=multiprocessing.Process(target=checkMic, args=(q,micOne,1,times,))
         two=multiprocessing.Process(target=checkMic, args=(q,micTwo,2,times,))
         three=multiprocessing.Process(target=checkMic, args=(q,micThree,3,times,))
