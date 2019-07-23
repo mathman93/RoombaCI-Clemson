@@ -323,12 +323,16 @@ time.sleep(0.5)
 imu.CalibrateGyro() # Calculate gyroscope offset values
 # Display offset values
 print("mx_offset = {:f}; my_offset = {:f}; mz_offset = {:f}"\
-	.format(imu.m_offset[0], imu.m_offset[1], imu.m_offset[2]))
+    .format(imu.m_offset[0], imu.m_offset[1], imu.m_offset[2]))
 print("gx_offset = {:f}; gy_offset = {:f}; gz_offset = {:f}"\
-	.format(imu.g_offset[0], imu.g_offset[1], imu.g_offset[2]))
+    .format(imu.g_offset[0], imu.g_offset[1], imu.g_offset[2]))
 print(" IMU Setup Complete")
 time.sleep(3) # Gives time to read offset values before continuing
 GPIO.output(yled, GPIO.LOW) # Indicate setup sequence is complete
+
+# if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
+    # x = Xbee.read(Xbee.inWaiting()).decode() # Clear out Xbee input buffer
+    # #print(x) # Include for debugging
 
 GPIO.output(reset,GPIO.LOW)
 startTime=time.time()
