@@ -39,6 +39,11 @@ y1=-129.9038
 y2=129.9038
 y3=0
 
+
+wheelToWheel=235
+wheelBaseCircumference=wheelToWheel*math.pi
+countConversion=72*math.pi/508.8
+
 ## Functions and Definitions ##
 ''' Displays current date and time to the screen
     '''
@@ -68,6 +73,18 @@ def matrixMethod(t12, t23, t13, c):
     ang=math.atan2(m3[1][0], m3[0][0])
     return ang,slope
     
+    
+def turn(ang, speed):#angle in radians, speed in mm/s
+    if ang<0:
+        speed=-speed
+    Roomba.StartQueryStream(43,44)
+    leftEncoder,rightEncoder=Roomba.ReadQueryStream
+    leftInit=leftEncoder
+    rightInit=rightEncoder
+    target=abs(ang/(2*math.pi)*wheelBaseCircumference)
+    move(speed, -speed)
+    while leftEncoder*countConversion<target and rightEncoder*countConversion<target:
+        leftEncoder,rightEncoder=Roomba.ReadQueryStream(43,44)
     
     ###HYPERBOLA METHOD
 def triangulate(t12,t23,t13,c):#1-2=12
@@ -321,6 +338,7 @@ while True:
             angle,slope=matrixMethod(times[0]-times[1],times[1]-times[2],times[0]-times[2],cSound)
             print("slope matrix:",slope)
             print("angle matrix:",angle)
+            turn(angle,50)
             angle,x,y= triangulate(times[0]-times[1],times[1]-times[2],times[0]-times[2],cSound)
             print("angle hyperbola",angle)
             print(x)
@@ -342,7 +360,7 @@ while True:
         break
 GPIO.output(reset,GPIO.LOW)
 
-'''
+
 # Wake Up Roomba Sequence
 GPIO.output(gled, GPIO.HIGH) # Turn on green LED to say we are alive
 print(" Starting ROOMBA... ")
@@ -352,7 +370,7 @@ GPIO.setup(Roomba.ddPin, GPIO.OUT, initial=GPIO.LOW)
 Roomba.WakeUp(131) # Start up Roomba in Safe Mode
 # 131 = Safe Mode; 132 = Full Mode (Be ready to catch it!)
 Roomba.BlinkCleanLight() # Blink the Clean light on Roomba
-
+'''
 if Roomba.Available() > 0: # If anything is in the Roomba receive buffer
 	x = Roomba.DirectRead(Roomba.Available()) # Clear out Roomba boot-up info
 	#print(x) # Include for debugging
