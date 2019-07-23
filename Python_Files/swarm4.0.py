@@ -112,7 +112,7 @@ def complexTurn(ang,speed):
             leftInit=leftEncoder
             rightInit=rightEncoder
             heading=heading+theta
-    Roomba.move(0,0)
+    Roomba.Move(0,0)
     
     
     ###HYPERBOLA METHOD
