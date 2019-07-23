@@ -272,8 +272,34 @@ GPIO.setup(Roomba.ddPin, GPIO.OUT, initial=GPIO.LOW)
 Roomba.WakeUp(131) # Start up Roomba in Safe Mode
 # 131 = Safe Mode; 132 = Full Mode (Be ready to catch it!)
 Roomba.BlinkCleanLight() # Blink the Clean light on Roomba
-'''
-
+if Roomba.Available() > 0: # If anything is in the Roomba receive buffer
+	temp= Roomba.DirectRead(Roomba.Available()) # Clear out Roomba boot-up info
+	#print(x) # Include for debugging
+print(" ROOMBA Setup Complete")
+GPIO.output(yled, GPIO.HIGH) # Indicate within setup sequence
+# Initialize IMU
+print(" Starting IMU...")
+imu = RoombaCI_lib.LSM9DS1_I2C() # Initialize IMU
+time.sleep(0.1)
+# Clear out first reading from all sensors
+temp = imu.magnetic
+temp= imu.acceleration
+temp= imu.gyro
+# Calibrate IMU
+print(" Calibrating IMU...")
+Roomba.Move(0,75) # Start Roomba spinning
+imu.CalibrateMag() # Calculate magnetometer offset values
+Roomba.Move[0,0] # Stop Roomba spinning
+time.sleep(0.5)
+imu.CalibrateGyro() # Calculate gyroscope offset values
+# Display offset values
+print("mx_offset = {:f}; my_offset = {:f}; mz_offset = {:f}"\
+	.format(imu.m_offset[0], imu.m_offset[1], imu.m_offset[2]))
+print("gx_offset = {:f}; gy_offset = {:f}; gz_offset = {:f}"\
+	.format(imu.g_offset[0], imu.g_offset[1], imu.g_offset[2]))
+print(" IMU Setup Complete")
+time.sleep(3) # Gives time to read offset values before continuing
+GPIO.output(yled, GPIO.LOW) # Indicate setup sequence is complete
 
 GPIO.output(reset,GPIO.LOW)
 startTime=time.time()
@@ -372,40 +398,38 @@ while True:
 GPIO.output(reset,GPIO.LOW)
 
 
-'''
-if Roomba.Available() > 0: # If anything is in the Roomba receive buffer
-	x = Roomba.DirectRead(Roomba.Available()) # Clear out Roomba boot-up info
-	#print(x) # Include for debugging
+# if Roomba.Available() > 0: # If anything is in the Roomba receive buffer
+	# x = Roomba.DirectRead(Roomba.Available()) # Clear out Roomba boot-up info
+	# #print(x) # Include for debugging
+# print(" ROOMBA Setup Complete")
+# GPIO.output(yled, GPIO.HIGH) # Indicate within setup sequence
+# # Initialize IMU
+# print(" Starting IMU...")
+# imu = RoombaCI_lib.LSM9DS1_I2C() # Initialize IMU
+# time.sleep(0.1)
+# # Clear out first reading from all sensors
+# x = imu.magnetic
+# x = imu.acceleration
+# x = imu.gyro
+# # Calibrate IMU
+# print(" Calibrating IMU...")
+# Roomba.Move(0,75) # Start Roomba spinning
+# imu.CalibrateMag() # Calculate magnetometer offset values
+# Roomba.Move[0,0] # Stop Roomba spinning
+# time.sleep(0.5)
+# imu.CalibrateGyro() # Calculate gyroscope offset values
+# # Display offset values
+# print("mx_offset = {:f}; my_offset = {:f}; mz_offset = {:f}"\
+	# .format(imu.m_offset[0], imu.m_offset[1], imu.m_offset[2]))
+# print("gx_offset = {:f}; gy_offset = {:f}; gz_offset = {:f}"\
+	# .format(imu.g_offset[0], imu.g_offset[1], imu.g_offset[2]))
+# print(" IMU Setup Complete")
+# time.sleep(3) # Gives time to read offset values before continuing
+# GPIO.output(yled, GPIO.LOW) # Indicate setup sequence is complete
 
-print(" ROOMBA Setup Complete")
-GPIO.output(yled, GPIO.HIGH) # Indicate within setup sequence
-# Initialize IMU
-print(" Starting IMU...")
-imu = RoombaCI_lib.LSM9DS1_I2C() # Initialize IMU
-time.sleep(0.1)
-# Clear out first reading from all sensors
-x = imu.magnetic
-x = imu.acceleration
-x = imu.gyro
-# Calibrate IMU
-print(" Calibrating IMU...")
-Roomba.Move(0,75) # Start Roomba spinning
-imu.CalibrateMag() # Calculate magnetometer offset values
-Roomba.Move[0,0] # Stop Roomba spinning
-time.sleep(0.5)
-imu.CalibrateGyro() # Calculate gyroscope offset values
-# Display offset values
-print("mx_offset = {:f}; my_offset = {:f}; mz_offset = {:f}"\
-	.format(imu.m_offset[0], imu.m_offset[1], imu.m_offset[2]))
-print("gx_offset = {:f}; gy_offset = {:f}; gz_offset = {:f}"\
-	.format(imu.g_offset[0], imu.g_offset[1], imu.g_offset[2]))
-print(" IMU Setup Complete")
-time.sleep(3) # Gives time to read offset values before continuing
-GPIO.output(yled, GPIO.LOW) # Indicate setup sequence is complete
-
-if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
-    x = Xbee.read(Xbee.inWaiting()).decode() # Clear out Xbee input buffer
-    #print(x) # Include for debugging
+# if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
+    # x = Xbee.read(Xbee.inWaiting()).decode() # Clear out Xbee input buffer
+    # #print(x) # Include for debugging
 
 # Main Code #
 
