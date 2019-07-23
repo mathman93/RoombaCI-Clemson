@@ -289,7 +289,7 @@ temp= imu.gyro
 print(" Calibrating IMU...")
 Roomba.Move(0,75) # Start Roomba spinning
 imu.CalibrateMag() # Calculate magnetometer offset values
-Roomba.Move[0,0] # Stop Roomba spinning
+Roomba.Move(0,0) # Stop Roomba spinning
 time.sleep(0.5)
 imu.CalibrateGyro() # Calculate gyroscope offset values
 # Display offset values
