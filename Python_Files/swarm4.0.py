@@ -262,6 +262,7 @@ GPIO.setup(micTwo, GPIO.IN,  pull_up_down= GPIO.PUD_UP)
 GPIO.setup(micThree, GPIO.IN, pull_up_down= GPIO.PUD_UP)
 GPIO.setup(reset, GPIO.OUT, initial=GPIO.LOW)
 startloop=0
+
 # Wake Up Roomba Sequence
 GPIO.output(gled, GPIO.HIGH) # Turn on green LED to say we are alive
 print(" Starting ROOMBA... ")
@@ -414,7 +415,6 @@ if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 
 Roomba.ShutDown() # Shutdown Roomba serial connection
 Xbee.close()
-'''
 one.terminate()
 two.terminate()
 three.terminate()
