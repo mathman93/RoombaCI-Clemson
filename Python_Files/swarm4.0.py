@@ -262,6 +262,16 @@ GPIO.setup(micTwo, GPIO.IN,  pull_up_down= GPIO.PUD_UP)
 GPIO.setup(micThree, GPIO.IN, pull_up_down= GPIO.PUD_UP)
 GPIO.setup(reset, GPIO.OUT, initial=GPIO.LOW)
 startloop=0
+# Wake Up Roomba Sequence
+GPIO.output(gled, GPIO.HIGH) # Turn on green LED to say we are alive
+print(" Starting ROOMBA... ")
+Roomba = RoombaCI_lib.Create_2("/dev/ttyS0", 115200)
+Roomba.ddPin = 23 # Set Roomba dd pin number
+GPIO.setup(Roomba.ddPin, GPIO.OUT, initial=GPIO.LOW)
+Roomba.WakeUp(131) # Start up Roomba in Safe Mode
+# 131 = Safe Mode; 132 = Full Mode (Be ready to catch it!)
+Roomba.BlinkCleanLight() # Blink the Clean light on Roomba
+'''
 
 
 GPIO.output(reset,GPIO.LOW)
@@ -361,15 +371,6 @@ while True:
 GPIO.output(reset,GPIO.LOW)
 
 
-# Wake Up Roomba Sequence
-GPIO.output(gled, GPIO.HIGH) # Turn on green LED to say we are alive
-print(" Starting ROOMBA... ")
-Roomba = RoombaCI_lib.Create_2("/dev/ttyS0", 115200)
-Roomba.ddPin = 23 # Set Roomba dd pin number
-GPIO.setup(Roomba.ddPin, GPIO.OUT, initial=GPIO.LOW)
-Roomba.WakeUp(131) # Start up Roomba in Safe Mode
-# 131 = Safe Mode; 132 = Full Mode (Be ready to catch it!)
-Roomba.BlinkCleanLight() # Blink the Clean light on Roomba
 '''
 if Roomba.Available() > 0: # If anything is in the Roomba receive buffer
 	x = Roomba.DirectRead(Roomba.Available()) # Clear out Roomba boot-up info
