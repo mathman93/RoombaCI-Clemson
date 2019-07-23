@@ -74,17 +74,30 @@ def matrixMethod(t12, t23, t13, c):
     return ang,slope
     
     
-def turn(ang, speed):#angle in radians, speed in mm/s
+def simpleTurn(ang, speed):#angle in radians, speed in mm/s
     if ang<0:
         speed=-speed
     Roomba.StartQueryStream(43,44)
-    leftEncoder,rightEncoder=Roomba.ReadQueryStream
+    leftEncoder,rightEncoder=Roomba.ReadQueryStream(43,44)
     leftInit=leftEncoder
     rightInit=rightEncoder
     target=abs(ang/(2*math.pi)*wheelBaseCircumference)
     move(speed, -speed)
     while abs(leftEncoder-leftInit)*countConversion<target and abs(rightEncoder-rightInit)*countConversion<target:
         leftEncoder,rightEncoder=Roomba.ReadQueryStream(43,44)
+    
+    def complexTurn(ang,speed):
+    if ang<0:
+        speed=-speed
+    Roomba.StartQueryStream(43,44)
+    leftEncoder,rightEncoder=Roomba.ReadQueryStream(43,44)
+    leftInit=leftEncoder
+    rightInit=rightEncoder
+    target=abs(ang/(2*math.pi)*wheelBaseCircumference)
+    move(speed, -speed)
+    while abs(leftEncoder-leftInit)*countConversion<target and abs(rightEncoder-rightInit)*countConversion<target:
+        leftEncoder,rightEncoder=Roomba.ReadQueryStream(43,44)
+    
     
     ###HYPERBOLA METHOD
 def triangulate(t12,t23,t13,c):#1-2=12
@@ -375,7 +388,7 @@ while True:
             angle,slope=matrixMethod(times[0]-times[1],times[1]-times[2],times[0]-times[2],cSound)
             print("slope matrix:",slope)
             print("angle matrix:",angle)
-            turn(angle,50)
+            simpleTurn(angle,50)
             angle,x,y= triangulate(times[0]-times[1],times[1]-times[2],times[0]-times[2],cSound)
             print("angle hyperbola",angle)
             print(x)
@@ -438,7 +451,7 @@ GPIO.output(reset,GPIO.LOW)
 # Make sure this code runs to end the program cleanly
 
 Roomba.ShutDown() # Shutdown Roomba serial connection
-Xbee.close()
+#Xbee.close()
 one.terminate()
 two.terminate()
 three.terminate()
