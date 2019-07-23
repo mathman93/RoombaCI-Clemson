@@ -83,7 +83,7 @@ def turn(ang, speed):#angle in radians, speed in mm/s
     rightInit=rightEncoder
     target=abs(ang/(2*math.pi)*wheelBaseCircumference)
     move(speed, -speed)
-    while leftEncoder*countConversion<target and rightEncoder*countConversion<target:
+    while abs(leftEncoder-leftInit)*countConversion<target and abs(rightEncoder-rightInit)*countConversion<target:
         leftEncoder,rightEncoder=Roomba.ReadQueryStream(43,44)
     
     ###HYPERBOLA METHOD
