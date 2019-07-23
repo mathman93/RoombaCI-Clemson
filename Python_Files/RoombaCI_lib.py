@@ -3,7 +3,7 @@ Purpose: Python Library with LSM9DS1 class and specific functions
 	and iRobot Create 2 (Roomba) class and specific functions
 Import this file in main Python file to access functions
 Made by: Timothy Anglea, Joshua Harvey, Madeline Corvin
-Last Modified: 06/06/2019
+Last Modified: 06/11/2019
 '''
 ## Import Libraries ##
 from ctypes import * # May not need this anymore
@@ -353,7 +353,7 @@ class LSM9DS1_I2C(I2CDevice):
 	def temperature(self):
 		# The temperature of the sensor in degrees Celsius.
 		temp = self.read_temp_raw()
-		temp = 27.5 + temp/16
+		temp = 25.0 + temp/16
 		return temp
 	
 	''' Determines offset parameters for magnetometer
@@ -598,11 +598,19 @@ class Create_2:
 		# 131 = Safe Mode; 132 = Full Mode (Be ready to catch it!)
 		time.sleep(0.1)
 
+	''' Dock the Roomba Sequence
+		'''
+	def Dock(self):
+		#self.conn.write(b'\x80\xa5\x04') # Send to Passive Mode, and push Dock button
+		self.conn.write(b'\x8f') # Seek Dock command
+		time.sleep(2.0) # Wait for Dock "happy noise" to play.
+
 	''' Roomba Shut-down Sequence
 		Run at end of code to completely close Create_2 connection '''
-	def ShutDown(self):
+	def ShutDown(self, off = False):
 		self.conn.write(b'\x80') # Send Roomba to Passive Mode (128)
-		self.conn.write(b'\xad') # Stop Roomba OI (173)
+		if off:
+			self.conn.write(b'\xad') # Stop Roomba OI (173)
 		time.sleep(0.05)
 		self.conn.close() # Close the Roomba serial port.
 
@@ -735,7 +743,7 @@ class Create_2:
 		while num > 0: # Go until we reach the checksum
 			# The first byte is the packet ID
 			packetID = int.from_bytes(self.conn.read(1), byteorder='big', signed=False)
-			byte, sign = self.packet_dict.get(packetID, [0, False]) #Get packet info
+			byte, sign = self.packet_dict.get(packetID, [0, False]) # Get packet info
 			# Determine the value of the current packet
 			value = int.from_bytes(self.conn.read(byte), byteorder='big', signed=sign)
 			value_dict[packetID] = value # Create new entry in the dictionary
