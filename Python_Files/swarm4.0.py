@@ -43,6 +43,7 @@ y3=0
 wheelToWheel=235
 wheelBaseCircumference=wheelToWheel*math.pi
 countConversion=72*math.pi/508.8
+thetaConvert=72*math.pi/(508.8*235)
 
 ## Functions and Definitions ##
 ''' Displays current date and time to the screen
@@ -85,8 +86,8 @@ def simpleTurn(ang, speed):#angle in radians, speed in mm/s
     move(speed, -speed)
     while abs(leftEncoder-leftInit)*countConversion<target and abs(rightEncoder-rightInit)*countConversion<target:
         leftEncoder,rightEncoder=Roomba.ReadQueryStream(43,44)
-    
-    def complexTurn(ang,speed):
+
+def complexTurn(ang,speed):
     if ang<0:
         speed=-speed
     Roomba.StartQueryStream(43,44)
@@ -95,6 +96,7 @@ def simpleTurn(ang, speed):#angle in radians, speed in mm/s
     rightInit=rightEncoder
     target=abs(ang/(2*math.pi)*wheelBaseCircumference)
     move(speed, -speed)
+    theta=0
     while abs(leftEncoder-leftInit)*countConversion<target and abs(rightEncoder-rightInit)*countConversion<target:
         leftEncoder,rightEncoder=Roomba.ReadQueryStream(43,44)
     
