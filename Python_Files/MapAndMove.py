@@ -252,7 +252,7 @@ GPIO.output(gled, GPIO.LOW)
 
 # Open a text file for data retrieval
 file_name_input = input("Name for data file: ")
-dir_path = "/home/pi/SPRI2019_Roomba/Data_Files/" # Directory path to save file
+dir_path = "/home/pi/RoombaCI-Clemson/Data_Files/2019_Summer/" # Directory path to save file
 file_name = os.path.join(dir_path, file_name_input+".txt") # text file extension
 file = open(file_name, "w") # Open a text file for storing data
 	# Will overwrite anything that was in the text file previously
