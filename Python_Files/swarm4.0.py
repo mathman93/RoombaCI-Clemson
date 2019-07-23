@@ -302,8 +302,8 @@ Roomba.WakeUp(131) # Start up Roomba in Safe Mode
 # 131 = Safe Mode; 132 = Full Mode (Be ready to catch it!)
 Roomba.BlinkCleanLight() # Blink the Clean light on Roomba
 if Roomba.Available() > 0: # If anything is in the Roomba receive buffer
-	temp= Roomba.DirectRead(Roomba.Available()) # Clear out Roomba boot-up info
-	#print(x) # Include for debugging
+    temp= Roomba.DirectRead(Roomba.Available()) # Clear out Roomba boot-up info
+    #print(x) # Include for debugging
 print(" ROOMBA Setup Complete")
 GPIO.output(yled, GPIO.HIGH) # Indicate within setup sequence
 # Initialize IMU
@@ -404,7 +404,7 @@ while True:
             angle,slope=matrixMethod(times[0]-times[1],times[1]-times[2],times[0]-times[2],cSound)
             print("slope matrix:",slope)
             print("angle matrix:",angle)
-            simpleTurn(angle,50)
+            complexTurn(angle,50)
             angle,x,y= triangulate(times[0]-times[1],times[1]-times[2],times[0]-times[2],cSound)
             print("angle hyperbola",angle)
             print(x)
