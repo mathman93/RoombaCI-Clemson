@@ -96,9 +96,23 @@ def complexTurn(ang,speed):
     rightInit=rightEncoder
     target=abs(ang/(2*math.pi)*wheelBaseCircumference)
     move(speed, -speed)
+    heading=0
     theta=0
-    while abs(leftEncoder-leftInit)*countConversion<target and abs(rightEncoder-rightInit)*countConversion<target:
-        leftEncoder,rightEncoder=Roomba.ReadQueryStream(43,44)
+    if speed>0:
+        while heading<ang:
+            leftEncoder,rightEncoder=Roomba.ReadQueryStream(43,44)
+            theta=((leftEncoder-leftInit)-(rightEncoder-rightInit))*thetaConvert
+            leftInit=leftEncoder
+            rightInit=rightEncoder
+            heading=heading+theta
+    elif speed<0:
+        while heading>ang:
+            leftEncoder,rightEncoder=Roomba.ReadQueryStream(43,44)
+            theta=((leftEncoder-leftInit)-(rightEncoder-rightInit))*thetaConvert
+            leftInit=leftEncoder
+            rightInit=rightEncoder
+            heading=heading+theta
+        
     
     
     ###HYPERBOLA METHOD
