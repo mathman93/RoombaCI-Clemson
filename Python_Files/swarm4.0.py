@@ -83,10 +83,10 @@ def simpleTurn(ang, speed):#angle in radians, speed in mm/s
     leftInit=leftEncoder
     rightInit=rightEncoder
     target=abs(ang/(2*math.pi)*wheelBaseCircumference)
-    Roomba.Move(speed, -speed)
+    Roomba.Move(0, speed)
     while abs(leftEncoder-leftInit)*countConversion<target and abs(rightEncoder-rightInit)*countConversion<target:
         leftEncoder,rightEncoder=Roomba.ReadQueryStream(43,44)
-
+    Roomba.Move(0,0)
 def complexTurn(ang,speed):
     if ang<0:
         speed=-speed
@@ -95,7 +95,7 @@ def complexTurn(ang,speed):
     leftInit=leftEncoder
     rightInit=rightEncoder
     target=abs(ang/(2*math.pi)*wheelBaseCircumference)
-    Roomba.Move(speed, -speed)
+    Roomba.Move(0, speed)
     heading=0
     theta=0
     if speed>0:
@@ -112,7 +112,7 @@ def complexTurn(ang,speed):
             leftInit=leftEncoder
             rightInit=rightEncoder
             heading=heading+theta
-        
+    Roomba.move(0,0)
     
     
     ###HYPERBOLA METHOD
