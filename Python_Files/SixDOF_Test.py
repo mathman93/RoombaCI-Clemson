@@ -1,4 +1,4 @@
-''' SixDOF_Test_TA.py
+''' SixDOF_Test.py
 Purpose: Read and save data from IMU while Roomba is moving
 Also calculate Directional Cosine Matrix (DCM) to determine orientation
 Last Modified: 6/27/2019
