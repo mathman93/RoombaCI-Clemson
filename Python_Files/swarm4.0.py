@@ -116,7 +116,19 @@ def complexTurn(ang,speed):
             heading=heading+theta
     Roomba.Move(0,0)
     
-    
+def driveDist(x,y, speed):
+    Roomba.StartQueryStream(43,44)
+    targetDist= math.sqrt(x**2+y**2)
+    leftEncoder,rightEncoder=Roomba.ReadQueryStream(43,44)
+    leftInit=leftEncoder
+    rightInit=rightEncoder
+    dist=0
+    Roomba.Move(speed,0)
+    while dist<targetdist:
+        leftEncoder,rightEncoder=Roomba.ReadQueryStream(43,44)
+        dist=(leftEncoder-leftInit)*countConversion
+    Roomba.Move(0,0)
+  
     ###HYPERBOLA METHOD
 def triangulate(t12,t23,t13,c):#1-2=12
     
