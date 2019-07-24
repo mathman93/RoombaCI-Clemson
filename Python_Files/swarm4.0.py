@@ -347,19 +347,19 @@ while True:
         lights=False
         start=time.time()
         while q.qsize() <3:###WHILE ALL MICS NOT BACK TURN LIGHTS ON AND OFF
-            # GPIO.output(gled,GPIO.HIGH)
-            # GPIO.output(yled,GPIO.HIGH)
-            # GPIO.output(rled,GPIO.HIGH)
-            # if (time.time()-start)>4.0:
-                # start=start+4
-            # if lights:
-                # GPIO.output(gled,GPIO.LOW)
-                # GPIO.output(yled,GPIO.LOW)
-                # GPIO.output(rled,GPIO.LOW)
-            # else:
-                # GPIO.output(gled,GPIO.HIGH)
-                # GPIO.output(yled,GPIO.HIGH)
-                # GPIO.output(rled,GPIO.HIGH)
+            GPIO.output(gled,GPIO.HIGH)
+            GPIO.output(yled,GPIO.HIGH)
+            GPIO.output(rled,GPIO.HIGH)
+            if (time.time()-start)>4.0:
+                start=start+4
+            if lights:
+                GPIO.output(gled,GPIO.LOW)
+                GPIO.output(yled,GPIO.LOW)
+                GPIO.output(rled,GPIO.LOW)
+            else:
+                GPIO.output(gled,GPIO.HIGH)
+                GPIO.output(yled,GPIO.HIGH)
+                GPIO.output(rled,GPIO.HIGH)
             GPIO.output(gled,GPIO.LOW)
             GPIO.output(yled,GPIO.LOW)
             GPIO.output(rled,GPIO.LOW)
