@@ -360,9 +360,9 @@ while True:
                 # GPIO.output(gled,GPIO.HIGH)
                 # GPIO.output(yled,GPIO.HIGH)
                 # GPIO.output(rled,GPIO.HIGH)
-        GPIO.output(gled,GPIO.LOW)
-        GPIO.output(yled,GPIO.LOW)
-        GPIO.output(rled,GPIO.LOW)
+            GPIO.output(gled,GPIO.LOW)
+            GPIO.output(yled,GPIO.LOW)
+            GPIO.output(rled,GPIO.LOW)
         ###GETS MIC VALUES AND NUMBERS IN ORDER FROM THE QUEUE
         first=q.get()
         second=q.get()
