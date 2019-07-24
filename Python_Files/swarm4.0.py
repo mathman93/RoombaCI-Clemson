@@ -1,8 +1,8 @@
 
-''' script.py
-Purpose: Code to test our roomba program;
+''' swarm4.0.py
+Purpose: Code to localize mics using matrix and/or hyperbola methd;
 IMPORTANT: Must be run using Python 3 (python3)
-Last Modified: 7/3/2019
+Last Modified: 7/24/2019
 '''
 ## Import libraries ##
 import serial
@@ -40,10 +40,10 @@ y2=129.9038
 y3=0
 
 
-wheelToWheel=235
-wheelBaseCircumference=wheelToWheel*math.pi
-countConversion=72*math.pi/508.8
-thetaConvert=72*math.pi/(508.8*235)
+wheelToWheel=235###DISTANCE BETWEEN WHEELS
+wheelBaseCircumference=wheelToWheel*math.pi###CIRCUMERENCE OF CIRCLE WITH WHEEL TO WHEEL AS DIAMETER
+countConversion=72*math.pi/508.8###CONVERTS TICKS TO MM
+thetaConvert=72*math.pi/(508.8*235)###CONVERTS TICKS TO RADIANS
 
 ## Functions and Definitions ##
 ''' Displays current date and time to the screen
@@ -74,9 +74,9 @@ def matrixMethod(t12, t23, t13, c):
     ang=math.atan2(m3[1][0], m3[0][0])
     return ang,slope
     
-    
+    ###WILL TURN AT SPEED UNTILL THE ROOMBA HAS DISPLACED A TARGET ANGLE
 def simpleTurn(ang, speed):#angle in radians, speed in mm/s
-    if ang<0:
+    if ang<0:###USED TO DETERMINE DIRECTIONALITY OF SPIN
         speed=-speed
     Roomba.StartQueryStream(43,44)
     leftEncoder,rightEncoder=Roomba.ReadQueryStream(43,44)
@@ -87,6 +87,8 @@ def simpleTurn(ang, speed):#angle in radians, speed in mm/s
     while abs(leftEncoder-leftInit)*countConversion<target and abs(rightEncoder-rightInit)*countConversion<target:
         leftEncoder,rightEncoder=Roomba.ReadQueryStream(43,44)
     Roomba.Move(0,0)
+    
+    ###SAME AS SIMPLE TURN BUT USES MATH TO ACCOUNT FOR ANY DIFFERENCE IN WHEEL ENCODERS.
 def complexTurn(ang,speed):
     if ang<0:
         speed=-speed
@@ -118,6 +120,7 @@ def complexTurn(ang,speed):
     ###HYPERBOLA METHOD
 def triangulate(t12,t23,t13,c):#1-2=12
     
+    ###WILL USE TIME DIFFERENCES TO ASSES VALIDITY AND MAKE HYPERBOLA EQUATIONS
     a12=abs(0.5*c*t12)
     if a12>y2:
         print("INVALID!")
@@ -306,34 +309,6 @@ if Roomba.Available() > 0: # If anything is in the Roomba receive buffer
     temp= Roomba.DirectRead(Roomba.Available()) # Clear out Roomba boot-up info
     #print(x) # Include for debugging
 print(" ROOMBA Setup Complete")
-# GPIO.output(yled, GPIO.HIGH) # Indicate within setup sequence
-# # Initialize IMU
-# print(" Starting IMU...")
-# imu = RoombaCI_lib.LSM9DS1_I2C() # Initialize IMU
-# time.sleep(0.1)
-# # Clear out first reading from all sensors
-# temp = imu.magnetic
-# temp= imu.acceleration
-# temp= imu.gyro
-# # Calibrate IMU
-# print(" Calibrating IMU...")
-# Roomba.Move(0,75) # Start Roomba spinning
-# imu.CalibrateMag() # Calculate magnetometer offset values
-# Roomba.Move(0,0) # Stop Roomba spinning
-# time.sleep(0.5)
-# imu.CalibrateGyro() # Calculate gyroscope offset values
-# # Display offset values
-# print("mx_offset = {:f}; my_offset = {:f}; mz_offset = {:f}"\
-    # .format(imu.m_offset[0], imu.m_offset[1], imu.m_offset[2]))
-# print("gx_offset = {:f}; gy_offset = {:f}; gz_offset = {:f}"\
-    # .format(imu.g_offset[0], imu.g_offset[1], imu.g_offset[2]))
-# print(" IMU Setup Complete")
-# time.sleep(3) # Gives time to read offset values before continuing
-# GPIO.output(yled, GPIO.LOW) # Indicate setup sequence is complete
-
-# if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
-    # x = Xbee.read(Xbee.inWaiting()).decode() # Clear out Xbee input buffer
-    # #print(x) # Include for debugging
 
 GPIO.output(reset,GPIO.LOW)
 startTime=time.time()
@@ -350,11 +325,11 @@ mps.append(two)
 mps.append(three)
 while True:
     try:
-        startloop=time.time()
+        startloop=time.time()###FOR THE PURPOSE OF ASSESING RUNTIME
         for p in mps:
             p.start()
             print("started")
-        start=time.time()
+        print(time.time()-startloop)
         lights=False
         while q.qsize() <3:###WHILE ALL MICS NOT BACK TURN LIGHTS ON AND OFF
             GPIO.output(gled,GPIO.HIGH)
@@ -409,6 +384,7 @@ while True:
                     print("321")
                 else:
                     print("312")
+            ###PRINT RESULTS FROM BOTH METHODS
             angle,slope=matrixMethod(times[0]-times[1],times[1]-times[2],times[0]-times[2],cSound)
             print("slope matrix:",slope)
             print("angle matrix:",angle)
@@ -435,47 +411,11 @@ while True:
 GPIO.output(reset,GPIO.LOW)
 
 
-# if Roomba.Available() > 0: # If anything is in the Roomba receive buffer
-	# x = Roomba.DirectRead(Roomba.Available()) # Clear out Roomba boot-up info
-	# #print(x) # Include for debugging
-# print(" ROOMBA Setup Complete")
-# GPIO.output(yled, GPIO.HIGH) # Indicate within setup sequence
-# # Initialize IMU
-# print(" Starting IMU...")
-# imu = RoombaCI_lib.LSM9DS1_I2C() # Initialize IMU
-# time.sleep(0.1)
-# # Clear out first reading from all sensors
-# x = imu.magnetic
-# x = imu.acceleration
-# x = imu.gyro
-# # Calibrate IMU
-# print(" Calibrating IMU...")
-# Roomba.Move(0,75) # Start Roomba spinning
-# imu.CalibrateMag() # Calculate magnetometer offset values
-# Roomba.Move[0,0] # Stop Roomba spinning
-# time.sleep(0.5)
-# imu.CalibrateGyro() # Calculate gyroscope offset values
-# # Display offset values
-# print("mx_offset = {:f}; my_offset = {:f}; mz_offset = {:f}"\
-	# .format(imu.m_offset[0], imu.m_offset[1], imu.m_offset[2]))
-# print("gx_offset = {:f}; gy_offset = {:f}; gz_offset = {:f}"\
-	# .format(imu.g_offset[0], imu.g_offset[1], imu.g_offset[2]))
-# print(" IMU Setup Complete")
-# time.sleep(3) # Gives time to read offset values before continuing
-# GPIO.output(yled, GPIO.LOW) # Indicate setup sequence is complete
-
-# if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
-    # x = Xbee.read(Xbee.inWaiting()).decode() # Clear out Xbee input buffer
-    # #print(x) # Include for debugging
-
-# Main Code #
-
-
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
 
 Roomba.ShutDown() # Shutdown Roomba serial connection
-#Xbee.close()
+#TERMINATES ANY ACTIVE PROCESSES
 one.terminate()
 two.terminate()
 three.terminate()
