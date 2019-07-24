@@ -345,6 +345,7 @@ while True:
             print("started")
         print(time.time()-startloop)
         lights=False
+        start=time.time()
         while q.qsize() <3:###WHILE ALL MICS NOT BACK TURN LIGHTS ON AND OFF
             GPIO.output(gled,GPIO.HIGH)
             GPIO.output(yled,GPIO.HIGH)
