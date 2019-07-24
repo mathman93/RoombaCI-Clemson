@@ -116,6 +116,8 @@ def complexTurn(ang,speed):
             heading=heading+theta
     Roomba.Move(0,0)
     
+###DRIVES ROOMBA DISTANCE SPECIFIED BY X AND Y FROM HYPERBOLA METHOD
+###ASSUMES TURN TO CORRECT ANGLE HAS ALREADY BEEN MADE.
 def driveDist(x,y, speed):
     Roomba.StartQueryStream(43,44)
     targetDist= math.sqrt(x**2+y**2)
