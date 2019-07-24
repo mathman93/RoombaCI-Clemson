@@ -431,7 +431,7 @@ GPIO.output(reset,GPIO.LOW)
 
 Roomba.ShutDown() # Shutdown Roomba serial connection
 #TERMINATES ANY ACTIVE PROCESSES
-one.terminate()
-two.terminate()
-three.terminate()
+# one.terminate()
+# two.terminate()
+# three.terminate()
 GPIO.cleanup() # Reset GPIO pins for next program
