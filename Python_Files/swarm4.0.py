@@ -403,7 +403,7 @@ while True:
             angle,slope=matrixMethod(times[0]-times[1],times[1]-times[2],times[0]-times[2],cSound)
             print("slope matrix:",slope)
             print("angle matrix:",angle)
-            complexTurn(angle,50)
+            #complexTurn(angle,50)
             angle,x,y= triangulate(times[0]-times[1],times[1]-times[2],times[0]-times[2],cSound)
             print("angle hyperbola",angle)
             print(x)
