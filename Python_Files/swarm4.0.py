@@ -372,7 +372,7 @@ while True:
         times[second[0]]=second[1]
         times[third[0]]=third[1]
         ###PRINT NAH FAM IF NOT ALL THREE MICS ARE HEARD
-        if max(times)-min(times)>0.002:
+        if max(times)-min(times)>0.005:
             print("Nah fam")
             print("T1-T2: {0:.7f}".format(1000*(times[0]-times[1])))
             print("T2-T3: {0:.7f}".format(1000*(times[1]-times[2])))
