@@ -337,7 +337,6 @@ mps=[]
 mps.append(one)
 mps.append(two)
 mps.append(three)
-GPIO.output(reset,GPIO.LOW)
 while True:
     try:
         startloop=time.time()###FOR THE PURPOSE OF ASSESING RUNTIME
