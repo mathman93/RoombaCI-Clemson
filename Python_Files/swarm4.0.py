@@ -420,7 +420,7 @@ while True:
         first=[0,0]
         second=[0,0]
         third=[0,0]
-        #timedReset()
+        timedReset()
     except KeyboardInterrupt:
         break
 GPIO.output(reset,GPIO.LOW)
