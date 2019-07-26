@@ -283,8 +283,8 @@ def matrixMath(ang1, ang2,x1,x2,x3,y1,y2,y3):
     ansAngle=atan2(y,x)#angle to target
     return ansAngle, x, y
     
-def HyperCalc(ang1, ang2, mpx,mpy, mp2x, mp2y):
-    pass
+def fourMicMatrix():
+    m1= [[2*x1-2*x2, 2*y1-2*y2, -2*cSound*times[0]-times[1]],[2*x1-2*x2, 2*y1-2*y2, -2*cSound*times[0]-times[1]],[2*x1-2*x2, 2*y1-2*y2, -2*cSound*times[0]-times[1]]]
     
     ###CHECKS A MIC AT A GIVEN PIN TO SEE IF THEY ARE HEARING
 def checkMic(cue,pin, mic, times):
@@ -420,7 +420,7 @@ while True:
         first=[0,0]
         second=[0,0]
         third=[0,0]
-        #timedReset()
+        timedReset()
     except KeyboardInterrupt:
         break
 GPIO.output(reset,GPIO.LOW)
