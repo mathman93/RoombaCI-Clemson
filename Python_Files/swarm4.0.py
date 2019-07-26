@@ -35,9 +35,11 @@ cSound=343000
 x1=75
 x2=75
 x3=-150
+x4=0
 y1=-129.9038
 y2=129.9038
 y3=0
+y4=0
 
 
 wheelToWheel=235###DISTANCE BETWEEN WHEELS
@@ -284,7 +286,12 @@ def matrixMath(ang1, ang2,x1,x2,x3,y1,y2,y3):
     return ansAngle, x, y
     
 def fourMicMatrix():
-    m1= [[2*x1-2*x2, 2*y1-2*y2, -2*cSound*times[0]-times[1]],[2*x1-2*x2, 2*y1-2*y2, -2*cSound*times[0]-times[1]],[2*x1-2*x2, 2*y1-2*y2, -2*cSound*times[0]-times[1]]]
+    # m1= np.array([[2*x1-2*x2, 2*y1-2*y2, -2*cSound*times[0]-times[1]],[2*x1-2*x3, 2*y1-2*y3, -2*cSound*times[0]-times[2]],[2*x1-2*x4, 2*y1-2*y4, -2*cSound*times[0]-times[3]]])
+    # minv=np.linalg.inv(m1)
+    # m2=np.array([[cSound**2*(times[0]-times[1])**2+x1**2+y1**2-x2**2-y2**2],[cSound**2*(times[0]-times[2])**2+x1**2+y1**2-x3**2-y3**2],[cSound**2*(times[0]-times[3])**2+x1**2+y1**2-x4**2-y4**2]])
+    # m3=np.matmul(m2,minv)
+    # return m3
+    pass
     
     ###CHECKS A MIC AT A GIVEN PIN TO SEE IF THEY ARE HEARING
 def checkMic(cue,pin, mic, times):
