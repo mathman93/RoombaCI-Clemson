@@ -58,7 +58,7 @@ def DisplayDateTime():
     ###RESETS THE FLIP FLOP TO ALLOW FOR NEW SOUND
 def timedReset():
     GPIO.output(reset,GPIO.LOW)
-    time.sleep(0.2)
+    time.sleep(3)
     GPIO.output(reset,GPIO.HIGH)
     
     ###CONCUCTS THE MATRIX METHOD TO GIVE US AN ANGLE
