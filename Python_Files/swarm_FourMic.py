@@ -168,6 +168,7 @@ GPIO.setup(gled, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(micOne, GPIO.IN, pull_up_down= GPIO.PUD_UP)##Check for initial later
 GPIO.setup(micTwo, GPIO.IN,  pull_up_down= GPIO.PUD_UP)
 GPIO.setup(micThree, GPIO.IN, pull_up_down= GPIO.PUD_UP)
+GPIO.setup(micFour, GPIO.IN, pull_up_down= GPIO.PUD_UP)
 GPIO.setup(reset, GPIO.OUT, initial=GPIO.LOW)
 startloop=0
 
