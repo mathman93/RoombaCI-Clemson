@@ -30,8 +30,8 @@ statusThree=0
 statusFour=0
 statusOneTwo=0
 statusTwoTwo=0
-StatusThreeTwo=0
-statuFourTwo=0
+statusThreeTwo=0
+statusFourTwo=0
 times=[0,0,0,0]
 cSound=343000
 x1=0
@@ -175,13 +175,16 @@ while True:
             statusFour=GPIO.input(micFour)
             if statusOne>statusOneTwo:
                 times[0]=time.time()
+                statusOneTwo=statusOne
             if statusTwo>statusTwoTwo:
                 times[1]=time.time()
+                statusTwoTwo=statusTwo
             if statusThree>statusThreeTwo:
                 times[2]=time.time()
+                statusThreeTwo=statusThree
             if statusFour>statusFourTwo:
                 times[3]=time.time()
-        
+                statusFourTwo=statusFour
         ###PRINT NAH FAM IF NOT ALL THREE MICS ARE HEARD
         if max(times)-min(times)>0.005:
             print("Nah fam")
@@ -225,6 +228,10 @@ while True:
             print(distance)
         ###SETTING EVERYTHING BACK UP TO MULTIPROCESS AGAIN
         times=[0,0,0,0]
+        statusOneTwo=0
+        statusTwoTwo=0
+        statusThreeTwo=0
+        statusFourTwo=0
         timedReset()
     except KeyboardInterrupt:
         break
