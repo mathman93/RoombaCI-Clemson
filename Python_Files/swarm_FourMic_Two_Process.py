@@ -203,8 +203,8 @@ timeBase=time.time()
 GPIO.output(reset, GPIO.HIGH)
 q=Queue()
 ###SETS UP THREE PROCESSES FOR MICS
-oneTwo=multiprocessing.Process(target=checkMic, args=(q,micOne,micTwo,1,2,times,))
-threeFour=multiprocessing.Process(target=checkMic, args=(q,micThree, micFour,3,4,times,))
+oneTwo=multiprocessing.Process(target=checkMics, args=(q,micOne,micTwo,1,2,times,))
+threeFour=multiprocessing.Process(target=checkMics, args=(q,micThree, micFour,3,4,times,))
 mps=[]
 mps.append(oneTwo)
 mps.append(threeFour)
@@ -286,9 +286,8 @@ while True:
             print(y)
             print(distance)
         ###SETTING EVERYTHING BACK UP TO MULTIPROCESS AGAIN
-        mps=[]
-        mps.append(oneTwo)
-        mps.append(threeFour)
+        oneTwo=multiprocessing.Process(target=checkMics, args=(q,micOne,micTwo,1,2,times,))
+        threeFour=multiprocessing.Process(target=checkMics, args=(q,micThree, micFour,3,4,times,))
         mps=[]
         mps.append(oneTwo)
         mps.append(threeFour)
