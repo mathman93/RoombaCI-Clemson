@@ -149,7 +149,7 @@ def fourMicMatrix():#check variable scope
     ###CHECKS A MIC AT A GIVEN PIN TO SEE IF THEY ARE HEARING
 def checkMics(cue,pin, pin1, mic, mic1, times):
     status1=0
-    status2=0
+    status=0
     while status==0 or status1==0:
         status=GPIO.input(pin)
         status1=GPIO.input(pin1)
