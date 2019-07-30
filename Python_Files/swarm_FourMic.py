@@ -20,10 +20,10 @@ from multiprocessing import Queue
 yled = 5
 rled = 6
 gled = 13
-micOne=17
-micTwo=22
-micThree=27
-micFour=25##FILL IN REAL VALUE
+micOne=25#
+micTwo=17
+micThree=22
+micFour=27#FILL IN REAL VALUE
 reset=24
 statusOne=0
 statusTwo=0
