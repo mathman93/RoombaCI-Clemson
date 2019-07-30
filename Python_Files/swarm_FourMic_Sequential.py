@@ -1,5 +1,5 @@
-''' swarm4.0.py
-Purpose: Code to localize mics using matrix and/or hyperbola methd;
+''' swarm_FourMic_Sequential.py
+Purpose: Code to localize mics using matrix methd;
 IMPORTANT: Must be run using Python 3 (python3)
 Last Modified: 7/24/2019
 '''
@@ -9,9 +9,7 @@ import math
 import time
 import RPi.GPIO as GPIO
 import RoombaCI_lib
-import multiprocessing
 import numpy as np
-from multiprocessing import Queue
 
 
 ## Variables and Constants ##
@@ -32,7 +30,7 @@ statusOneTwo=0
 statusTwoTwo=0
 statusThreeTwo=0
 statusFourTwo=0
-times=[0,0,0,0]
+times=[0,0,0,0] #ARRAY HOLDS TIME, INDEXED IN MIC ORDER
 cSound=343000
 x1=0
 x2=75
@@ -121,7 +119,7 @@ def driveDist(x,y, speed):
     Roomba.Move(0,0)
 
     
-def fourMicMatrix():#check variable scope
+def fourMicMatrix():#USES TIME OF FLIGHTS 2001 MATH
     m1= np.array([[2*x1-2*x2, 2*y1-2*y2, -2*cSound*(times[1]-times[0])],[2*x1-2*x3, 2*y1-2*y3, -2*cSound*(times[2]-times[0])],[2*x1-2*x4, 2*y1-2*y4, -2*cSound*(times[3]-times[0])]])
     minv=np.linalg.inv(m1)
     m2=np.array([[cSound**2*(times[1]-times[0])**2+x1**2+y1**2-x2**2-y2**2],[cSound**2*(times[2]-times[0])**2+x1**2+y1**2-x3**2-y3**2],[cSound**2*(times[3]-times[0])**2+x1**2+y1**2-x4**2-y4**2]])
@@ -199,7 +197,7 @@ while True:
             #print("T2-T3: {0:.7f}".format(1000*(times[1]-times[2])))
             print("T1-T3: {0:.7f}".format(1000*(times[0]-times[2])))
             print("T1-T4: {0:.7f}".format(1000*(times[0]-times[3])))
-            ###PRINT OUT ORDER THE MICS WERE HIT
+            ###PRINT OUT ORDER THE MICS WERE HIT (not yet adjusted for four mics)
             if times[0]<times[1] and times[0]<times[2]:
                 if times[1]<times[2]:
                     print("123")
@@ -215,18 +213,13 @@ while True:
                     print("321")
                 else:
                     print("312")
-            #x,y,distance= fourMicMatrix()
             ans=fourMicMatrix()
             x=ans[0]
             y=ans[1]
             distance=ans[2]
-            #print("x: {0:.7f}".format(x))
-            #print("y: {0:.7f}".format(y))
-            #print("distance: {0:.7f}".format(distance))
             print(x)
             print(y)
             print(distance)
-        ###SETTING EVERYTHING BACK UP TO MULTIPROCESS AGAIN
         times=[0,0,0,0]
         statusOneTwo=0
         statusTwoTwo=0
@@ -242,8 +235,4 @@ GPIO.output(reset,GPIO.LOW)
 # Make sure this code runs to end the program cleanly
 
 Roomba.ShutDown() # Shutdown Roomba serial connection
-#TERMINATES ANY ACTIVE PROCESSES
-# one.terminate()
-# two.terminate()
-# three.terminate()
 GPIO.cleanup() # Reset GPIO pins for next program

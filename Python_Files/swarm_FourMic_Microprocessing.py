@@ -1,6 +1,6 @@
 
-''' swarm4.0.py
-Purpose: Code to localize mics using matrix and/or hyperbola methd;
+''' swarm_FourMic_Microprocessing.py
+Purpose: Code to localize mics using matrix methd;
 IMPORTANT: Must be run using Python 3 (python3)
 Last Modified: 7/24/2019
 '''

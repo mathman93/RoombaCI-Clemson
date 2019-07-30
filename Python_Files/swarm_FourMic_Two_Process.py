@@ -1,5 +1,5 @@
-''' swarm4.0.py
-Purpose: Code to localize mics using matrix and/or hyperbola methd;
+''' swarm_FourMic_TwoProcess.py
+Purpose: Code to localize mics using matrix methd;
 IMPORTANT: Must be run using Python 3 (python3)
 Last Modified: 7/24/2019
 '''
@@ -28,7 +28,8 @@ statusOne=0
 statusTwo=0
 statusThree=0
 statusFour=0
-times=[0,0,0,0]
+times=[0,0,0,0]#ARRAY HOLDS TIME, INDEXED IN MIC ORDER
+#ARRAYS ASSIGNED MIC NUMBER AND TIME. (first, second, etc. refer to order of mics)
 first=[0,0]
 second=[0,0]
 third=[0,0]
@@ -139,21 +140,20 @@ def matrixMath(ang1, ang2,x1,x2,x3,y1,y2,y3):
     ansAngle=atan2(y,x)#angle to target
     return ansAngle, x, y
     
-def fourMicMatrix():#check variable scope
+def fourMicMatrix():#USES TIME OF FLIGHTS 2001 MATH
     m1= np.array([[2*x1-2*x2, 2*y1-2*y2, -2*cSound*times[0]-times[1]],[2*x1-2*x3, 2*y1-2*y3, -2*cSound*times[0]-times[2]],[2*x1-2*x4, 2*y1-2*y4, -2*cSound*times[0]-times[3]]])
     minv=np.linalg.inv(m1)
     m2=np.array([[cSound**2*(times[0]-times[1])**2+x1**2+y1**2-x2**2-y2**2],[cSound**2*(times[0]-times[2])**2+x1**2+y1**2-x3**2-y3**2],[cSound**2*(times[0]-times[3])**2+x1**2+y1**2-x4**2-y4**2]])
     m3=np.matmul(minv,m2)
     return m3
     
-    ###CHECKS A MIC AT A GIVEN PIN TO SEE IF THEY ARE HEARING
+    ###CHECKS TWO MIC AT GIVEN PIN TO SEE IF THEY ARE HEARING
 def checkMics(cue,pin, pin1, mic, mic1, times):
     status1=0
     status=0
     while status==0 or status1==0:
         status=GPIO.input(pin)
         status1=GPIO.input(pin1)
-        #print(time.time()-startloop)
         if status1>0:
             cue.put([mic1-1, time.time()])
             while status==0:
@@ -244,7 +244,7 @@ while True:
         times[second[0]]=second[1]
         times[third[0]]=third[1]
         times[fourth[0]]=fourth[1]
-        ###PRINT NAH FAM IF NOT ALL THREE MICS ARE HEARD
+        ###PRINT NAH FAM IF NOT ALL THREE MICS ARE HEARD IN REASONABLE TIME
         if max(times)-min(times)>0.005:
             print("Nah fam")
             print("T1-T2: {0:.7f}".format(1000*(times[0]-times[1])))
@@ -258,7 +258,7 @@ while True:
             print("T2-T3: {0:.7f}".format(1000*(times[1]-times[2])))
             print("T1-T3: {0:.7f}".format(1000*(times[0]-times[2])))
             print("T1-T4: {0:.7f}".format(1000*(times[0]-times[3])))
-            ###PRINT OUT ORDER THE MICS WERE HIT
+            ###PRINT OUT ORDER THE MICS WERE HIT (not yet adjusted for four mics)
             if times[0]<times[1] and times[0]<times[2]:
                 if times[1]<times[2]:
                     print("123")
@@ -274,14 +274,10 @@ while True:
                     print("321")
                 else:
                     print("312")
-            #x,y,distance= fourMicMatrix()
             ans=fourMicMatrix()
             x=ans[0]
             y=ans[1]
             distance=ans[2]
-            #print("x: {0:.7f}".format(x))
-            #print("y: {0:.7f}".format(y))
-            #print("distance: {0:.7f}".format(distance))
             print(x)
             print(y)
             print(distance)
@@ -306,8 +302,4 @@ GPIO.output(reset,GPIO.LOW)
 # Make sure this code runs to end the program cleanly
 
 Roomba.ShutDown() # Shutdown Roomba serial connection
-#TERMINATES ANY ACTIVE PROCESSES
-# one.terminate()
-# two.terminate()
-# three.terminate()
 GPIO.cleanup() # Reset GPIO pins for next program
