@@ -243,7 +243,8 @@ while True:
             print("T1-T2: {0:.7f}".format(1000*(times[0]-times[1])))
             print("T2-T3: {0:.7f}".format(1000*(times[1]-times[2])))
             print("T1-T3: {0:.7f}".format(1000*(times[0]-times[2])))
-            times=[0,0,0]
+            print("T1-T4: {0:.7f}".format(1000*(times[0]-times[3])))
+            times=[0,0,0,0]
         ###PRINTS TIME DIFFERENCES
         else:
             print("T1-T2: {0:.7f}".format(1000*(times[0]-times[1])))
@@ -271,9 +272,12 @@ while True:
             x=ans[0]
             y=ans[1]
             distance=ans[2]
-            print("x: {0:.7f}".format(x))
-            print("y: {0:.7f}".format(y))
-            print("distance: {0:.7f}".format(distance))
+            #print("x: {0:.7f}".format(x))
+            #print("y: {0:.7f}".format(y))
+            #print("distance: {0:.7f}".format(distance))
+            print(x)
+            print(y)
+            print(distance)
         ###SETTING EVERYTHING BACK UP TO MULTIPROCESS AGAIN
         one=multiprocessing.Process(target=checkMic, args=(q,micOne,1,times,))
         two=multiprocessing.Process(target=checkMic, args=(q,micTwo,2,times,))
