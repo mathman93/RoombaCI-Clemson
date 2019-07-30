@@ -249,6 +249,7 @@ while True:
             print("T1-T2: {0:.7f}".format(1000*(times[0]-times[1])))
             print("T2-T3: {0:.7f}".format(1000*(times[1]-times[2])))
             print("T1-T3: {0:.7f}".format(1000*(times[0]-times[2])))
+            print("T1-T4: {0:.7f}".format(1000*(times[0]-times[3])))
             ###PRINT OUT ORDER THE MICS WERE HIT
             if times[0]<times[1] and times[0]<times[2]:
                 if times[1]<times[2]:
@@ -265,7 +266,11 @@ while True:
                     print("321")
                 else:
                     print("312")
-            x,y,distance= fourMicMatrix()
+            #x,y,distance= fourMicMatrix()
+            ans=fourMicMatrix()
+            x=ans[0]
+            y=ans[1]
+            distance=ans[2]
             print("x: {0:.7f}".format(x))
             print("y: {0:.7f}".format(y))
             print("distance: {0:.7f}".format(distance))
