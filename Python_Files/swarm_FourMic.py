@@ -144,7 +144,7 @@ def fourMicMatrix():#check variable scope
     m1= np.array([[2*x1-2*x2, 2*y1-2*y2, -2*cSound*times[0]-times[1]],[2*x1-2*x3, 2*y1-2*y3, -2*cSound*times[0]-times[2]],[2*x1-2*x4, 2*y1-2*y4, -2*cSound*times[0]-times[3]]])
     minv=np.linalg.inv(m1)
     m2=np.array([[cSound**2*(times[0]-times[1])**2+x1**2+y1**2-x2**2-y2**2],[cSound**2*(times[0]-times[2])**2+x1**2+y1**2-x3**2-y3**2],[cSound**2*(times[0]-times[3])**2+x1**2+y1**2-x4**2-y4**2]])
-    m3=np.matmul(m2,minv)
+    m3=np.matmul(minv,m2)
     return m3
     
     ###CHECKS A MIC AT A GIVEN PIN TO SEE IF THEY ARE HEARING
