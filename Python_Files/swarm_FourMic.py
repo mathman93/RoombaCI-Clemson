@@ -35,14 +35,14 @@ second=[0,0]
 third=[0,0]
 fourth=[0,0]
 cSound=343000
-x1=100
-x2=100
-x3=0
-x4=-100
-y1=-100
-y2=100
-y3=150
-y4=-100
+x1=0
+x2=75
+x3=75
+x4=-150
+y1=0
+y2=-129.9038
+y3=129.9038
+y4=0
 
 
 wheelToWheel=235###DISTANCE BETWEEN WHEELS
