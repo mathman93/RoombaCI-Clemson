@@ -244,7 +244,7 @@ while True:
             print("T2-T3: {0:.7f}".format(1000*(times[1]-times[2])))
             print("T1-T3: {0:.7f}".format(1000*(times[0]-times[2])))
             print("T1-T4: {0:.7f}".format(1000*(times[0]-times[3])))
-            times=[0,0,0,0]
+            #times=[0,0,0,0]
         ###PRINTS TIME DIFFERENCES
         else:
             print("T1-T2: {0:.7f}".format(1000*(times[0]-times[1])))
