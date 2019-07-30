@@ -124,7 +124,7 @@ def driveDist(x,y, speed):
 def fourMicMatrix():#check variable scope
     m1= np.array([[2*x1-2*x2, 2*y1-2*y2, -2*cSound*times[0]-times[1]],[2*x1-2*x3, 2*y1-2*y3, -2*cSound*times[0]-times[2]],[2*x1-2*x4, 2*y1-2*y4, -2*cSound*times[0]-times[3]]])
     minv=np.linalg.inv(m1)
-    m2=np.array([[cSound**2*(times[0]-times[1])**2+x1**2+y1**2-x2**2-y2**2],[cSound**2*(times[0]-times[2])**2+x1**2+y1**2-x3**2-y3**2],[cSound**2*(times[0]-times[3])**2+x1**2+y1**2-x4**2-y4**2]])
+    m2=np.array([[cSound**2*(times[1]-times[0])**2+x1**2+y1**2-x2**2-y2**2],[cSound**2*(times[2]-times[0])**2+x1**2+y1**2-x3**2-y3**2],[cSound**2*(times[3]-times[0])**2+x1**2+y1**2-x4**2-y4**2]])
     m3=np.matmul(minv,m2)
     return m3
     
@@ -189,14 +189,14 @@ while True:
         if max(times)-min(times)>0.005:
             print("Nah fam")
             print("T1-T2: {0:.7f}".format(1000*(times[0]-times[1])))
-            print("T2-T3: {0:.7f}".format(1000*(times[1]-times[2])))
+            #print("T2-T3: {0:.7f}".format(1000*(times[1]-times[2])))
             print("T1-T3: {0:.7f}".format(1000*(times[0]-times[2])))
             print("T1-T4: {0:.7f}".format(1000*(times[0]-times[3])))
             #times=[0,0,0,0]
         ###PRINTS TIME DIFFERENCES
         else:
             print("T1-T2: {0:.7f}".format(1000*(times[0]-times[1])))
-            print("T2-T3: {0:.7f}".format(1000*(times[1]-times[2])))
+            #print("T2-T3: {0:.7f}".format(1000*(times[1]-times[2])))
             print("T1-T3: {0:.7f}".format(1000*(times[0]-times[2])))
             print("T1-T4: {0:.7f}".format(1000*(times[0]-times[3])))
             ###PRINT OUT ORDER THE MICS WERE HIT
