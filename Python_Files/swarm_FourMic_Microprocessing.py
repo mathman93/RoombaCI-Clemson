@@ -1,6 +1,6 @@
 
-''' swarm4.0.py
-Purpose: Code to localize mics using matrix and/or hyperbola methd;
+''' swarm_FourMic_Microprocessing.py
+Purpose: Code to localize mics using matrix methd;
 IMPORTANT: Must be run using Python 3 (python3)
 Last Modified: 7/24/2019
 '''
@@ -20,24 +20,29 @@ from multiprocessing import Queue
 yled = 5
 rled = 6
 gled = 13
-micOne=17
-micTwo=22
-micThree=27
+micOne=25#
+micTwo=17
+micThree=22
+micFour=27#FILL IN REAL VALUE
 reset=24
 statusOne=0
 statusTwo=0
 statusThree=0
-times=[0,0,0]
+statusFour=0
+times=[0,0,0,0]
 first=[0,0]
 second=[0,0]
 third=[0,0]
+fourth=[0,0]
 cSound=343000
-x1=75
+x1=0
 x2=75
-x3=-150
-y1=-129.9038
-y2=129.9038
-y3=0
+x3=75
+x4=-150
+y1=0
+y2=-129.9038
+y3=129.9038
+y4=0
 
 
 wheelToWheel=235###DISTANCE BETWEEN WHEELS
@@ -58,21 +63,6 @@ def timedReset():
     GPIO.output(reset,GPIO.LOW)
     time.sleep(1)
     GPIO.output(reset,GPIO.HIGH)
-    
-    ###CONCUCTS THE MATRIX METHOD TO GIVE US AN ANGLE
-def matrixMethod(t12, t23, t13, c):
-
-    #m1=np.matrix0 y2-y1; x3-x1 y3-y1')
-    m1=np.array([[0,y2-y1],[x3-x1, y3-y1]])
-    minv=np.linalg.inv(m1)
-    #m2=np.matrix('c*t12; c*t13')
-    m2=np.array([[c*t12],[c*t13]])
-    #m3=m2*minv
-    m3=np.matmul(minv,m2)
-    #slope=list(m3).index(0)/list(m3).index(1)
-    slope=m3[1][0]/m3[0][0]
-    ang=math.atan2(m3[1][0], m3[0][0])
-    return ang,slope
     
     ###WILL TURN AT SPEED UNTILL THE ROOMBA HAS DISPLACED A TARGET ANGLE
 def simpleTurn(ang, speed):#angle in radians, speed in mm/s
@@ -130,139 +120,6 @@ def driveDist(x,y, speed):
         leftEncoder,rightEncoder=Roomba.ReadQueryStream(43,44)
         dist=(leftEncoder-leftInit)*countConversion
     Roomba.Move(0,0)
-  
-    ###HYPERBOLA METHOD
-def triangulate(t12,t23,t13,c):#1-2=12
-    
-    ###WILL USE TIME DIFFERENCES TO ASSES VALIDITY AND MAKE HYPERBOLA EQUATIONS
-    a12=abs(0.5*c*t12)
-    if a12>y2:
-        print("INVALID!")
-    b12=math.sqrt(abs(y2**2-a12**2))
-    
-    
-    a23=abs(0.5*c*t23)
-    if a23>y2:
-        print("INVALID!")
-    b23=math.sqrt(abs(y2**2-a23**2))
-     
-    a13=abs(0.5*c*t13)
-    if a12>y2:
-        print("INVALID!")
-    b13=math.sqrt(abs(y2**2-a13**2))
-    
-    ###WILL TELL BASED ON ORDER WHAT QUAD EACH MICROPHONE SEES FROM ITS POV
-    if t12>=0:
-        if t13<=0:
-            quad=1
-            quad2=3.5
-            quad3=2
-        elif t23>=0:
-            quad=2
-            quad2=1
-            quad3=1.5
-        else: 
-            quad=1.5
-            quad2=4
-            quad3=3
-    elif t23<=0:
-        quad=4
-        quad2=3
-        quad3=1.5
-    elif t13>=0:
-        quad=3
-        quad2=1.5
-        quad3=4
-    else:
-        quad=3.5
-        quad2=2
-        quad3=1
-        
-    ###WILL SET QUAD 0 IF NOT USING PAIR AND OTHERWISE FIND ANGLE
-    asyAngle=0
-    if quad==1:
-        asyAngle=math.atan(a12/b12)
-    elif quad==2:
-        asyAngle=math.atan(-a12/b12)+math.pi
-    elif quad==3:
-        asyAngle=math.atan(a12/b12)+math.pi
-    elif quad==4:
-        asyAngle=math.atan(-a12/b12)
-    asyAngle2=0
-    if quad2==1:
-        asyAngle2=math.atan(a23/b23)+(2*math.pi/3)
-    elif quad2==2:
-        asyAngle2=math.atan(-a23/b23)+(5*math.pi/3)
-    elif quad2==3:
-        asyAngle2=math.atan(a23/a23)+(5*math.pi/3)
-    elif quad2==4:
-        asyAngle2=math.atan(-a23/b23)+(2*math.pi/3)
-    asyAngle3=0
-    if quad3==1:
-        asyAngle3=math.atan(a13/b13)+(4*math.pi/3)
-    elif quad3==2:
-        asyAngle3=math.atan(-a13/b13)+(math.pi/3)
-    elif quad3==3:
-        asyAngle3=math.atan(a13/a13)+(math.pi/3)
-    elif quad3==4:
-        asyAngle3=math.atan(-a13/b13)+(4*math.pi/3)
-    
-    if asyAngle==0:
-        #matrixMath(ang1, ang2,x1,x2,x3,y1,y2,y3)
-        cos1=math.cos(asyAngle2)
-        cos2=math.cos(asyAngle3)
-        sin1=math.sin(asyAngle2)
-        sin2=math.sin(asyAngle3)
-        m1=np.array([[cos1,-cos2],[sin1,-sin2]])
-        minv=np.linalg.inv(m1)
-        m2=np.array([[(x1+x3)/2-(x2+x3)/2],[(y1+y3)/2-(y2+y3)/2]])
-        m3=np.matmul(minv,m2)
-        w1=m3[0][0]
-        #w2=m3[1][0]
-        m4=np.array([[w1*cos1],[w1*sin1]])
-        m5=np.array([[(x2+x3)/2],[(y2+y3)/2]])
-        final=m4+m5
-        x=final[0][0]
-        y=final[1][0]
-        ansAngle=math.atan2(y,x)#angle to target
-    elif asyAngle2==0:
-        #matrixMath(ang1, ang2,x1,x2,x3,y1,y2,y3)
-        cos1=math.cos(asyAngle3)
-        cos2=math.cos(asyAngle)
-        sin1=math.sin(asyAngle3)
-        sin2=math.sin(asyAngle)
-        m1=np.array([[cos1,-cos2],[sin1,-sin2]])
-        minv=np.linalg.inv(m1)
-        m2=np.array([[(x1+x2)/2-(x1+x3)/2],[(y1+y2)/2-(y1+y3)/2]])
-        m3=np.matmul(minv,m2)
-        w1=m3[0][0]
-        #w2=m3[1][0]
-        m4=np.array([[w1*cos1],[w1*sin1]])
-        m5=np.array([[(x1+x3)/2],[(y1+y3)/2]])
-        final=m4+m5
-        x=final[0][0]
-        y=final[1][0]
-        ansAngle=math.atan2(y,x)#angle to target
-    elif asyAngle3==0:
-        #matrixMath(asyAngle, asyAngle2,x1,x2,x3,y1,y2,y3)
-        cos1=math.cos(asyAngle)
-        cos2=math.cos(asyAngle2)
-        sin1=math.sin(asyAngle)
-        sin2=math.sin(asyAngle2)
-        m1=np.array([[cos1,-cos2],[sin1,-sin2]])
-        minv=np.linalg.inv(m1)
-        m2=np.array([[(x2+x3)/2-(x1+x2)/2],[(y2+y3)/2-(y1+y2)/2]])
-        m3=np.matmul(minv,m2)
-        w1=m3[0][0]
-        #w2=m3[1][0]
-        m4=np.array([[w1*cos1],[w1*sin1]])
-        m5=np.array([[(x1+x2)/2],[(y1+y2)/2]])
-        final=m4+m5
-        x=final[0][0]
-        y=final[1][0]
-        ansAngle=math.atan2(y,x)#angle to target
-    return ansAngle,x,y
-        
     
 def matrixMath(ang1, ang2,x1,x2,x3,y1,y2,y3):
     cos1=math.cos(ang1)
@@ -283,8 +140,12 @@ def matrixMath(ang1, ang2,x1,x2,x3,y1,y2,y3):
     ansAngle=atan2(y,x)#angle to target
     return ansAngle, x, y
     
-def HyperCalc(ang1, ang2, mpx,mpy, mp2x, mp2y):
-    pass
+def fourMicMatrix():#check variable scope
+    m1= np.array([[2*x1-2*x2, 2*y1-2*y2, -2*cSound*times[0]-times[1]],[2*x1-2*x3, 2*y1-2*y3, -2*cSound*times[0]-times[2]],[2*x1-2*x4, 2*y1-2*y4, -2*cSound*times[0]-times[3]]])
+    minv=np.linalg.inv(m1)
+    m2=np.array([[cSound**2*(times[0]-times[1])**2+x1**2+y1**2-x2**2-y2**2],[cSound**2*(times[0]-times[2])**2+x1**2+y1**2-x3**2-y3**2],[cSound**2*(times[0]-times[3])**2+x1**2+y1**2-x4**2-y4**2]])
+    m3=np.matmul(minv,m2)
+    return m3
     
     ###CHECKS A MIC AT A GIVEN PIN TO SEE IF THEY ARE HEARING
 def checkMic(cue,pin, mic, times):
@@ -307,6 +168,7 @@ GPIO.setup(gled, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(micOne, GPIO.IN, pull_up_down= GPIO.PUD_UP)##Check for initial later
 GPIO.setup(micTwo, GPIO.IN,  pull_up_down= GPIO.PUD_UP)
 GPIO.setup(micThree, GPIO.IN, pull_up_down= GPIO.PUD_UP)
+GPIO.setup(micFour, GPIO.IN, pull_up_down= GPIO.PUD_UP)
 GPIO.setup(reset, GPIO.OUT, initial=GPIO.LOW)
 startloop=0
 
@@ -333,10 +195,12 @@ q=Queue()
 one=multiprocessing.Process(target=checkMic, args=(q,micOne,1,times,))
 two=multiprocessing.Process(target=checkMic, args=(q,micTwo,2,times,))
 three=multiprocessing.Process(target=checkMic, args=(q,micThree,3,times,))
+four=multiprocessing.Process(target=checkMic, args=(q,micFour,4,times,))
 mps=[]
 mps.append(one)
 mps.append(two)
 mps.append(three)
+mps.append(four)
 while True:
     try:
         startloop=time.time()###FOR THE PURPOSE OF ASSESING RUNTIME
@@ -346,7 +210,7 @@ while True:
         print(time.time()-startloop)
         lights=False
         start=time.time()
-        while q.qsize() <3:###WHILE ALL MICS NOT BACK TURN LIGHTS ON AND OFF
+        while q.qsize() <4:###WHILE ALL MICS NOT BACK TURN LIGHTS ON AND OFF
             GPIO.output(gled,GPIO.HIGH)
             GPIO.output(yled,GPIO.HIGH)
             GPIO.output(rled,GPIO.HIGH)
@@ -367,22 +231,26 @@ while True:
         first=q.get()
         second=q.get()
         third=q.get()
+        fourth=q.get()
         ###USES MIC NUMBER TO CHOOSE INDEX IN TIMES AND ASSIGNS RETURNED TIME
         times[first[0]]=first[1]
         times[second[0]]=second[1]
         times[third[0]]=third[1]
+        times[fourth[0]]=fourth[1]
         ###PRINT NAH FAM IF NOT ALL THREE MICS ARE HEARD
         if max(times)-min(times)>0.005:
             print("Nah fam")
             print("T1-T2: {0:.7f}".format(1000*(times[0]-times[1])))
             print("T2-T3: {0:.7f}".format(1000*(times[1]-times[2])))
             print("T1-T3: {0:.7f}".format(1000*(times[0]-times[2])))
-            times=[0,0,0]
+            print("T1-T4: {0:.7f}".format(1000*(times[0]-times[3])))
+            #times=[0,0,0,0]
         ###PRINTS TIME DIFFERENCES
         else:
             print("T1-T2: {0:.7f}".format(1000*(times[0]-times[1])))
             print("T2-T3: {0:.7f}".format(1000*(times[1]-times[2])))
             print("T1-T3: {0:.7f}".format(1000*(times[0]-times[2])))
+            print("T1-T4: {0:.7f}".format(1000*(times[0]-times[3])))
             ###PRINT OUT ORDER THE MICS WERE HIT
             if times[0]<times[1] and times[0]<times[2]:
                 if times[1]<times[2]:
@@ -399,27 +267,32 @@ while True:
                     print("321")
                 else:
                     print("312")
-            ###PRINT RESULTS FROM BOTH METHODS
-            angle,slope=matrixMethod(times[0]-times[1],times[1]-times[2],times[0]-times[2],cSound)
-            print("slope matrix:",slope)
-            print("angle matrix:",angle)
-            #complexTurn(angle,50)
-            angle,x,y= triangulate(times[0]-times[1],times[1]-times[2],times[0]-times[2],cSound)
-            print("angle hyperbola",angle)
+            #x,y,distance= fourMicMatrix()
+            ans=fourMicMatrix()
+            x=ans[0]
+            y=ans[1]
+            distance=ans[2]
+            #print("x: {0:.7f}".format(x))
+            #print("y: {0:.7f}".format(y))
+            #print("distance: {0:.7f}".format(distance))
             print(x)
             print(y)
+            print(distance)
         ###SETTING EVERYTHING BACK UP TO MULTIPROCESS AGAIN
         one=multiprocessing.Process(target=checkMic, args=(q,micOne,1,times,))
         two=multiprocessing.Process(target=checkMic, args=(q,micTwo,2,times,))
         three=multiprocessing.Process(target=checkMic, args=(q,micThree,3,times,))
+        four=multiprocessing.Process(target=checkMic, args=(q,micFour,4,times,))
         mps=[]
         mps.append(one)
         mps.append(two)
         mps.append(three)
-        times=[0,0,0]
+        mps.append(four)
+        times=[0,0,0,0]
         first=[0,0]
         second=[0,0]
         third=[0,0]
+        fourth=[0,0]
         timedReset()
     except KeyboardInterrupt:
         break

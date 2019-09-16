@@ -1,6 +1,6 @@
 ''' Dock_Test.py
 Purpose: Python code for automated Roomba docking to charging station
-Last Modified: 6/28/2019
+Last Modified: 9/16/2019
 '''
 
 ## Import libraries ##
@@ -124,6 +124,7 @@ if Roomba.Available() > 0: # If anything is in the Roomba receive buffer
 time.sleep(0.1)
 
 ## -- Ending Code Starts Here -- ##
+Roomba.PlaySMB()
 # Make sure this code runs to end the program cleanly
 Roomba.ShutDown() # Shutdown Roomba serial connection
 GPIO.cleanup() # Reset GPIO pins for next program
