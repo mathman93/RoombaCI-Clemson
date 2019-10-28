@@ -40,7 +40,7 @@ GPIO.setup(gled, GPIO.OUT, initial=GPIO.LOW)
 # Wake up Roomba sequence
 GPIO.output(gled, GPIO.HIGH) # Turn on green LED to say we are alive
 print(" Starting ROOMBA...")
-Roomba = RoombaCI_lib.Create_2("/dev/ttySO", 115200)
+Roomba = RoombaCI_lib.Create_2("/dev/ttyS0", 115200)
 Roomba.ddPin = 23 # Set Roomba dd pin number
 GPIO.setup(Roomba.ddPin, GPIO.OUT, initial=GPIO.LOW)
 Roomba.WakeUp(131) # Start up Roomba in Safe Mode
@@ -76,7 +76,7 @@ Roomba.Move(0,0) # Start Roomba moving
 
 Roomba.StartQueryStream(7) # Start query stream with specific sensor packets
 # can add other packets later if needed
-while true:
+while True:
 	try:
 		if Roomba.Available() > 0:
 			bumper_byte = Roomba.ReadQueryStream(7)
@@ -92,15 +92,15 @@ while true:
 				elif(bumper_byte % 4) == 2:
 					# left bump
 					print(" Left bumper hit!") #check
-                                else:
+                        	#else:
 				        # both - front hit
-				        print(" Hit head on!") #check
-                        else:
+				#print(" Hit head on!") #check
+                        #else:
 				#no hit
 				#print(" Still clear!") # for debugging
-	except KeyboardInterrupt():
-		print('') # print new line)
-		break # exit while loop
+	#except KeyboardInterrupt():
+		#print('') # print new line)
+		#break # exit while loop
 
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
