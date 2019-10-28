@@ -93,8 +93,8 @@ while true:
 					# left bump
 					print(" Left bumper hit!") #check
                                 else:
-					# both - front hit
-					print(" Hit head on!") #check
+			    	        # both - front hit
+				        print(" Hit head on!") #check
                         else:
 				#no hit
 				#print(" Still clear!") # for debugging
