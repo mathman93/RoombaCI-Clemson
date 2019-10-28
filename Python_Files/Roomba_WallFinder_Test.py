@@ -83,7 +83,7 @@ while True:
 		#print("{0:0>8b}".format(bumper_byte))
 
 		# Bumper logic
-		if (bumper_byte % 4) > 0:	# if there is a hit to bumper
+		if (bumper_byte[0] % 4) > 0:	# if there is a hit to bumper
 			Roomba.Move(0,0) # stop Roomba; replace later
 			#Roomba.PlaySMB() #check
 			if (bumper_byte % 4) == 1:
