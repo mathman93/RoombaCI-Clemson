@@ -51,6 +51,7 @@ while True:
 		
 		if Xbee.inWaiting() > 0: # If there is something in the receive buffer
 			message = Xbee.read(Xbee.inWaiting()).decode() # Read all data in
+			print(message) 
 			print(float(message)) # Display message to screen
 		
 		if (time.time() - basetime) > basetime_offset: # If enough time has passed.
