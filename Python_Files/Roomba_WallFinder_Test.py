@@ -77,30 +77,30 @@ Roomba.Move(0,0) # Start Roomba moving
 Roomba.StartQueryStream(7) # Start query stream with specific sensor packets
 # can add other packets later if needed
 while True:
-	try:
-		if Roomba.Available() > 0:
-			bumper_byte = Roomba.ReadQueryStream(7)
-			print("{0:0>8b};".format(bumper_byte)) # check this
+	#try:
+	if Roomba.Available() > 0:
+		bumper_byte = Roomba.ReadQueryStream(7)
+		print("{0:0>8b};".format(bumper_byte)) # check this
 			
-			# Bumper logic
-			if (bumper_byte % 4) > 0:	# if there is a hit to bumper
-				Roomba.Move(0,0) # stop Roomba; replace later
-				#Roomba.PlaySMB() #check
-				if (bumper_byte % 4) == 1:
-					# right bump
-					print(" Right bumper hit!") #check
-				elif(bumper_byte % 4) == 2:
-					# left bump
-					print(" Left bumper hit!") #check
-                        	#else:
-				        # both - front hit
-				#print(" Hit head on!") #check
+		# Bumper logic
+		if (bumper_byte % 4) > 0:	# if there is a hit to bumper
+			Roomba.Move(0,0) # stop Roomba; replace later
+			#Roomba.PlaySMB() #check
+			if (bumper_byte % 4) == 1:
+				# right bump
+				print(" Right bumper hit!") #check
+			elif(bumper_byte % 4) == 2:
+				# left bump
+				print(" Left bumper hit!") #check
                         #else:
-				#no hit
-				#print(" Still clear!") # for debugging
-	except:
-		print('') # print new line)
-		break # exit while loop
+				# both - front hit
+				#print(" Hit head on!") #check
+		#else:
+			#no hit
+			#print(" Still clear!") # for debugging
+	#except:
+		#print('') # print new line)
+		#break # exit while loop
 
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
