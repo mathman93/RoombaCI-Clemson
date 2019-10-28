@@ -45,8 +45,9 @@ basetime_offset = 0.5
 while True:
 	try:
 		if (time.time() - sendtime) > sendtime_offset:
-			message = str(0089.7) # Make this the number of the Xbee you want to test
-			Xbee.write(message.encode())
+			message = 379.456821 # Make this the number of the Xbee you want to test
+			var = "{0:0>5.3f}".format(message)
+			Xbee.write(var.encode())
 			sendtime += sendtime_offset
 		
 		if Xbee.inWaiting() > 0: # If there is something in the receive buffer
