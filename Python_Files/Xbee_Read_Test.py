@@ -45,15 +45,15 @@ basetime_offset = 0.5
 while True:
 	try:
 		if (time.time() - sendtime) > sendtime_offset:
-			message = 379.456821 # Make this the number of the Xbee you want to test
-			var = "{0:09.3f}".format(message)
-			Xbee.write(var.encode())
-			sendtime += sendtime_offset
+			message = -379.456821 # Make this the number  you want to send
+			var = "{0:09.3f}".format(message) # Make the string representation of the number
+			Xbee.write(var.encode()) # Send the number over the Xbee
+			sendtime += sendtime_offset # Increase offset for next message
 		
 		if Xbee.inWaiting() > 0: # If there is something in the receive buffer
 			message = Xbee.read(Xbee.inWaiting()).decode() # Read all data in
-			print(message) 
-			print(float(message)) # Display message to screen
+			print(message) # To see what the string representation is
+			print(float(message)) # Display message to screen as a number
 		
 		if (time.time() - basetime) > basetime_offset: # If enough time has passed.
 			if GPIO.input(gled) == True:  # If the LED is on...
