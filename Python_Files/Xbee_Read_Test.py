@@ -46,11 +46,11 @@ while True:
 	try:
 		if (time.time() - sendtime) > sendtime_offset:
 			message = 89 # Make this the number of the Xbee you want to test
-			Xbee.write(message.encode())
+			Xbee.write(message)
 			sendtime += sendtime_offset
 		
 		if Xbee.inWaiting() > 0: # If there is something in the receive buffer
-			message = Xbee.read(Xbee.inWaiting()).decode() # Read all data in
+			message = Xbee.read(Xbee.inWaiting()) # Read all data in
 			print(message) # Display message to screen
 		
 		if (time.time() - basetime) > basetime_offset: # If enough time has passed.
