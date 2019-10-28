@@ -64,7 +64,7 @@ if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 #spnspd = 100
 
 # initalize values
-bumper_byte = 0
+bumper_data = 0
 # others as necessary later
 
 # Main Code #
@@ -79,17 +79,17 @@ Roomba.StartQueryStream(7) # Start query stream with specific sensor packets
 while True:
 	#try:
 	if Roomba.Available() > 0:
-		bumper_byte = Roomba.ReadQueryStream(7)
-		#print("{0:0>8b}".format(bumper_byte))
+		bumper_data = Roomba.ReadQueryStream(7)
+		#print("{0:0>8b}".format(bumper_data[0]))
 
 		# Bumper logic
-		if (bumper_byte[0] % 4) > 0:	# if there is a hit to bumper
+		if (bumper_data[0] % 4) > 0:	# if there is a hit to bumper
 			Roomba.Move(0,0) # stop Roomba; replace later
 			#Roomba.PlaySMB() #check
-			if (bumper_byte % 4) == 1:
+			if (bumper_data[0] % 4) == 1:
 				# right bump
 				print(" Right bumper hit!") #check
-			elif(bumper_byte % 4) == 2:
+			elif(bumper_data[0] % 4) == 2:
 				# left bump
 				print(" Left bumper hit!") #check
                         #else:
