@@ -76,7 +76,7 @@ Roomba.Move(0,0) # Start Roomba moving
 
 Roomba.StartQueryStream(7) # Start query stream with specific sensor packets
 # can add other packets later if needed
-while true:
+while True:
 	try:
 		if Roomba.Available() > 0:
 			bumper_byte = Roomba.ReadQueryStream(7)
