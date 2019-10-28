@@ -98,9 +98,9 @@ while True:
                         #else:
 				#no hit
 				#print(" Still clear!") # for debugging
-	except KeyboardInterrupt():
-		print('') # print new line)
-		break # exit while loop
+	#except KeyboardInterrupt():
+		#print('') # print new line)
+		#break # exit while loop
 
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
