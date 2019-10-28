@@ -80,7 +80,7 @@ while True:
 	#try:
 	if Roomba.Available() > 0:
 		bumper_byte = Roomba.ReadQueryStream(7)
-		print("{0:0>8b};".format(bumper_byte)) # check this
+		print("{0>8b};".format(bumper_byte)) # check this
 			
 		# Bumper logic
 		if (bumper_byte % 4) > 0:	# if there is a hit to bumper
