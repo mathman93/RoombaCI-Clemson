@@ -92,9 +92,9 @@ while true:
 				elif(bumper_byte % 4) == 2:
 					# left bump
 					print(" Left bumper hit!") #check
-                                else:
+                        	#else:
 				        # both - front hit
-				        print(" Hit head on!") #check
+				#print(" Hit head on!") #check
                         else:
 				#no hit
 				#print(" Still clear!") # for debugging
