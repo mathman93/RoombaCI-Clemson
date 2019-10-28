@@ -95,7 +95,7 @@ while true:
                         	#else:
 				        # both - front hit
 				#print(" Hit head on!") #check
-                        else:
+                        #else:
 				#no hit
 				#print(" Still clear!") # for debugging
 	except KeyboardInterrupt():
