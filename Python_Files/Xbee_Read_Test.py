@@ -46,7 +46,7 @@ while True:
 	try:
 		if (time.time() - sendtime) > sendtime_offset:
 			message = 379.456821 # Make this the number of the Xbee you want to test
-			var = "{0:0>5.3f}".format(message)
+			var = "{0:09.3f}".format(message)
 			Xbee.write(var.encode())
 			sendtime += sendtime_offset
 		
