@@ -59,10 +59,6 @@ if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 	x = Xbee.read(Xbee.inWaiting()).decode() # Clear out Xbee input buffer
 	#print(x) # for debugging
 
-#initialize move speed - necessary?
-#movSpd = 138
-#spnspd = 100
-
 # initalize values
 bumper_data = 0
 # others as necessary later
@@ -80,7 +76,7 @@ while True:
 	#try:
 	if Roomba.Available() > 0:
 		bumper_data = Roomba.ReadQueryStream(7)
-		#print("{0:0>8b}".format(bumper_data[0]))
+		print("{0:0>8b}".format(bumper_data[0]))
 
 		# Bumper logic
 		if (bumper_data[0] % 4) > 0:	# if there is a hit to bumper
@@ -92,13 +88,13 @@ while True:
 			elif(bumper_data[0] % 4) == 2:
 				# left bump
 				print(" Left bumper hit!") #check
-                        #else:
+                        #else: 
 				# both - front hit
 				#print(" Hit head on!") #check
 		#else:
 			#no hit
 			#print(" Still clear!") # for debugging
-	#except:
+	#except KeyboardInterrupt:
 		#print('') # print new line)
 		#break # exit while loop
 
