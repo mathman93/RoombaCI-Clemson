@@ -108,7 +108,7 @@ while True:
 				# left bump
 				spinVal = spnspd
 				moveVal = -100
-                        else: 
+			else: 
 				# both - front hit
 				y = random.randint(0,1)
 				spinVal = random.randint(spnspd - 50, spnspd + 50)
