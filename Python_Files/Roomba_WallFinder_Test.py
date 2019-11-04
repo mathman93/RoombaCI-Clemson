@@ -98,7 +98,7 @@ while True:
 		print("{0:0>8b}, {1}, {2}".format(bumper_byte, l_counts, r_counts) #check syntax
 
 		# Bumper logic
-		if (bumper_byte % 4) > 0:	# if there is a hit to bumper
+		if (bumper_byte % 4) > 0:	
 			moveHelper = time.time()
 			if (bumper_byte % 4) == 1:
 				# right bump
