@@ -102,14 +102,17 @@ while True:
 			moveHelper = time.time()
 			if (bumper_byte % 4) == 1:
 				# right bump
+				print("Right bumper hit!")
 				spinVal = -spnspd
 				moveVal = -100
 			elif (bumper_byte % 4) == 2:
 				# left bump
+				print("Left bumper hit!")
 				spinVal = spnspd
 				moveVal = -100
 			else: 
 				# both - front hit
+				print("Both bumpers hit!")
 				y = random.randint(0,1)
 				spinVal = random.randint(spnspd - 50, spnspd + 50)
 				if y == 0:
