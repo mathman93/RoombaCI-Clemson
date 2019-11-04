@@ -69,7 +69,7 @@ spinTime = (235 * math.pi) / (4 * spnspd) # from formula
 backTime = 0.5
 dataTimer = time.time()
 timer = time.time()
-
+moveHelper = (time.time() - (spinTime + backTime))
 # initialize values
 spinVal = 100
 moveVal = 0
