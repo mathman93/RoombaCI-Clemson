@@ -115,6 +115,7 @@ while True:
 				if y == 0:
 					spinVal = -spinVal
 				moveVal = -100
+	
 	#timer for the backward movement, then the spin
 	if (time.time() - moveHelper) < backTime:
 		Roomba.Move(moveVal, 0) # backward movement
