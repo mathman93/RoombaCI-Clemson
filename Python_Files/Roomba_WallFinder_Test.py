@@ -95,7 +95,7 @@ while True:
 
 	if Roomba.Available() > 0:
 		bumper_byte, l_counts, r_counts = Roomba.ReadQueryStream(7, 43, 44)
-		print("{0:0>8b}, {1}, {2}".format(bumper_byte, l_counts, r_counts) #check syntax
+		print("{0:0>8b}, {1}, {2}".format(bumper_byte, l_counts, r_counts)) #check syntax
 
 		# Bumper logic
 		if (bumper_byte % 4) > 0:
