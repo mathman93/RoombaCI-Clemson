@@ -69,7 +69,7 @@ spinTime = (235 * math.pi) / (4 * spnspd) # from formula
 backTime = 0.5
 dataTimer = time.time()
 timer = time.time()
-
+moveHelper = (time.time() - (spinTime + backTime))
 # initialize values
 spinVal = 100
 moveVal = 0
@@ -108,7 +108,7 @@ while True:
 				# left bump
 				spinVal = spnspd
 				moveVal = -100
-                        else: 
+			else: 
 				# both - front hit
 				y = random.randint(0,1)
 				spinVal = random.randint(spnspd - 50, spnspd + 50)
@@ -120,7 +120,7 @@ while True:
 		Roomba.Move(moveVal, 0) # backward movement
 	elif (time.time() - moveHelper) < (backTime + spinTime):
 		Roomba.Move(0, spinVal) # spin
-	else:
+	else: 
 		Roomba.Move(movSpd, 0) # forward
 
 ## -- Ending Code Starts Here -- ##
