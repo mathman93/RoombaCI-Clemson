@@ -120,7 +120,7 @@ while True:
 		Roomba.Move(moveVal, 0) # backward movement
 	elif (time.time() - moveHelper) < (backTime + spinTime):
 		Roomba.Move(0, spinVal) # spin
-	else:
+	else: 
 		Roomba.Move(movSpd, 0) # forward
 
 ## -- Ending Code Starts Here -- ##
