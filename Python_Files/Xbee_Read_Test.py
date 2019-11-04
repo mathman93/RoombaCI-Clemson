@@ -45,8 +45,9 @@ basetime_offset = 0.5
 while True:
 	try:
 		if (time.time() - sendtime) > sendtime_offset:
-			message = 779.456821 # Make this the number  you want to send
-			var = "{0:09.3f}".format(message) # Make the string representation of the number
+			message1 = 779.456821 # Make this the number  you want to send
+			message2 = -17
+			var = "{0:09.3f}"{1:09.3f}".format(message1,message2) # Make the string representation of the number
 			Xbee.write(var.encode()) # Send the number over the Xbee
 			sendtime += sendtime_offset # Increase offset for next message
 		
