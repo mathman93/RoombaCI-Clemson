@@ -1,7 +1,7 @@
 '''
 Roomba_WallFinder_Test.py
 Purpose: Test code to have Roomba report when it has hit an obstacle
-Last Modified: 11/04/19
+Last Modified: 11/11/19
 '''
 
 ## Import libraries ##
@@ -74,6 +74,7 @@ moveHelper = (time.time() - (spinTime + backTime))
 spinVal = 100
 moveVal = 0
 bumper_byte = 0
+#which_bumper = 0 # keeps track of which bumper was hit
 
 # Main Code #
 query_time = time.time() # set base time for query
@@ -106,11 +107,13 @@ while True:
 					print("Right bumper hit!")
 					spinVal = -spnspd
 					moveVal = -100
+					#which_bumper = 1
 				elif (bumper_byte % 4) == 2:
 					# left bump
 					print("Left bumper hit!")
 					spinVal = spnspd
 					moveVal = -100
+					#which_bumper = 2
 				else: 
 					# both - front hit
 					print("Both bumpers hit!")
@@ -119,6 +122,7 @@ while True:
 					if y == 0:
 						spinVal = -spinVal
 					moveVal = -100
+					#which_bumper = 3
 	
 		#timer for the backward movement, then the spin
 		if (time.time() - moveHelper) < backTime:
@@ -127,6 +131,20 @@ while True:
 			Roomba.Move(0, spinVal) # spin
 		else: 
 			Roomba.Move(movSpd, 0) # forward
+			''' potential code for wall-following; needs work
+			wait a certain amount of time somehow
+			bumper_byte, l_counts, r_counts = Roomba.ReadQueryStream(7, 43, 44)
+			if (bumper_byte % 4) > 0:
+				# Roomba has not cleared wall yet
+				# start while loop again
+			else:
+				# command Roomba to turn back towards wall
+				# moveHelper = time.time()
+				# if (which_bumper > 0): # need to make sure Roomba has hit at least once
+				moveVal = -1 * moveVal
+				spinVal = -1 * spinVal
+				Roomba.Move(moveVal, spinVal) # might need to time this
+			'''
 
 	except KeyboardInterrupt:
 		print('')
