@@ -130,6 +130,7 @@ while True:
 	except KeyboardInterrupt:
 		print('')
 		break # exit while loop
+
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
 Roomba.PauseQueryStream() # Pause Query Stream before ending program
