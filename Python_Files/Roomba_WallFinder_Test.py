@@ -132,7 +132,7 @@ while True:
 		else: 
 			Roomba.Move(movSpd, 0) # forward
 			''' potential code for wall-following; needs work
-			wait a certain amount of time somehow
+			time.sleep(3) # should pause program for 3 seconds; may need longer
 			bumper_byte, l_counts, r_counts = Roomba.ReadQueryStream(7, 43, 44)
 			if (bumper_byte % 4) > 0:
 				# Roomba has not cleared wall yet
