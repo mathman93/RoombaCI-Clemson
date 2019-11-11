@@ -67,7 +67,7 @@ spnspd = 50
 # initialize timers
 #spinTime = (235 * math.pi) / (4 * spnspd) # from formula
 spinTime = 1 # arbitrary number
-backTime = 0.5
+backTime = 0.25
 dataTimer = time.time()
 timer = time.time()
 moveHelper = (time.time() - (spinTime + backTime))
@@ -128,7 +128,7 @@ while True:
 					if y == 0:
 						spinVal = -spinVal
 					moveVal = -100
-				forwardSpin = -spinVal
+				forwardSpin = -spinVal / 2
 	
 			#timer for the backward movement, then the spin
 			if (time.time() - moveHelper) < backTime:
