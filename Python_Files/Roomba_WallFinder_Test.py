@@ -66,7 +66,7 @@ spnspd = 50
 
 # initialize timers
 #spinTime = (235 * math.pi) / (4 * spnspd) # from formula
-spinTime = 0.2 # arbitrary number
+spinTime = 0.5 # arbitrary number
 backTime = 0.5
 dataTimer = time.time()
 timer = time.time()
