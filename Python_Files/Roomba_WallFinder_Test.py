@@ -74,8 +74,9 @@ moveHelper = (time.time() - (spinTime + backTime))
 spinVal = 100
 moveVal = 0
 bumper_byte = 0
-bumper_hits = 0
+#bumper_hits = 0
 #which_bumper = 0 # keeps track of which bumper was hit
+forwardSpin = 0
 
 # Main Code #
 query_time = time.time() # set base time for query
@@ -103,20 +104,21 @@ while True:
 			# Bumper logic
 			if (bumper_byte % 4) > 0:
 				moveHelper = time.time()
-				bumper_hits += 1
-				print("%s",bumper_hits)
+				# bumper_hits += 1
+				# print("%s",bumper_hits)
 				if (bumper_byte % 4) == 1:
 					# right bump
 					print("Right bumper hit!")
 					spinVal = -spnspd
 					moveVal = -100
-					#which_bumper = 1
+					#forwardSpin = spnspd
 				elif (bumper_byte % 4) == 2:
 					# left bump
 					print("Left bumper hit!")
 					spinVal = spnspd
 					moveVal = -100
-					#which_bumper = 2
+					#forwardSpin = -spnspd
+
 				else: 
 					# both - front hit
 					print("Both bumpers hit!")
@@ -125,26 +127,27 @@ while True:
 					if y == 0:
 						spinVal = -spinVal
 					moveVal = -100
-					#which_bumper = 3
+				forwardSpin = -spinVal
 	
-		#timer for the backward movement, then the spin
-		if (time.time() - moveHelper) < backTime:
-			Roomba.Move(moveVal, 0) # backward movement
-		elif (time.time() - moveHelper) < (backTime + spinTime):
-			Roomba.Move(0, spinVal) # spin
-		else: 
-			Roomba.Move(movSpd, 0) # forward
-			# potential code for wall-following; needs work
-			time.sleep(0.1) # should pause program for 0.5 seconds
-			bumper_byte, l_counts, r_counts = Roomba.ReadQueryStream(7, 43, 44)
-			if ((bumper_byte % 4) == 0) and (bumper_hits > 0):
-				# command Roomba to turn back towards wall
-				# moveHelper = time.time()
-				# if (which_bumper > 0): # need to make sure Roomba has hit at least once - necessary?
-				moveVal = -1 * moveVal
-				spinVal = -1 * spinVal
-				Roomba.Move(moveVal, spinVal) # might need to time this
-				print("Turning back to wall")
+			#timer for the backward movement, then the spin
+			if (time.time() - moveHelper) < backTime:
+				Roomba.Move(moveVal, 0) # backward movement
+			elif (time.time() - moveHelper) < (backTime + spinTime):
+				Roomba.Move(0, spinVal) # spin
+			else: 
+				Roomba.Move(movSpd, forwardSpin) # forward and spin
+				'''# potential code for wall-following; maybe delete
+				time.sleep(0.1) # should pause program for 0.5 seconds
+				bumper_byte, l_counts, r_counts = Roomba.ReadQueryStream(7, 43, 44)
+				if ((bumper_byte % 4) == 0) and (bumper_hits > 0):
+					# command Roomba to turn back towards wall
+					# moveHelper = time.time()
+					# if (which_bumper > 0): # need to make sure Roomba has hit at least once - necessary?
+					moveVal = -1 * moveVal
+					spinVal = -1 * spinVal
+					Roomba.Move(moveVal, spinVal) # might need to time this
+					print("Turning back to wall")
+				'''
 
 	except KeyboardInterrupt:
 		print('')
