@@ -74,6 +74,7 @@ moveHelper = (time.time() - (spinTime + backTime))
 spinVal = 100
 moveVal = 0
 bumper_byte = 0
+bumper_hits = 0
 #which_bumper = 0 # keeps track of which bumper was hit
 
 # Main Code #
@@ -102,6 +103,7 @@ while True:
 			# Bumper logic
 			if (bumper_byte % 4) > 0:
 				moveHelper = time.time()
+				bumper_hits += 1
 				if (bumper_byte % 4) == 1:
 					# right bump
 					print("Right bumper hit!")
@@ -134,7 +136,7 @@ while True:
 			# potential code for wall-following; needs work
 			time.sleep(3) # should pause program for 3 seconds; may need longer
 			bumper_byte, l_counts, r_counts = Roomba.ReadQueryStream(7, 43, 44)
-			if (bumper_byte % 4) == 0:
+			if ((bumper_byte % 4) == 0) and (bumper_hits > 0):
 				# command Roomba to turn back towards wall
 				# moveHelper = time.time()
 				# if (which_bumper > 0): # need to make sure Roomba has hit at least once - necessary?
