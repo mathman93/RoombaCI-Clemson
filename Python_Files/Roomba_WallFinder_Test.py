@@ -134,8 +134,8 @@ while True:
 			Roomba.Move(0, spinVal) # spin
 		else: 
 			Roomba.Move(movSpd, 0) # forward
-			'''# potential code for wall-following; needs work
-			time.sleep(3) # should pause program for 3 seconds; may need longer
+			# potential code for wall-following; needs work
+			time.sleep(0.1) # should pause program for 0.5 seconds
 			bumper_byte, l_counts, r_counts = Roomba.ReadQueryStream(7, 43, 44)
 			if ((bumper_byte % 4) == 0) and (bumper_hits > 0):
 				# command Roomba to turn back towards wall
@@ -145,7 +145,6 @@ while True:
 				spinVal = -1 * spinVal
 				Roomba.Move(moveVal, spinVal) # might need to time this
 				print("Turning back to wall")
-			'''
 
 	except KeyboardInterrupt:
 		print('')
