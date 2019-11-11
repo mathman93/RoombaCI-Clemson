@@ -62,7 +62,7 @@ if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 
 # initalize speeds
 movSpd = 138 # initializes move speed
-spnspd = 100
+spnspd = 50
 
 # initialize timers
 spinTime = (235 * math.pi) / (4 * spnspd) # from formula
