@@ -134,10 +134,7 @@ while True:
 			# potential code for wall-following; needs work
 			time.sleep(3) # should pause program for 3 seconds; may need longer
 			bumper_byte, l_counts, r_counts = Roomba.ReadQueryStream(7, 43, 44)
-			if (bumper_byte % 4) > 0:
-				# Roomba has not cleared wall yet
-				# start while loop again
-			else:
+			if (bumper_byte % 4) = 0:
 				# command Roomba to turn back towards wall
 				# moveHelper = time.time()
 				# if (which_bumper > 0): # need to make sure Roomba has hit at least once - necessary?
