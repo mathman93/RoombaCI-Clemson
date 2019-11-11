@@ -140,7 +140,7 @@ while True:
 			else:
 				# command Roomba to turn back towards wall
 				# moveHelper = time.time()
-				# if (which_bumper > 0): # need to make sure Roomba has hit at least once
+				# if (which_bumper > 0): # need to make sure Roomba has hit at least once - necessary?
 				moveVal = -1 * moveVal
 				spinVal = -1 * spinVal
 				Roomba.Move(moveVal, spinVal) # might need to time this
