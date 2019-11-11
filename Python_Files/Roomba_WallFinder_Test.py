@@ -127,6 +127,7 @@ while True:
 			Roomba.Move(0, spinVal) # spin
 		else: 
 			Roomba.Move(movSpd, 0) # forward
+
 	except KeyboardInterrupt:
 		print('')
 		break # exit while loop
