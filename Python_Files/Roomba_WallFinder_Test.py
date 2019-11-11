@@ -85,48 +85,51 @@ Roomba.Move(0,0) # Start Roomba moving
 Roomba.StartQueryStream(7, 43, 44) # Start query stream with specific sensor packets
 # can add other packets later if needed
 while True:
-	if (time.time() - timer) > 0.5:
-		#flickers green led for checking if it works
-		if GPIO.input(gled) == True:
-			GPIO.output(gled, 0)
-		else:
-			GPIO.output(gled, 1)
-		timer = time.time()	
+	try:
+		if (time.time() - timer) > 0.5:
+			#flickers green led for checking if it works
+			if GPIO.input(gled) == True:
+				GPIO.output(gled, 0)
+			else:
+				GPIO.output(gled, 1)
+			timer = time.time()	
 
-	if Roomba.Available() > 0:
-		bumper_byte, l_counts, r_counts = Roomba.ReadQueryStream(7, 43, 44)
-		print("{0:0>8b}, {1}, {2}".format(bumper_byte, l_counts, r_counts)) #check syntax
+		if Roomba.Available() > 0:
+			bumper_byte, l_counts, r_counts = Roomba.ReadQueryStream(7, 43, 44)
+			print("{0:0>8b}, {1}, {2}".format(bumper_byte, l_counts, r_counts)) #check syntax
 
-		# Bumper logic
-		if (bumper_byte % 4) > 0:
-			moveHelper = time.time()
-			if (bumper_byte % 4) == 1:
-				# right bump
-				print("Right bumper hit!")
-				spinVal = -spnspd
-				moveVal = -100
-			elif (bumper_byte % 4) == 2:
-				# left bump
-				print("Left bumper hit!")
-				spinVal = spnspd
-				moveVal = -100
-			else: 
-				# both - front hit
-				print("Both bumpers hit!")
-				y = random.randint(0,1)
-				spinVal = random.randint(spnspd - 50, spnspd + 50)
-				if y == 0:
-					spinVal = -spinVal
-				moveVal = -100
+			# Bumper logic
+			if (bumper_byte % 4) > 0:
+				moveHelper = time.time()
+				if (bumper_byte % 4) == 1:
+					# right bump
+					print("Right bumper hit!")
+					spinVal = -spnspd
+					moveVal = -100
+				elif (bumper_byte % 4) == 2:
+					# left bump
+					print("Left bumper hit!")
+					spinVal = spnspd
+					moveVal = -100
+				else: 
+					# both - front hit
+					print("Both bumpers hit!")
+					y = random.randint(0,1)
+					spinVal = random.randint(spnspd - 50, spnspd + 50)
+					if y == 0:
+						spinVal = -spinVal
+					moveVal = -100
 	
-	#timer for the backward movement, then the spin
-	if (time.time() - moveHelper) < backTime:
-		Roomba.Move(moveVal, 0) # backward movement
-	elif (time.time() - moveHelper) < (backTime + spinTime):
-		Roomba.Move(0, spinVal) # spin
-	else: 
-		Roomba.Move(movSpd, 0) # forward
-
+		#timer for the backward movement, then the spin
+		if (time.time() - moveHelper) < backTime:
+			Roomba.Move(moveVal, 0) # backward movement
+		elif (time.time() - moveHelper) < (backTime + spinTime):
+			Roomba.Move(0, spinVal) # spin
+		else: 
+			Roomba.Move(movSpd, 0) # forward
+	except KeyboardInterrupt:
+		print('')
+		break # exit while loop
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
 Roomba.PauseQueryStream() # Pause Query Stream before ending program
