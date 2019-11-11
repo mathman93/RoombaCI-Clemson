@@ -54,7 +54,7 @@ while True:
 		if Xbee.inWaiting() > 17: # If there is something in the receive buffer
 			message = Xbee.read(Xbee.inWaiting()).decode() # Read all data in
 			print(message) # To see what the string representation is
-			coordinate = message.split( ) # To split the string into x and y coordinates
+			coordinate = message.split() # To split the string into x and y coordinates
 			print(coordinate)
 			#absissa = float(coordinate[0])
 			#print(absissa)			
