@@ -128,7 +128,8 @@ while True:
 					if y == 0:
 						spinVal = -spinVal
 					moveVal = -100
-				forwardSpin = -spinVal / 2
+				forwardSpin = -spinVal # need to decrease and convert back to integer
+							# Roomba Move command needs to be sent an int
 	
 			#timer for the backward movement, then the spin
 			if (time.time() - moveHelper) < backTime:
