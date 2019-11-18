@@ -62,11 +62,11 @@ if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 
 # initalize speeds
 movSpd = 138 # initializes move speed
-spnspd = 50
+spnspd = 75
 
 # initialize timers
 #spinTime = (235 * math.pi) / (4 * spnspd) # from formula
-spinTime = 1 # arbitrary number
+spinTime = 0.75 # arbitrary number
 backTime = 0.25
 dataTimer = time.time()
 timer = time.time()
@@ -137,18 +137,6 @@ while True:
 				Roomba.Move(0, spinVal) # spin
 			else: 
 				Roomba.Move(movSpd, forwardSpin) # forward and spin
-				'''# potential code for wall-following; maybe delete
-				time.sleep(0.1) # should pause program for 0.5 seconds
-				bumper_byte, l_counts, r_counts = Roomba.ReadQueryStream(7, 43, 44)
-				if ((bumper_byte % 4) == 0) and (bumper_hits > 0):
-					# command Roomba to turn back towards wall
-					# moveHelper = time.time()
-					# if (which_bumper > 0): # need to make sure Roomba has hit at least once - necessary?
-					moveVal = -1 * moveVal
-					spinVal = -1 * spinVal
-					Roomba.Move(moveVal, spinVal) # might need to time this
-					print("Turning back to wall")
-				'''
 
 	except KeyboardInterrupt:
 		print('')
