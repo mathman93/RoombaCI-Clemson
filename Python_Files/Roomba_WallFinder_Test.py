@@ -71,12 +71,12 @@ backTime = 0.25
 dataTimer = time.time()
 timer = time.time()
 moveHelper = (time.time() - (spinTime + backTime))
+
 # initialize values
 spinVal = 100
 moveVal = 0
 bumper_byte = 0
-#bumper_hits = 0
-#which_bumper = 0 # keeps track of which bumper was hit
+last_bumper = 0 # tracks which bumper was hit on previous loop
 forwardSpin = 0
 
 # Main Code #
@@ -105,21 +105,18 @@ while True:
 			# Bumper logic
 			if (bumper_byte % 4) > 0:
 				moveHelper = time.time()
-				# bumper_hits += 1
-				# print("%s",bumper_hits)
 				if (bumper_byte % 4) == 1:
 					# right bump
 					print("Right bumper hit!")
 					spinVal = -spnspd
 					moveVal = -100
-					#forwardSpin = spnspd
+					last_bump = 1
 				elif (bumper_byte % 4) == 2:
 					# left bump
 					print("Left bumper hit!")
 					spinVal = spnspd
 					moveVal = -100
-					#forwardSpin = -spnspd
-
+					last_bump = 2
 				else: 
 					# both - front hit
 					print("Both bumpers hit!")
@@ -128,7 +125,9 @@ while True:
 					if y == 0:
 						spinVal = -spinVal
 					moveVal = -100
-				forwardSpin = int(-spinVal / 2) 
+					last_bump = 3
+				forwardSpin = int(-spinVal / 2)
+				print(last_bump) 
 	
 			#timer for the backward movement, then the spin
 			if (time.time() - moveHelper) < backTime:
