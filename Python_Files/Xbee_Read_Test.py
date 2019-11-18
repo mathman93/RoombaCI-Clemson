@@ -42,6 +42,9 @@ sendtime_offset = 1.0
 basetime = time.time()
 basetime_offset = 0.5
 
+		if Xbee.inWaiting() > 0:
+			XBee.read(Xbee.inWaiting().decode() = junk
+			print(junk)
 while True:
 	try:
 		if (time.time() - sendtime) > sendtime_offset:
@@ -51,9 +54,7 @@ while True:
 			Xbee.write(var.encode()) # Send the number over the Xbee
 			sendtime += sendtime_offset # Increase offset for next message
 		
-		Xbee.inWaiting() > 0:
-		XBee.read(Xbee.inWaiting().decode() = junk
-		print(junk)
+		
 		if Xbee.inWaiting() > 18: # If there is something in the receive buffer
 			message = Xbee.read(Xbee.inWaiting()).decode() # Read all data in
 			print(message) # To see what the string representation is
