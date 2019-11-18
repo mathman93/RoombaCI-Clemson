@@ -52,7 +52,7 @@ while True:
 			sendtime += sendtime_offset # Increase offset for next message
 		
 		if Xbee.inWaiting() > 18: # If there is something in the receive buffer
-			message = Xbee.read(Xbee.inWaiting()).decode() # Read all data in
+			message = Xbee.read(19).decode() # Read all data in
 			print(message) # To see what the string representation is
 			coordinate = message.split() # To split the string into x and y coordinates
 			print(coordinate) #print the newly made list from the split
