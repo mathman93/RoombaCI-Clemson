@@ -43,7 +43,7 @@ basetime = time.time()
 basetime_offset = 0.5
 
 if Xbee.inWaiting() > 0:
-	junk = XBee.read(Xbee.inWaiting().decode()
+	junk = XBee.read(Xbee.inWaiting().decode())
 	print(junk)
 while True:
 	try:
