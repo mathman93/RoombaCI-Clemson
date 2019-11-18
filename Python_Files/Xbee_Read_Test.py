@@ -51,11 +51,11 @@ while True:
 			Xbee.write(var.encode()) # Send the number over the Xbee
 			sendtime += sendtime_offset # Increase offset for next message
 		
-		if Xbee.inWaiting() > 17: # If there is something in the receive buffer
+		if Xbee.inWaiting() > 18: # If there is something in the receive buffer
 			message = Xbee.read(Xbee.inWaiting()).decode() # Read all data in
 			print(message) # To see what the string representation is
 			coordinate = message.split() # To split the string into x and y coordinates
-			#print(coordinate)
+			print(coordinate[0])
 			absissa = float(coordinate[0])
 			print(absissa)			
 			#print(float(message)) # Display message to screen as a number
