@@ -48,8 +48,8 @@ if Xbee.inWaiting() > 0:
 while True:
 	try:
 		if (time.time() - sendtime) > sendtime_offset:
-			message1 = 779.456821 # Make this the number  you want to send
-			message2 = -17
+			message1 = 7714 # Make this the number  you want to send
+			message2 = -00891.3
 			var = "{0:09.3f} {1:09.3f}".format(message1,message2) # Make the string representation of the number
 			Xbee.write(var.encode()) # Send the number over the Xbee
 			sendtime += sendtime_offset # Increase offset for next message
