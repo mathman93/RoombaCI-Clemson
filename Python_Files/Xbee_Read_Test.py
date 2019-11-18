@@ -55,8 +55,9 @@ while True:
 			message = Xbee.read(Xbee.inWaiting()).decode() # Read all data in
 			print(message) # To see what the string representation is
 			message.split() # To split the string into x and y coordinates
-			print(message)
-			#print(coordinate[0])
+			print(message) #print the newly made list from the split
+			message = coordinate #set the list to coordinate instead of message
+			print(coordinate[0])
 			#absissa = float(coordinate[0])
 			#print(absissa)			
 			#print(float(message)) # Display message to screen as a number
