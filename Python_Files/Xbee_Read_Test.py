@@ -59,10 +59,10 @@ while True:
 			message = Xbee.read(Xbee.inWaiting()).decode() # Read all data in
 			print(message) # To see what the string representation is
 			coordinate = message.split() # To split the string into x and y coordinates
-			#print(coordinate) #print the newly made list from the split
 			absissa = float(coordinate[0])
 			print(absissa)			
-			#print(float(message)) # Display message to screen as a number
+			ordinate = float(coordinate[1])
+			print(ordinate)
 		
 		if (time.time() - basetime) > basetime_offset: # If enough time has passed.
 			if GPIO.input(gled) == True:  # If the LED is on...
