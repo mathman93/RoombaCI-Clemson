@@ -60,8 +60,7 @@ while True:
 			print(message) # To see what the string representation is
 			coordinate = message.split() # To split the string into x and y coordinates
 			print(coordinate) #print the newly made list from the split
-			#message = coordinate set the list to coordinate instead of message
-			#print(message[0])
+			print(coordinate[0])
 			#absissa = float(coordinate[0])
 			#print(absissa)			
 			#print(float(message)) # Display message to screen as a number
