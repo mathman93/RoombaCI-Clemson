@@ -41,30 +41,35 @@ sendtime = time.time()
 sendtime_offset = 1.0
 basetime = time.time()
 basetime_offset = 0.5
+roombaname = 'rp2'
 
+if Xbee.inWaiting() > 0:
+	junk = XBee.read(Xbee.inWaiting().decode())
+	print(junk)
 while True:
 	try:
 		if (time.time() - sendtime) > sendtime_offset:
-			message1 = 779.456821 # Make this the number  you want to send
-			message2 = -17
-			var = "{0:09.3f} {1:09.3f}".format(message1,message2) # Make the string representation of the number
+			message1 = 7714 # Make this the number  you want to send
+			message2 = -00891.3
+			var = "{0} {1:09.3f} {2:09.3f}".format(roombaname, message1,message2) # Make the string representation of the number
 			Xbee.write(var.encode()) # Send the number over the Xbee
 			sendtime += sendtime_offset # Increase offset for next message
 		
-		if Xbee.inWaiting() > 18: # If there is something in the receive buffer
+		
+		if Xbee.inWaiting() > 23: # If there is something in the receive buffer
 			message = Xbee.read(Xbee.inWaiting()).decode() # Read all data in
 			print(message) # To see what the string representation is
-			message.split() # To split the string into x and y coordinates
-			print(message) #print the newly made list from the split
-			#message = coordinate set the list to coordinate instead of message
-			#print(message[0])
-			#absissa = float(coordinate[0])
-			#print(absissa)			
-			#print(float(message)) # Display message to screen as a number
+			coordinate = message.split() # To split the string into x and y coordinates
+			id = coordinate[0]
+			print(id)
+			absissa = float(coordinate[1])
+			print(absissa)			
+			ordinate = float(coordinate[2])
+			print(ordinate)
 		
 		if (time.time() - basetime) > basetime_offset: # If enough time has passed.
 			if GPIO.input(gled) == True:  # If the LED is on...
-				GPIO.output(gled, GPIO.LOW)  # turn it off.
+				GPIO.output(gled, GPIO.LOW)  # turn it off
 			else:
 				GPIO.output(gled, GPIO.HIGH) # otherwise, turn it on.
 			basetime += basetime_offset  # set the next base time
