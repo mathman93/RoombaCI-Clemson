@@ -41,7 +41,7 @@ sendtime = time.time()
 sendtime_offset = 1.0
 basetime = time.time()
 basetime_offset = 0.5
-roombaname = rp2
+roombaname = 'rp2'
 
 if Xbee.inWaiting() > 0:
 	junk = XBee.read(Xbee.inWaiting().decode())
