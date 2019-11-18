@@ -44,7 +44,7 @@ basetime_offset = 0.5
 roombaname = 'rp2'
 
 if Xbee.inWaiting() > 0:
-	junk = Xbee.read(Xbee.inWaiting().decode())
+	junk = Xbee.read(Xbee.inWaiting()).decode()
 	print(junk)
 while True:
 	try:
