@@ -52,7 +52,6 @@ while True:
 			message1 = 7714 # Make this the number  you want to send
 			message2 = -00891.3
 			var = "{0} {1:09.3f} {2:09.3f}".format(roombaname, message1,message2) # Make the string representation of the number
-			print(var)
 			Xbee.write(var.encode()) # Send the number over the Xbee
 			sendtime += sendtime_offset # Increase offset for next message
 		
