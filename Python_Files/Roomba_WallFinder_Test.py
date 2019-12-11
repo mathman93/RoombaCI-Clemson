@@ -131,8 +131,10 @@ while True:
 					last_bump = 3
 				forwardSpin = int(-spinVal / 2)
 				last_encoder_left = l_counts
+				print(last_encoder_left)
 				last_encoder_right = r_counts
-				#print(last_bump) 
+				
+				# if statement here 
 	
 			#timer for the backward movement, then the spin
 			if (time.time() - moveHelper) < backTime:
