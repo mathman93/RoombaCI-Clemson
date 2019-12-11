@@ -73,7 +73,7 @@ timer = time.time()
 moveHelper = (time.time() - (spinTime + backTime))
 
 # initialize values
-spinVal = 100
+spinVal = 0 # was 100, just trying something
 moveVal = 0
 bumper_byte = 0
 last_bumper = 0 # tracks which bumper was hit on previous loop
@@ -127,7 +127,7 @@ while True:
 					moveVal = -100
 					last_bump = 3
 				forwardSpin = int(-spinVal / 2)
-				print(last_bump) 
+				//print(last_bump) 
 	
 			#timer for the backward movement, then the spin
 			if (time.time() - moveHelper) < backTime:
