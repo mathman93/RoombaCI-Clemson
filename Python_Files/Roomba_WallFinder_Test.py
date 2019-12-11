@@ -77,6 +77,9 @@ spinVal = 0 # was 100, just trying something
 moveVal = 0
 bumper_byte = 0
 last_bumper = 0 # tracks which bumper was hit on previous loop
+last_encoder_left = 0
+last_encoder_right = 0
+stuck_count = 0
 forwardSpin = 0
 
 # Main Code #
@@ -127,6 +130,8 @@ while True:
 					moveVal = -100
 					last_bump = 3
 				forwardSpin = int(-spinVal / 2)
+				last_encoder_left = l_counts
+				last_encoder_right = r_counts
 				#print(last_bump) 
 	
 			#timer for the backward movement, then the spin
