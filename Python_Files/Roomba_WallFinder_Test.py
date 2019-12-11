@@ -127,7 +127,7 @@ while True:
 					moveVal = -100
 					last_bump = 3
 				forwardSpin = int(-spinVal / 2)
-				//print(last_bump) 
+				#print(last_bump) 
 	
 			#timer for the backward movement, then the spin
 			if (time.time() - moveHelper) < backTime:
