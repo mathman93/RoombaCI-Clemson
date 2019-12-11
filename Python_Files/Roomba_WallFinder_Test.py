@@ -105,7 +105,7 @@ distance_per_count = (wheel_diameter*math.pi)/counts_per_rev
 data_time = time.time()
 
 # Write initial data to file
-file.write("{0},{1},{2},{3},{4},{5},{6:0>8b}\n".format(0,left_start,right_start,x_position,y_position,theta,bumper_byte))
+file.write("{0:.3f},{1},{2},{3:.3f},{4:.3f},{5:.5f},{6:0>8b}\n".format(0,left_start,right_start,x_position,y_position,theta,bumper_byte))
 
 # Main Code #
 query_time = time.time() # set base time for query
@@ -144,7 +144,7 @@ while True:
 			x_position = x_position + delta_d*math.cos(theta-.5*delta_theta)
 			y_position = y_position + delta_d*math.sin(theta-.5*delta_theta)
 			# write the time, left encoder, right encoder, x position, y position, and theta
-			file.write("{0},{1},{2},{3},{4},{5},{6:0>8b}\n".format(data_time2-data_time,l_counts,r_counts,x_position,y_position,theta,bumper_byte))
+			file.write("{0:.3f},{1},{2},{3:.3f},{4:.3f},{5:.5f},{6:0>8b}\n".format(data_time2-data_time,l_counts,r_counts,x_position,y_position,theta,bumper_byte))
 			left_start = l_counts
 			right_start = r_counts
 			
