@@ -132,9 +132,11 @@ while True:
 					moveVal = -100
 					last_bump = 3
 				forwardSpin = int(-spinVal / 2)
-				
 				l_difference = abs(last_encoder_left - l_counts)
 				r_difference = abs(last_encoder_right - r_counts)
+
+				if ((l_difference > 300) && (r_difference > 300)):
+					stuck_count += 1
 
 				last_encoder_left = l_counts
 				last_encoder_right = r_counts
