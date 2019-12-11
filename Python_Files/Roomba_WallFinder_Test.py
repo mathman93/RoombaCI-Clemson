@@ -145,8 +145,8 @@ while True:
 			y_position = y_position + delta_d*math.sin(theta-.5*delta_theta)
 			# write the time, left encoder, right encoder, x position, y position, and theta
 			file.write("{0},{1},{2},{3},{4},{5},{6:0>8b}\n".format(data_time2-data_time,l_counts,r_counts,x_position,y_position,theta,bumper_byte))
-			left_start = left_encoder
-			right_start = right_encoder
+			left_start = l_counts
+			right_start = r_counts
 			
 			# Bumper logic
 			if (bumper_byte % 4) > 0:
