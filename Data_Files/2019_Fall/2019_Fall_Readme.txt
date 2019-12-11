@@ -1,0 +1,1 @@
+This folder contains data collected during the Fall of 2019.
