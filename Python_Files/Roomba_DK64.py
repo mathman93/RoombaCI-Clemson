@@ -186,7 +186,7 @@ song_list = [0, 1, 2, 3]
 while True:
 	try:
 		for song in song_list:
-			# Play SuperStar
+			# Play DK64 Theme
 			Roomba.DirectWrite(141) # Header Opcode
 			Roomba.DirectWrite(song)   # Song number (0-3)
 			
