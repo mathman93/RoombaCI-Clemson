@@ -172,10 +172,24 @@ def MyLoop(stdscr):
 				x_pos += delta_distance*math.cos(math.radians(angle-.5*delta_angle))
 				y_pos += delta_distance*math.sin(math.radians(angle-.5*delta_angle))
 				
+				# Measure IMU values
+				accel_x, accel_y, accel_z = imu.acceleration
+				mag_x, mag_y, mag_z = imu.magnetic
+				gyro_x, gyro_y, gyro_z = imu.gyro
+
 				# Display current data to the screen
 				stdscr.move(5,0)
 				stdscr.clrtoeol() # Clear line
-				stdscr.addstr(5,0,"{0:.4f}, {1:0>8b}, {2}, {3}, {4:0>8b}, {5}, {6}, {7:.3f}, {8:.3f};".format(current_time, bumper_byte, l_counts, r_counts, light_bumper, l_speed, r_speed, y_pos, x_pos))
+				stdscr.addstr(5,0,"{0:.4f}, {1:0>8b}, {2}, {3}, {4:0>8b}, {5}, {6}, {7:.3f}, {8:.3f}, {9:.2f};".format(current_time, bumper_byte, l_counts, r_counts, light_bumper, l_speed, r_speed, y_pos, x_pos, angle))
+				stdscr.move(6,0)
+				stdscr.clrtoeol() # Clear line
+				stdscr.addstr(6,0,"{0:.3f}, {1:.3f}, {2:.3f}; (9.8 m/s^2)".format(accel_x, accel_y, accel_z))
+				stdscr.move(7,0)
+				stdscr.clrtoeol() # Clear line
+				stdscr.addstr(7,0,"{0:.3f}, {1:.3f}, {2:.3f}; (Gauss)".format(mag_x, mag_y, mag_z))
+				stdscr.move(8,0)
+				stdscr.clrtoeol() # Clear line
+				stdscr.addstr(8,0,"{0:.3f}, {1:.3f}, {2:.3f}; (deg/s)".format(gyro_x, gyro_y, gyro_z))
 				
 				# Update current wheel encoder counts
 				l_counts_current = l_counts
