@@ -166,11 +166,11 @@ def MyLoop(stdscr):
 				if delta_l_count-delta_r_count == 0: # delta_angle == 0
 					delta_distance = 0.5*(delta_l_count+delta_r_count)*DISTANCE_CONSTANT
 				else: # delta_angle != 0
-					delta_distance = 2*(WHEEL_SEPARATION*(delta_l_count/(delta_l_count-delta_r_count)-.5))*math.sin(delta_angle/2)
+					delta_distance = 2*(WHEEL_SEPARATION*(delta_l_count/(delta_l_count-delta_r_count)-.5))*math.sin(math.radians(delta_angle/2))
 				distance += delta_distance # Updated distance of Roomba
 				# Find new x and y position
-				x_pos += delta_distance*math.cos(angle-.5*delta_angle)
-				y_pos += delta_distance*math.sin(angle-.5*delta_angle)
+				x_pos += delta_distance*math.cos(math.radians(angle-.5*delta_angle))
+				y_pos += delta_distance*math.sin(math.radians(angle-.5*delta_angle))
 				
 				# Display current data to the screen
 				stdscr.move(5,0)
