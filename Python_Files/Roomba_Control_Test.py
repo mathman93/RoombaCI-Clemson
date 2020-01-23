@@ -157,19 +157,20 @@ def MyLoop(stdscr):
 					delta_r_count -= pow(2,16)
 				if delta_r_count < -pow(2,15): # 2^15 is somewhat arbitrary
 					delta_r_count += pow(2,16)
-				# Calculated the forward distance traveled since the last counts
-				distance_change = DISTANCE_CONSTANT * (delta_l_count + delta_r_count) * 0.5
-				# Calculated the turn angle change since the last counts
-				angle_change = TURN_CONSTANT * (delta_l_count - delta_r_count)
-				distance += distance_change # Updated distance of Roomba
-				angle += angle_change # Update angle of Roomba and correct for overflow
+				
+				delta_angle = (delta_l_count-delta_r_count)*TURN_CONSTANT
+				angle += delta_angle
 				if angle >= 360 or angle < 0:
 					angle = (angle % 360) # Normalize the angle value from [0,360)
-				# Calculate position data
-				delta_x_pos = distance_change * math.cos(math.radians(angle))
-				delta_y_pos = distance_change * math.sin(math.radians(angle))
-				x_pos += delta_x_pos
-				y_pos += delta_y_pos
+				# Determine what method to use to find the change in distance
+				if delta_l_count-delta_r_count == 0: # delta_angle == 0
+					delta_distance = 0.5*(delta_l_count+delta_r_count)*DISTANCE_CONSTANT
+				else: # delta_angle != 0
+					delta_distance = 2*(WHEEL_SEPARATION*(delta_l_count/(delta_l_count-delta_r_count)-.5))*math.sin(delta_angle/2)
+				distance += delta_distance # Updated distance of Roomba
+				# Find new x and y position
+				x_pos += delta_distance*math.cos(angle-.5*delta_angle)
+				y_pos += delta_distance*math.sin(angle-.5*delta_angle)
 				
 				# Display current data to the screen
 				stdscr.move(5,0)
