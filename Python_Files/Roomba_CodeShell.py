@@ -55,7 +55,7 @@ GPIO.output(yled, GPIO.HIGH) # Indicate within setup sequence
 # Initialize IMU
 print(" Starting IMU...")
 imu = RoombaCI_lib.LSM9DS1_I2C() # Initialize IMU
-time.sleep(0.2)
+time.sleep(0.1)
 # Clear out first reading from all sensors
 x = imu.magnetic
 x = imu.acceleration
