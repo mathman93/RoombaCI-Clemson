@@ -36,21 +36,22 @@ GPIO.setup(gled, GPIO.OUT, initial=GPIO.LOW)
 
 # Main Code #
 sendtime = time.time()
-sendtime_offset = 1.0
+sendtime_offset = 1.0 # Time between sending messages
 basetime = time.time()
-basetime_offset = 0.5
+basetime_offset = 0.5 # Time between LED blinks
 
 while True:
 	try:
 		if (time.time() - sendtime) > sendtime_offset:
-			message = '1'
+			message = '1' # Change this to any character string you want
 			Xbee.write(message.encode()) # Send the number over the Xbee
-			sendtime += sendtime_offset # Increase offset for next message
+			sendtime += sendtime_offset # Increase offset for next time to send message
 		
 		if Xbee.inWaiting() > 0: # If there is something in the receive buffer
 			message = Xbee.read(Xbee.inWaiting()).decode() # Read all data in
-			print(message) # To see what the string representation is
+			print(message) # To see what the message is
 		
+		# LED blink conditional, to make sure code is running
 		if (time.time() - basetime) > basetime_offset: # If enough time has passed.
 			if GPIO.input(gled) == True:  # If the LED is on...
 				GPIO.output(gled, GPIO.LOW)  # turn it off
