@@ -1,5 +1,5 @@
 ''' Xbee_MultiRead_Test.py
-Purpose: Testing sending long strings between Xbee modules
+Purpose: Tests sending long strings between Xbee modules
 IMPORTANT: Must be run using Python 3 (python3)
 Last Modified: 2/11/2020
 '''
@@ -36,14 +36,15 @@ GPIO.setup(gled, GPIO.OUT, initial=GPIO.LOW)
 
 # Main Code #
 if Xbee.inWaiting() > 0:
-	junk = Xbee.read(Xbee.inWaiting()).decode()
-	print(junk)
+	# Clear out Xbee buffer
+	x = Xbee.read(Xbee.inWaiting()).decode()
+	print(x)
 
 sendtime = time.time()
 sendtime_offset = 1.0
 basetime = time.time()
 basetime_offset = 0.5
-roombaname = 'rp2'
+roombaname = 'rp1'
 
 while True:
 	try:
