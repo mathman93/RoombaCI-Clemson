@@ -189,8 +189,10 @@ def UpdateDCM(delta_time, accel, mag, omega, gyro_init, I_B, K_B, weights = [1,1
 	delta_theta_DCM_para = ((s_gyro*delta_theta_gyro_para)+(s_mag*delta_theta_mag_para))/(s_gyro+s_mag)
 	delta_theta_DCM = delta_theta_DCM_perp + delta_theta_DCM_para # Combined values
 	# Update versors
-	K_B_update += np.cross(delta_theta_DCM, K_B)
-	I_B_update += np.cross(delta_theta_DCM, I_B)
+	delta_K_B = np.cross(delta_theta_DCM, K_B)
+	delta_I_B = np.cross(delta_theta_DCM, I_B)
+	K_B_update = K_B + delta_K_B
+	I_B_update = I_B + delta_I_B
 	# Orthogonalize updated versors
 	error = 0.5*K_B_update.dot(I_B_update)
 	K_B_prime = K_B_update - (error*I_B_update)
