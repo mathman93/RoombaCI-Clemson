@@ -231,15 +231,19 @@ GPIO.output(gled, GPIO.LOW) # Turn off green LED to say we have finished setup s
 # Main Code #
 # Open a text file for data retrieval
 imu_file_name_input = input("Name for (IMU) data file: ")
-dir_path = "/home/pi/SPRI2019_Roomba/Data_Files/" # Directory path to save file
+dir_path = "/home/pi/RoombaCI-Clemson/Data_Files/2020_Spring/" # Directory path to save file
 imu_file_name = os.path.join(dir_path, imu_file_name_input+".txt") # text file extension
 imu_file = open(imu_file_name, "w") # Open a text file for storing data
 	# Will overwrite anything that was in the text file previously
 
 # Dictionary of move commands
-dict = {0:[0,0,2],
-	1:[0,75,2],
-	2:[0,0,1]
+move_dict = {0:[0,0,2],
+	1:[75,0,10], # Move forward
+	2:[0,0,2],
+	3:[0,75,14], # Spin
+	4:[0,0,2],
+	5:[75,0,10], # Move forward
+	6:[0,0,20]
 	}
 
 accel_sum = np.zeros(3) # Vector of sum of accelerometer values
@@ -284,6 +288,9 @@ if theta_imu < 0:
 # Variables and Constants
 y_position = 0 # Position of Roomba along y-axis (in mm)
 x_position = 0 # Position of Roomba along x-axis (in mm)
+delta_theta_enc = 0 # initialize with zero
+delta_theta_imu = 0 # initialize with zero
+delta_d = 0 # initialize with zero
 #theta_enc = 0 # Heading of Roomba (in radians)
 theta_enc = theta_imu # Heading of Roomba (using imu)
 #theta_enc = math.atan2(-mag[1],-mag[0]) # Heading of Roomba (using magnetometer)
@@ -314,14 +321,14 @@ print('DCM: [[{0:0.5f}, {1:0.5f}, {2:0.5f}]'.format(DCM_G[0,0], DCM_G[0,1], DCM_
 print('	[{0:0.5f}, {1:0.5f}, {2:0.5f}]'.format(DCM_G[1,0], DCM_G[1,1], DCM_G[1,2]))
 print('	[{0:0.5f}, {1:0.5f}, {2:0.5f}]]'.format(DCM_G[2,0], DCM_G[2,1], DCM_G[2,2]))
 # Write IMU data, wheel encoder data, and estimated inertial force vector values to a file.
-imu_file.write("{0:0.6f},{1:0.5f},{2:0.5f},{3:0.5f},{4:0.5f},{5:0.5f},{6:0.5f},{7:0.5f},{8:0.5f},{9:0.5f},{10},{11},{12:0.6f},{13:0.6f}\n"\
-	.format(data_time_init,accel[0],accel[1],accel[2],mag[0],mag[1],mag[2],omega[0],omega[1],omega[2],left_start,right_start,theta,theta_imu))
+imu_file.write("{0:0.6f},{1:0.5f},{2:0.5f},{3:0.5f},{4:0.5f},{5:0.5f},{6:0.5f},{7:0.5f},{8:0.5f},{9:0.5f},{10},{11},{12:0.6f},{13:0.6f},{14:0.6f},{15:0.6f},{16:0.6f}\n"\
+	.format(data_time_init,accel[0],accel[1],accel[2],mag[0],mag[1],mag[2],omega[0],omega[1],omega[2],left_start,right_start,delta_d,theta_enc,delta_theta_enc,theta_imu,delta_theta_imu))
 Roomba.StartQueryStream(43,44)
 
-for i in range(len(dict.keys())):
+for i in range(len(move_dict.keys())):
 	# Get pieces of dictionary and tell the roomba to move
 	start_time = time.time()
-	[f,s,t] = dict[i]
+	[f,s,t] = move_dict[i]
 	Roomba.Move(f,s)
 	while time.time() - start_time <= t:
 		# If data is available
@@ -400,8 +407,8 @@ for i in range(len(dict.keys())):
 			print('	[{0:0.5f}, {1:0.5f}, {2:0.5f}]'.format(DCM_G[1,0], DCM_G[1,1], DCM_G[1,2]))
 			print('	[{0:0.5f}, {1:0.5f}, {2:0.5f}]]'.format(DCM_G[2,0], DCM_G[2,1], DCM_G[2,2]))
 			# Write IMU data, wheel encoder data to a file.
-			imu_file.write("{0:0.6f},{1:0.5f},{2:0.5f},{3:0.5f},{4:0.5f},{5:0.5f},{6:0.5f},{7:0.5f},{8:0.5f},{9:0.5f},{10},{11},{12:0.6f},{13:0.6f}\n"\
-				.format(data_time_init,accel[0],accel[1],accel[2],mag[0],mag[1],mag[2],omega[0],omega[1],omega[2],left_start,right_start,theta,theta_imu))
+			imu_file.write("{0:0.6f},{1:0.5f},{2:0.5f},{3:0.5f},{4:0.5f},{5:0.5f},{6:0.5f},{7:0.5f},{8:0.5f},{9:0.5f},{10},{11},{12:0.6f},{13:0.6f},{14:0.6f},{15:0.6f},{16:0.6f}\n"\
+				.format(data_time2,accel[0],accel[1],accel[2],mag[0],mag[1],mag[2],omega[0],omega[1],omega[2],left_encoder,right_encoder,delta_d,theta_enc,delta_theta_enc,theta_imu,delta_theta_imu))
 			# Save values for next iteration
 			left_start = left_encoder
 			right_start = right_encoder
@@ -419,7 +426,7 @@ for i in range(len(dict.keys())):
 		
 		# End if Roomba.Available()
 	# End while time.time() - start_time <=t:
-# End for i in range(len(dict.keys())):
+# End for i in range(len(move_dict.keys())):
 Roomba.Move(0,0) # Stop Roomba
 Roomba.PauseQueryStream() # Pause data stream
 if Roomba.Available() > 0: # If anything is in the Roomba receive buffer
