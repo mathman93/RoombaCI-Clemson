@@ -162,8 +162,9 @@ def UpdateDCM(delta_time, accel, mag, omega, gyro_init, I_B, K_B, weights = [1,1
 	R_gyro = np.zeros(R_acc.shape)
 	R_gyro[0] = math.sin(theta_xz)/math.sqrt(1 + (math.cos(theta_xz)*math.tan(theta_yz))**2)
 	R_gyro[1] = math.sin(theta_yz)/math.sqrt(1 + (math.cos(theta_yz)*math.tan(theta_xz))**2)
-	R_gyro[2] = np.sqrt(1 - R_gyro[0]**2 - R_gyro[1]**2) * np.sign(R_acc[2]) # Testing
-	#R_gyro[2] = np.sqrt(1 - R_gyro[0]**2 - R_gyro[1]**2) * np.sign(R_est[2])
+	R_gyro[2] = np.sqrt(1 - R_gyro[0]**2 - R_gyro[1]**2) * np.sign(K_B[2]) # K_B is previous estimate of "up"
+	#R_gyro[2] = np.sqrt(1 - R_gyro[0]**2 - R_gyro[1]**2) * np.sign(R_acc[2]) # Could use current accel estimate
+	#R_gyro[2] = np.sqrt(1 - R_gyro[0]**2 - R_gyro[1]**2) * np.sign(R_est[2]) # Ideally would keep previous estimate, but it gets updated later
 	w_acc = weights[0] # Accelerometer weight value
 	w_gyro = weights[1] # Gyroscope weight value
 	R_est = ((w_acc * R_acc) + (w_gyro * R_gyro))/(w_acc + w_gyro) # New estimate of inertial force vector
@@ -362,7 +363,8 @@ for i in range(len(move_dict.keys())):
 			elif theta_enc < 0:
 				theta_enc += 2*math.pi
 			
-			[I_B, J_B, K_B] = UpdateDCM(delta_time, accel, mag, omega, gyro_init, I_B, K_B, [1,10,1,0.5,10])
+			[I_B, J_B, K_B] = UpdateDCM(delta_time, accel, mag, omega, gyro_init, I_B, K_B, [1,10,1,0,10])
+			# Weight order: [w_acc, w_gyro, s_acc, s_mag, s_gyro]
 			# Form DCM from component values
 			DCM_G = np.stack((I_B, J_B, K_B))
 			
@@ -426,6 +428,7 @@ for i in range(len(move_dict.keys())):
 		else: # If Roomba data hasn't come in
 			# Read acceleration, magnetometer, gyroscope data
 			[accel_sum, mag_sum, omega_sum, imu_counter] = ReadIMU(imu, accel_sum, mag_sum, omega_sum, imu_counter)
+			# Remove to use only one measurement per data iteration
 		
 		# End if Roomba.Available()
 	# End while time.time() - start_time <=t:
