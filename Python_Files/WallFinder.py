@@ -13,6 +13,8 @@ import os.path
 import math
 import random
 
+##----------------------------------------------------------------------------------------##
+
 ## Variables and Constants ##
 global Xbee # Specifies connection to Xbee
 Xbee = serial.Serial('/dev/ttyUSB0', 115200) # baud rate should be 115200
@@ -20,6 +22,8 @@ Xbee = serial.Serial('/dev/ttyUSB0', 115200) # baud rate should be 115200
 yled = 5
 rled = 6
 gled = 13
+
+##----------------------------------------------------------------------------------------##
 
 ## Functions and Definitions ##
 ''' Displays current date and time to screen
@@ -34,10 +38,14 @@ def DisplayDateTime():
 GPIO.setmode(GPIO.BCM) # use BCM pin numbering for GPIO
 DisplayDateTime() # Display current date and time
 
+##----------------------------------------------------------------------------------------##
+
 # LED Pin setup
 GPIO.setup(yled, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(rled, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(gled, GPIO.OUT, initial=GPIO.LOW)
+
+##----------------------------------------------------------------------------------------##
 
 # Wake up Roomba sequence
 GPIO.output(gled, GPIO.HIGH) # Turn on green LED to say we are alive
@@ -55,6 +63,8 @@ if Roomba.Available() > 0: # If anything is in the Roomba receive buffer
 
 print(" ROOMBA Setup Complete")
 
+##----------------------------------------------------------------------------------------##
+
 # Open a text file for data retrieval
 file_name_input = input("Name for data file: ")
 dir_path = "/home/pi/RoombaCI-Clemson/Data_Files/2019_Fall/" # Directory path to save file
@@ -68,9 +78,13 @@ if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 	x = Xbee.read(Xbee.inWaiting()).decode() # Clear out Xbee input buffer
 	#print(x) # for debugging
 
+##----------------------------------------------------------------------------------------##
+
 # initalize speeds
 movSpd = 138 # initializes move speed
 spnspd = 75
+
+##----------------------------------------------------------------------------------------##
 
 # initialize timers
 #spinTime = (235 * math.pi) / (4 * spnspd) # from formula
@@ -79,6 +93,8 @@ backTime = 0.25
 dataTimer = time.time()
 timer = time.time()
 moveHelper = (time.time() - (spinTime + backTime))
+
+##----------------------------------------------------------------------------------------##
 
 # initialize values
 spinVal = 0 # was 100, just trying something
@@ -104,8 +120,12 @@ C_theta = (wheel_diameter*math.pi)/(counts_per_rev*distance_between_wheels)
 distance_per_count = (wheel_diameter*math.pi)/counts_per_rev
 data_time = time.time()
 
+##----------------------------------------------------------------------------------------##
+
 # Write initial data to file
 file.write("{0:.3f},{1},{2},{3:.3f},{4:.3f},{5:.5f},{6:0>8b}\n".format(0,left_start,right_start,x_position,y_position,theta,bumper_byte))
+
+##----------------------------------------------------------------------------------------##
 
 # Main Code #
 query_time = time.time() # set base time for query
@@ -206,3 +226,5 @@ GPIO.output(gled, GPIO.LOW) # turn off green LED
 Roomba.ShutDown() # Shutdown Roomba serial connection
 Xbee.close()
 GPIO.cleanup() # Reset GPIO pins for next program
+
+##----------------------------------------------------------------------------------------##
