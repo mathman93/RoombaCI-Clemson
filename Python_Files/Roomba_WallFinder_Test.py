@@ -56,10 +56,10 @@ if Roomba.Available() > 0: # If anything is in the Roomba receive buffer
 print(" ROOMBA Setup Complete")
 
 # Open a text file for data retrieval
-file_name_input = input("Name for data file: ")
-dir_path = "/home/pi/RoombaCI-Clemson/Data_Files/2019_Fall/" # Directory path to save file
-file_name = os.path.join(dir_path, file_name_input+".txt") # Add text file extension
-file = open(file_name, "w") # Open a text file for storing data
+#file_name_input = input("Name for data file: ")
+#dir_path = "/home/pi/RoombaCI-Clemson/Data_Files/2020_Spring/" # Directory path to save file
+#file_name = os.path.join(dir_path, file_name_input+".txt") # Add text file extension
+#file = open(file_name, "w") # Open a text file for storing data
 	# Will overwrite anything that was in the text file previously
 
 # if the IMU is used later, put that setup code here
@@ -105,13 +105,9 @@ distance_per_count = (wheel_diameter*math.pi)/counts_per_rev
 data_time = time.time()
 
 # Write initial data to file
-file.write("{0:.3f},{1},{2},{3:.3f},{4:.3f},{5:.5f},{6:0>8b}\n".format(0,left_start,right_start,x_position,y_position,theta,bumper_byte))
+#file.write("{0:.3f},{1},{2},{3:.3f},{4:.3f},{5:.5f},{6:0>8b}\n".format(0,left_start,right_start,x_position,y_position,theta,bumper_byte))
 
 # Main Code #
-query_time = time.time() # set base time for query
-query_time_offset = 5*(0.015) # set time offset for query
-# smallest time offset for query is 15 ms
-
 Roomba.Move(0,0) # Start Roomba moving
 
 Roomba.StartQueryStream(7, 43, 44) # Start query stream with specific sensor packets
@@ -139,12 +135,12 @@ while True:
 			if delta_l-delta_r == 0:
 				delta_d = 0.5*(delta_l+delta_r)*distance_per_count
 			else:
-				delta_d = 2*(235*(delta_l/(delta_l-delta_r)-.5))*math.sin(delta_theta/2)
+				delta_d = 2*235*((delta_l/(delta_l-delta_r))-.5)*math.sin(delta_theta/2)
 			# Find new x and y position
 			x_position = x_position + delta_d*math.cos(theta-.5*delta_theta)
 			y_position = y_position + delta_d*math.sin(theta-.5*delta_theta)
 			# write the time, left encoder, right encoder, x position, y position, and theta
-			file.write("{0:.3f},{1},{2},{3:.3f},{4:.3f},{5:.5f},{6:0>8b}\n".format(data_time2-data_time,l_counts,r_counts,x_position,y_position,theta,bumper_byte))
+			#file.write("{0:.3f},{1},{2},{3:.3f},{4:.3f},{5:.5f},{6:0>8b}\n".format(data_time2-data_time,l_counts,r_counts,x_position,y_position,theta,bumper_byte))
 			left_start = l_counts
 			right_start = r_counts
 			
@@ -173,15 +169,15 @@ while True:
 					moveVal = -100
 					last_bump = 3
 				forwardSpin = int(-spinVal / 2)
+
+				''' Unimplemented
 				l_difference = abs(last_encoder_left - l_counts)
 				r_difference = abs(last_encoder_right - r_counts)
-
 				#if ((l_difference > 300) AND (r_difference > 300)):
 				#	stuck_count += 1
-
 				last_encoder_left = l_counts
-				last_encoder_right = r_counts
-	
+				last_encoder_right = r_counts'''
+			
 			#timer for the backward movement, then the spin
 			if (time.time() - moveHelper) < backTime:
 				Roomba.Move(moveVal, 0) # backward movement
@@ -199,7 +195,7 @@ while True:
 Roomba.PauseQueryStream() # Pause Query Stream before ending program
 Roomba.Move(0,0) # Stop Roomba movement
 x = Roomba.DirectRead(Roomba.Available()) # Clear buffer
-file.close() # Close data file
+#file.close() # Close data file
 Roomba.PlaySMB()
 GPIO.output(gled, GPIO.LOW) # turn off green LED
 
