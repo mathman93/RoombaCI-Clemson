@@ -13,8 +13,6 @@ import os.path
 import math
 import random
 
-##----------------------------------------------------------------------------------------##
-
 ## Variables and Constants ##
 global Xbee # Specifies connection to Xbee
 Xbee = serial.Serial('/dev/ttyUSB0', 115200) # baud rate should be 115200
@@ -23,29 +21,23 @@ yled = 5
 rled = 6
 gled = 13
 
-##----------------------------------------------------------------------------------------##
-
 ## Functions and Definitions ##
 ''' Displays current date and time to screen
 	'''
-def DisplayDateTime():
+#def DisplayDateTime():
 	# Month day, Year, Hour:Minute:Seconds
-	date_time = time.strftime("%B %d, %Y, %H:%M:%S", time.gmtime())
-	print("Program run: ", date_time)
+	#date_time = time.strftime("%B %d, %Y, %H:%M:%S", time.gmtime())
+	#print("Program run: ", date_time)
 
 ## -- Code Starts Here -- ##
 # Setup Code #
 GPIO.setmode(GPIO.BCM) # use BCM pin numbering for GPIO
-DisplayDateTime() # Display current date and time
-
-##----------------------------------------------------------------------------------------##
+#DisplayDateTime() # Display current date and time
 
 # LED Pin setup
 GPIO.setup(yled, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(rled, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(gled, GPIO.OUT, initial=GPIO.LOW)
-
-##----------------------------------------------------------------------------------------##
 
 # Wake up Roomba sequence
 GPIO.output(gled, GPIO.HIGH) # Turn on green LED to say we are alive
@@ -63,13 +55,11 @@ if Roomba.Available() > 0: # If anything is in the Roomba receive buffer
 
 print(" ROOMBA Setup Complete")
 
-##----------------------------------------------------------------------------------------##
-
 # Open a text file for data retrieval
-file_name_input = input("Name for data file: ")
-dir_path = "/home/pi/RoombaCI-Clemson/Data_Files/2019_Fall/" # Directory path to save file
-file_name = os.path.join(dir_path, file_name_input+".txt") # Add text file extension
-file = open(file_name, "w") # Open a text file for storing data
+#file_name_input = input("Name for data file: ")
+#dir_path = "/home/pi/RoombaCI-Clemson/Data_Files/2020_Spring/" # Directory path to save file
+#file_name = os.path.join(dir_path, file_name_input+".txt") # Add text file extension
+#file = open(file_name, "w") # Open a text file for storing data
 	# Will overwrite anything that was in the text file previously
 
 # if the IMU is used later, put that setup code here
@@ -78,13 +68,9 @@ if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 	x = Xbee.read(Xbee.inWaiting()).decode() # Clear out Xbee input buffer
 	#print(x) # for debugging
 
-##----------------------------------------------------------------------------------------##
-
 # initalize speeds
 movSpd = 138 # initializes move speed
 spnspd = 75
-
-##----------------------------------------------------------------------------------------##
 
 # initialize timers
 #spinTime = (235 * math.pi) / (4 * spnspd) # from formula
@@ -93,8 +79,6 @@ backTime = 0.25
 dataTimer = time.time()
 timer = time.time()
 moveHelper = (time.time() - (spinTime + backTime))
-
-##----------------------------------------------------------------------------------------##
 
 # initialize values
 spinVal = 0 # was 100, just trying something
@@ -120,18 +104,10 @@ C_theta = (wheel_diameter*math.pi)/(counts_per_rev*distance_between_wheels)
 distance_per_count = (wheel_diameter*math.pi)/counts_per_rev
 data_time = time.time()
 
-##----------------------------------------------------------------------------------------##
-
 # Write initial data to file
-file.write("{0:.3f},{1},{2},{3:.3f},{4:.3f},{5:.5f},{6:0>8b}\n".format(0,left_start,right_start,x_position,y_position,theta,bumper_byte))
-
-##----------------------------------------------------------------------------------------##
+#file.write("{0:.3f},{1},{2},{3:.3f},{4:.3f},{5:.5f},{6:0>8b}\n".format(0,left_start,right_start,x_position,y_position,theta,bumper_byte))
 
 # Main Code #
-query_time = time.time() # set base time for query
-query_time_offset = 5*(0.015) # set time offset for query
-# smallest time offset for query is 15 ms
-
 Roomba.Move(0,0) # Start Roomba moving
 
 Roomba.StartQueryStream(7, 43, 44) # Start query stream with specific sensor packets
@@ -159,14 +135,16 @@ while True:
 			if delta_l-delta_r == 0:
 				delta_d = 0.5*(delta_l+delta_r)*distance_per_count
 			else:
-				delta_d = 2*(235*(delta_l/(delta_l-delta_r)-.5))*math.sin(delta_theta/2)
+				delta_d = 2*235*((delta_l/(delta_l-delta_r))-.5)*math.sin(delta_theta/2)
 			# Find new x and y position
 			x_position = x_position + delta_d*math.cos(theta-.5*delta_theta)
 			y_position = y_position + delta_d*math.sin(theta-.5*delta_theta)
 			# write the time, left encoder, right encoder, x position, y position, and theta
-			file.write("{0:.3f},{1},{2},{3:.3f},{4:.3f},{5:.5f},{6:0>8b}\n".format(data_time2-data_time,l_counts,r_counts,x_position,y_position,theta,bumper_byte))
+			#file.write("{0:.3f},{1},{2},{3:.3f},{4:.3f},{5:.5f},{6:0>8b}\n".format(data_time2-data_time,l_counts,r_counts,x_position,y_position,theta,bumper_byte))
 			left_start = l_counts
 			right_start = r_counts
+
+			# ----------------------WORK HERE----------------------------------
 
 			# Bumper logic
 			if (bumper_byte % 4) > 0:
@@ -193,14 +171,14 @@ while True:
 					moveVal = -100
 					last_bump = 3
 				forwardSpin = int(-spinVal / 2)
+
+				''' Unimplemented
 				l_difference = abs(last_encoder_left - l_counts)
 				r_difference = abs(last_encoder_right - r_counts)
-
 				#if ((l_difference > 300) AND (r_difference > 300)):
 				#	stuck_count += 1
-
 				last_encoder_left = l_counts
-				last_encoder_right = r_counts
+				last_encoder_right = r_counts'''
 
 			#timer for the backward movement, then the spin
 			if (time.time() - moveHelper) < backTime:
@@ -219,12 +197,10 @@ while True:
 Roomba.PauseQueryStream() # Pause Query Stream before ending program
 Roomba.Move(0,0) # Stop Roomba movement
 x = Roomba.DirectRead(Roomba.Available()) # Clear buffer
-file.close() # Close data file
+#file.close() # Close data file
 Roomba.PlaySMB()
 GPIO.output(gled, GPIO.LOW) # turn off green LED
 
 Roomba.ShutDown() # Shutdown Roomba serial connection
 Xbee.close()
 GPIO.cleanup() # Reset GPIO pins for next program
-
-##----------------------------------------------------------------------------------------##
