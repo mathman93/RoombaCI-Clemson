@@ -73,9 +73,9 @@ while True:
 			coordinate = message.split() # To split the string into x and y coordinates
 			id = coordinate[0]
 			print(id)
-			absissa = hex(coordinate[1])
+			absissa = int(coordinate[1], 16)	#convert coordinate 1 to int base 16 number
 			print(absissa)			
-			ordinate = hex(coordinate[2])
+			ordinate = int(coordinate[2], 16)
 			print(ordinate)
 		
 		if (time.time() - basetime) > basetime_offset: # If enough time has passed.
