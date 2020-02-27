@@ -49,22 +49,34 @@ if Xbee.inWaiting() > 0:
 while True:
 	try:
 		if (time.time() - sendtime) > sendtime_offset:
-			message1 = 7714 # Make this the number  you want to send
-			message2 = -00891.3
-			var = "{0} {1:09.3f} {2:09.3f}".format(roombaname, message1,message2) # Make the string representation of the number
+            #message1 = 7714 # Make this the number  you want to send
+            #message2 = -00891.3
+            #var = "{0} {1:09.3f} {2:09.3f}".format(roombaname, message1,message2) # Make the string representation of the number
+            
+            num_str = '1234'
+            num_int = int(num_str)  # from string to int
+            num_hex = hex(num_int)  # from int to hex
+            message1 = str(num_hex) # from hex to string
+            
+            num2_str = '10'
+            num2_int = int(num2_str)
+            num2_hex = hex(num2_int)
+            message2 = str(num2_hex)
+            var = "{0} {0} {0}".format(roombaname, message1,message2) # Make the string representation of the number
+            
 			Xbee.write(var.encode()) # Send the number over the Xbee
 			sendtime += sendtime_offset # Increase offset for next message
 		
 		
-		if Xbee.inWaiting() > 22: # If there is something in the receive buffer
+		if Xbee.inWaiting() > 0: # If there is something in the receive buffer
 			message = Xbee.read(Xbee.inWaiting()).decode() # Read all data in
 			print(message) # To see what the string representation is
 			coordinate = message.split() # To split the string into x and y coordinates
 			id = coordinate[0]
 			print(id)
-			absissa = float(coordinate[1])
+			absissa = hex(coordinate[1])
 			print(absissa)			
-			ordinate = float(coordinate[2])
+			ordinate = hex(coordinate[2])
 			print(ordinate)
 		
 		if (time.time() - basetime) > basetime_offset: # If enough time has passed.
