@@ -61,7 +61,7 @@ while True:
 			num2_int = int(num2_str)
 			num2_hex = hex(num2_int)
 			message2 = str(num2_hex)
-			var = "{0} {0} {0}".format(roombaname, message1,message2) # Make the string representation of the number
+			var = "{0} {1} {2}".format(roombaname, message1,message2) # Make the string representation of the number
             
 			Xbee.write(var.encode()) # Send the number over the Xbee
 			sendtime += sendtime_offset # Increase offset for next message
