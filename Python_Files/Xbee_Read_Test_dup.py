@@ -54,15 +54,14 @@ while True:
             #var = "{0} {1:09.3f} {2:09.3f}".format(roombaname, message1,message2) # Make the string representation of the number
 
 			num_str = '1234'
-            num_int = int(num_str)  # from string to int
-            num_hex = hex(num_int)  # from int to hex
-            message1 = str(num_hex) # from hex to string
-            
-            num2_str = '10'
-            num2_int = int(num2_str)
-            num2_hex = hex(num2_int)
-            message2 = str(num2_hex)
-            var = "{0} {0} {0}".format(roombaname, message1,message2) # Make the string representation of the number
+			num_int = int(num_str)  # from string to int
+			num_hex = hex(num_int)  # from int to hex
+			message1 = str(num_hex) # from hex to string
+			num2_str = '10'
+			num2_int = int(num2_str)
+			num2_hex = hex(num2_int)
+			message2 = str(num2_hex)
+			var = "{0} {0} {0}".format(roombaname, message1,message2) # Make the string representation of the number
             
 			Xbee.write(var.encode()) # Send the number over the Xbee
 			sendtime += sendtime_offset # Increase offset for next message
