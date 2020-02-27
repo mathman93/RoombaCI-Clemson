@@ -52,8 +52,8 @@ while True:
             #message1 = 7714 # Make this the number  you want to send
             #message2 = -00891.3
             #var = "{0} {1:09.3f} {2:09.3f}".format(roombaname, message1,message2) # Make the string representation of the number
-            
-            num_str = '1234'
+
+			num_str = '1234'
             num_int = int(num_str)  # from string to int
             num_hex = hex(num_int)  # from int to hex
             message1 = str(num_hex) # from hex to string
