@@ -1,4 +1,4 @@
-''' 
+'''
 Roomba_DataRead_Test.py
 Purpose: Testing communication between Roomba and RPi
 	Form basis of Roomba code for other tests.
@@ -62,6 +62,7 @@ time.sleep(0.1)
 x = imu.magnetic
 x = imu.acceleration
 x = imu.gyro
+
 # Calibrate IMU
 print(" Calibrating IMU...")
 Roomba.Move(0,75) # Start Roomba spinning
@@ -69,6 +70,7 @@ imu.CalibrateMag() # Calculate magnetometer offset values
 Roomba.Move(0,0) # Stop Roomba spinning
 time.sleep(0.5)
 imu.CalibrateGyro() # Calculate gyroscope offset values
+
 # Display offset values
 print("mx_offset = {:f}; my_offset = {:f}; mz_offset = {:f}"\
 	.format(imu.m_offset[0], imu.m_offset[1], imu.m_offset[2]))
@@ -110,7 +112,7 @@ while data_counter < 1001: # stop after 1000 data points
 			print("{0}, {1:0>8b}, {2}, {3}, {4:0>8b};".format(data_counter, bumper_byte, l_wheel, r_wheel, light_bumper))
 			data_counter += 1 # Increment counter for the next data sample
 			query_time += query_time_offset # offset query time for next query
-			'''	
+			'''
 		# Read query stream for specific packets (ReadQueryStream)
 		if Roomba.Available() > 0:
 			data_time = time.time() - time_base
@@ -122,7 +124,7 @@ while data_counter < 1001: # stop after 1000 data points
 			# Write data values to a text file
 			#datafile.write("{0}, {1:0>8b}, {2}, {3}, {4:0>8b}, {5}, {6};".format(data_counter, bumper_byte, l_counts, r_counts, light_bumper, l_speed, r_speed))
 			data_counter += 1 # Increment counter for the next data sample
-		
+
 	except KeyboardInterrupt:
 		print('') # print new line
 		break # exit while loop
