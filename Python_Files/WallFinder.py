@@ -6,6 +6,11 @@ import RPi.GPIO as GPIO
 
 import RoombaCI_lib
 
+## Roomba_WallFinder_Test Libraries
+import os.path
+import math
+import random
+
 ## Variables and Constants ##
 global Xbee # Specifies connection to Xbee
 Xbee = serial.Serial('/dev/ttyUSB0', 115200) # Baud rate should be 115200
