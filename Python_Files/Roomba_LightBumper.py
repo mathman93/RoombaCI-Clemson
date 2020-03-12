@@ -116,7 +116,7 @@ while data_counter < 1001: # stop after 1000 data points
 		# Read query stream for specific packets (ReadQueryStream)
 		if Roomba.Available() > 0:
 			data_time = time.time() - time_base
-			bumper_byte, l_counts, r_counts, light_bumper, r_speed, l_speed = Roomba.ReadQueryStream(7, 43, 44, 45, 41, 42)
+			bumper_byte, l_counts, r_counts, light_bumper, r_speed, l_speed, bumper_A, bumper_B, bumper_C, bumper_D, bumper_E, bumper_F = Roomba.ReadQueryStream(7, 43, 44, 45, 41, 42, 46, 47, 48, 49, 50, 51)
 			angle = imu.CalculateHeading()
 			# Print data values out to the monitor
 			print("{0}, {1:.6f}, {2:0>8b}, {3}, {4}, {5:0>8b}, {6}, {7}, {8:.4f};"\
