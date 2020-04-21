@@ -17,7 +17,7 @@
 ##     43 - 44 Encoder Counts
 ##     45 Light Sensors
 ##     46 - 51 (Analog Light Bumpers)
-##      
+##
 ##
 ##
 ##
@@ -166,28 +166,103 @@ while True:
 
 			# Bumper logic
 			if (bumper_byte % 4) > 0:
+
 				moveHelper = time.time()
-				if (bumper_byte % 4) == 1:
-					# right bump
+
+				if (bumper_byte % 4) == 1: #Right Bumper
+
+					# Right Bumper: Sensors D, E and F are on the Right Bumper (Left to Right)
 					print("Right bumper hit!")
-					spinVal = -spnspd
+
+					# If statements depending on which sensors were activated
+
+					# Will always Turn Left
+					if(light_byte == 00000000) #When no sensors were activated
+						#Turn 90 degrees
+
+					elif(light_byte == 00000001) #When sensor D activates
+						#Turn 15 degrees
+
+					elif(light_byte == 00000010) #When sensor E activates
+						#Turn 45 degrees
+
+					elif(light_byte == 00000100) #When sensor F activates
+						#Turn 75 degrees
+
+					elif(light_byte == 00000011) #When sensors D and E activate
+						#Turn 30 degrees
+
+					elif(light_byte == 00000110) #When sensors E and F activate
+						#Turn 60 degree
+
+					else: #When no sensors were activated
+						#Turn 90 degree
+
+					spinVal = spnspd
 					moveVal = -100
 					last_bump = 1
+
 				elif (bumper_byte % 4) == 2:
-					# left bump
+
+					# Left Bumper: Sensors A, B and C are on the Left Bumper (Left to Right)
 					print("Left bumper hit!")
+
+					# If statements depending on which sensors were activated
+
+					# Will Always Turn Right
+					if(light_byte == 00000000) #When no sensors were activated
+						#Turn 90 degrees
+
+					elif(light_byte == 00000001) #When sensor A activates
+						#Turn 75 degrees
+
+					elif(light_byte == 00000010) #When sensor B activates
+						#Turn 45 degrees
+
+					elif(light_byte == 00000100) #When sensor C activates
+						#Turn 15 degrees
+
+					elif(light_byte == 00000011) #When sensors A and B activate
+						#Turn 60 degrees
+
+					elif(light_byte == 00000110) #When sensors B and C activate
+						#Turn 30 degree
+
+					else: #Other sensors activated
+						#Turn 90 degree
+
 					spinVal = spnspd
 					moveVal = -100
 					last_bump = 2
+
 				else:
-					# both - front hit
-					print("Both bumpers hit!")
+					# Both Bumpers: Sensors C and D will be included
+					print("Both Bumpers Hit!")
+
+					# If statements depending on which sensors were activated
+
+					if(light_byte == 00000000) #When no sensors were activated
+					#Turn 90 degrees (Either Left or Right: Random)
+
+					elif(light_byte == 0001100) #When sensors C and D activated
+					#Turn 15 degrees (Turn Right)
+
+					elif(light_byte == 00001000) #When sensor D activates
+					#Turn 30 degrees (Turn Left)
+
+					elif(light_byte == 00000100) #When sensor C activates
+					#Turn 30 degrees (Turn Right)
+
+					else: #When other sensors activate
+					#Turn 90 degrees (Either Left or Right: Random)
+
 					y = random.randint(0,1)
 					spinVal = random.randint(spnspd - 50, spnspd + 50)
 					if y == 0:
 						spinVal = -spinVal
 					moveVal = -100
 					last_bump = 3
+
 				forwardSpin = int(-spinVal / 2)
 
 				''' Unimplemented
