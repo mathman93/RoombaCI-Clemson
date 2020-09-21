@@ -1,16 +1,15 @@
-'''
-Roomba_DataRead_Test.py
-Purpose: Testing communication between Roomba and RPi
-	Form basis of Roomba code for other tests.
-IMPORTANT: Must be run using Python 3 (python3)
-Last Modified: 6/6/2019
-'''
+
 ## Import libraries ##
 import serial
 import time
 import RPi.GPIO as GPIO
 
 import RoombaCI_lib
+
+## Roomba_WallFinder_Test Libraries
+import os.path
+import math
+import random
 
 ## Variables and Constants ##
 global Xbee # Specifies connection to Xbee
@@ -62,7 +61,6 @@ time.sleep(0.1)
 x = imu.magnetic
 x = imu.acceleration
 x = imu.gyro
-
 # Calibrate IMU
 print(" Calibrating IMU...")
 Roomba.Move(0,75) # Start Roomba spinning
@@ -70,7 +68,6 @@ imu.CalibrateMag() # Calculate magnetometer offset values
 Roomba.Move(0,0) # Stop Roomba spinning
 time.sleep(0.5)
 imu.CalibrateGyro() # Calculate gyroscope offset values
-
 # Display offset values
 print("mx_offset = {:f}; my_offset = {:f}; mz_offset = {:f}"\
 	.format(imu.m_offset[0], imu.m_offset[1], imu.m_offset[2]))
@@ -122,7 +119,7 @@ while data_counter < 1001: # stop after 1000 data points
 			print("{0}, {1:.6f}, {2:0>8b}, {3}, {4}, {5:0>8b}, {6}, {7}, {8:.4f};"\
 				.format(data_counter, data_time, bumper_byte, l_counts, r_counts, light_bumper, l_speed, r_speed, angle))
 			# Write data values to a text file
-			# datafile.write("{0}, {1:0>8b}, {2}, {3}, {4:0>8b}, {5}, {6};".format(data_counter, bumper_byte, l_counts, r_counts, light_bumper, l_speed, r_speed))
+			#datafile.write("{0}, {1:0>8b}, {2}, {3}, {4:0>8b}, {5}, {6};".format(data_counter, bumper_byte, l_counts, r_counts, light_bumper, l_speed, r_speed))
 			data_counter += 1 # Increment counter for the next data sample
 
 	except KeyboardInterrupt:

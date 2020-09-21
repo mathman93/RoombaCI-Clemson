@@ -1,7 +1,7 @@
 ''' Xbee_Read_Test.py
 Purpose: Testing communication between Xbee modules on separate RPi
 IMPORTANT: Must be run using Python 3 (python3)
-Last Modified: 2/11/2020
+Last Modified: 5/31/2018
 '''
 ## Import libraries ##
 import serial
@@ -34,25 +34,50 @@ GPIO.setup(yled, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(rled, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(gled, GPIO.OUT, initial=GPIO.LOW)
 
+
 # Main Code #
+
 sendtime = time.time()
-sendtime_offset = 1.0 # Time between sending messages
+sendtime_offset = 1.0
 basetime = time.time()
-basetime_offset = 0.5 # Time between LED blinks
+basetime_offset = 0.5
+roombaname = 'rp2'      #can try to update a number in 
 
-
+if Xbee.inWaiting() > 0:
+	junk = Xbee.read(Xbee.inWaiting()).decode()
+	print(junk)
 while True:
 	try:
 		if (time.time() - sendtime) > sendtime_offset:
-			message = '1' # Change this to any character string you want
-			Xbee.write(message.encode()) # Send the number over the Xbee
-			sendtime += sendtime_offset # Increase offset for next time to send message
+            #message1 = 7714 # Make this the number  you want to send
+            #message2 = -00891.3
+            #var = "{0} {1:09.3f} {2:09.3f}".format(roombaname, message1,message2) # Make the string representation of the number
+
+			num_str = '1234'
+			num_int = int(num_str)  # from string to int
+			num_hex = hex(num_int)  # from int to hex
+			message1 = str(num_hex) # from hex to string
+			num2_str = '10'
+			num2_int = int(num2_str)
+			num2_hex = hex(num2_int)
+			message2 = str(num2_hex)
+			var = "{0} {1} {2}".format(roombaname, message1,message2) # Make the string representation of the number
+            
+			Xbee.write(var.encode()) # Send the number over the Xbee
+			sendtime += sendtime_offset # Increase offset for next message
+		
 		
 		if Xbee.inWaiting() > 0: # If there is something in the receive buffer
 			message = Xbee.read(Xbee.inWaiting()).decode() # Read all data in
-			print(message) # To see what the message is
+			print(message) # To see what the string representation is
+			coordinate = message.split() # To split the string into x and y coordinates
+			id = coordinate[0]
+			print(id)
+			absissa = int(coordinate[1], 16)	#convert coordinate 1 to int base 16 number
+			print(absissa)			
+			ordinate = int(coordinate[2], 16)
+			print(ordinate)
 		
-		# LED blink conditional, to make sure code is running
 		if (time.time() - basetime) > basetime_offset: # If enough time has passed.
 			if GPIO.input(gled) == True:  # If the LED is on...
 				GPIO.output(gled, GPIO.LOW)  # turn it off
