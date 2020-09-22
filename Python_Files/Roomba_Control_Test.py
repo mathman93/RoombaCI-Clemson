@@ -216,10 +216,10 @@ def MyLoop(stdscr):
 					pass # Do nothing
 				
 				# Cap off values
-				if forward > 250:
-					forward = 250
-				elif forward < -250:
-					forward = -250
+				if forward > 300:
+					forward = 300
+				elif forward < -300:
+					forward = -300
 				if spin > 150:
 					spin = 150
 				elif spin < -150:
