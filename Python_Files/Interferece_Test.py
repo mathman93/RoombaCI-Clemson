@@ -10,6 +10,7 @@ import sys
 ## Variables and Constants ##
 global Xbee # Specifies connection to Xbee
 Xbee = serial.Serial('/dev/ttyUSB0', 115200) # Baud rate should be 115200
+# LED pin numbers
 yled = 5
 rled = 6
 gled = 13
