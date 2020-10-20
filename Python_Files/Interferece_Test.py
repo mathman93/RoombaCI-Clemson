@@ -46,11 +46,11 @@ basetime_offset = 0.5
 roombaname = input('enter roombaname: ')
 
 for line in sys.stdin:
-     
+
 
         #variable=input('input letter: ')
 		#if variabe='s':
-        if 'send' == line.rstrip();
+        if 'send' == line.rstrip()
 			message1 = input('enter x value: ') # Make this the number  you want to send
             #make this input
 			message2 = input('enter y value: ')
