@@ -53,7 +53,8 @@ while True:
 			message1 = input('enter x value: ') # Make this the number  you want to send
 			message2 = input('enter y value: ')
 			Dict[roombaname] = [message1,message2]
-			var = "{0} {1:09.3f} {2:09.3f}".format(roombaname, message1,message2) # Make the string representation of the number
+			#var = "{0} {1:09.3f} {2:09.3f}".format(roombaname, message1,message2) # Make the string representation of the number
+			var = "{} {} {}".format(roombaname,message1,message2)
 			Xbee.write(var.encode()) # Send the number over the Xbee
 			sendtime += sendtime_offset # Increase offset for next message
 		elif variable == 'p':
