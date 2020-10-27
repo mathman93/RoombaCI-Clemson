@@ -111,6 +111,7 @@ data_time = time.time()
 Roomba.Move(0,0) # Start Roomba moving
 
 
+
 # New code implementation 
 Roomba.StartQueryStream(45)
 if Roomba.Available() > 0:
