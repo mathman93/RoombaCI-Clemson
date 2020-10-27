@@ -49,7 +49,7 @@ Dict = {roombaname: [0,0]}
 while True:
 
         variable=input('input letter: ')
-		if variable=='s':
+		if variable == 's':
         #if 'send' == line.rstrip()
 			message1 = input('enter x value: ') # Make this the number  you want to send
             #make this input
