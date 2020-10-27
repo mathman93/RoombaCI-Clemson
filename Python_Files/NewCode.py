@@ -1,6 +1,6 @@
 '''
-Roomba_WallFinder_Test.py
-Purpose: Test code to have Roomba report when it has hit an obstacle
+NewCode.py
+Purpose: Test code to have Roomba report when it has hit an obstacle or a Light Bumper
 Last Modified: 11/11/19
 '''
 
@@ -113,7 +113,7 @@ Roomba.Move(0,0) # Start Roomba moving
 
 
 
-# New code implementation, We added packet ID 45 
+# New code implementation, We added packet ID 45 and a new varibale called LightBump
 
 
 Roomba.StartQueryStream(7, 43, 44,45) # Start query stream with specific sensor packets
@@ -183,7 +183,7 @@ while True:
 				#if ((l_difference > 300) AND (r_difference > 300)):
 				#stuck_count += 1
 				last_encoder_left = l_counts
-				last_encoder_right = r_counts'''
+				last_encoder_right = r_counts
 			
 			#timer for the backward movement, then the spin
 			if (time.time() - moveHelper) < backTime:
@@ -193,7 +193,7 @@ while True:
 			else: 
 				Roomba.Move(movSpd, forwardSpin) # forward and spin
 
-	except KeyboardInterrupt:
+    except KeyboardInterrupt:
 		print('')
 		break # exit while loop
 
