@@ -113,15 +113,14 @@ Roomba.Move(0,0) # Start Roomba moving
 
 
 # New code implementation 
-Roomba.StartQueryStream(45)
-if Roomba.Available() > 0:
-[newcode] = Roomba.ReadQueryStream(45)
 
 
 
 
 
-Roomba.StartQueryStream(7, 43, 44) # Start query stream with specific sensor packets
+
+
+Roomba.StartQueryStream(7, 43, 44,45) # Start query stream with specific sensor packets
 # can add other packets later if needed
 while True:
 	try:
@@ -135,8 +134,9 @@ while True:
 
 		if Roomba.Available() > 0:
 			data_time2 = time.time()
-			bumper_byte, l_counts, r_counts = Roomba.ReadQueryStream(7, 43, 44)
-			print("{0:0>8b}, {1}, {2}".format(bumper_byte, l_counts, r_counts)) #check syntax
+			bumper_byte, l_counts, r_counts,Lightbump = Roomba.ReadQueryStream(7, 43, 44,45)
+            # 0>8b displays as binary for each bit
+			print("{0:0>8b}, {1}, {2},{3:0>8b}".format(bumper_byte, l_counts, r_counts, Lightbump)) #check syntax
 			delta_l = l_counts-left_start
 			delta_r = r_counts-right_start
 			# Determine the change in theta and what that is currently
