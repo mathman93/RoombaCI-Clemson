@@ -47,36 +47,36 @@ roombaname = input('enter roombaname: ')
 Dict = {roombaname: [0,0]}
 #for line in sys.stdin:
 while True:
-	variable=input('input letter: ')
-	if variable == 's':
-		message1 = input('enter x value: ') # Make this the number  you want to send
-		message2 = input('enter y value: ')
-		Dict[roombaname] = [message1,message2]
-		var = "{0} {1:09.3f} {2:09.3f}".format(roombaname, message1,message2) # Make the string representation of the number
-		Xbee.write(var.encode()) # Send the number over the Xbee
-		sendtime += sendtime_offset # Increase offset for next message
-	elif variable == 'p':
-		print(Dict)
+	try:
+		variable=input('input letter: ')
+		if variable == 's':
+			message1 = input('enter x value: ') # Make this the number  you want to send
+			message2 = input('enter y value: ')
+			Dict[roombaname] = [message1,message2]
+			var = "{0} {1:09.3f} {2:09.3f}".format(roombaname, message1,message2) # Make the string representation of the number
+			Xbee.write(var.encode()) # Send the number over the Xbee
+			sendtime += sendtime_offset # Increase offset for next message
+		elif variable == 'p':
+			print(Dict)
 
 
-	if Xbee.inWaiting() > 22: # If there is something in the receive buffer
-		message = Xbee.read(Xbee.inWaiting()).decode() # Read all data in
-		print(message) # To see what the string representation is
-		coordinate = message.split() # To split the string into x and y coordinates
-		Dict[coordinate[0]] = [coordinate[1],coordinate[2]]
+		if Xbee.inWaiting() > 22: # If there is something in the receive buffer
+			message = Xbee.read(Xbee.inWaiting()).decode() # Read all data in
+			print(message) # To see what the string representation is
+			coordinate = message.split() # To split the string into x and y coordinates
+			Dict[coordinate[0]] = [coordinate[1],coordinate[2]]
 
 
 
-		#if (time.time() - basetime) > basetime_offset: # If enough time has passed.
-		#	if GPIO.input(gled) == True:  # If the LED is on...
-		#		GPIO.output(gled, GPIO.LOW)  # turn it off
-		#	else:
-		#		GPIO.output(gled, GPIO.HIGH) # otherwise, turn it on.
-		#	basetime += basetime_offset  # set the next base time
-
-except KeyboardInterrupt:
-	print('The program has ended')
-	break
+			#if (time.time() - basetime) > basetime_offset: # If enough time has passed.
+			#	if GPIO.input(gled) == True:  # If the LED is on...
+			#		GPIO.output(gled, GPIO.LOW)  # turn it off
+			#	else:
+			#		GPIO.output(gled, GPIO.HIGH) # otherwise, turn it on.
+			#	basetime += basetime_offset  # set the next base time
+	except KeyboardInterrupt:
+		print('The program has ended')
+		break
 
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
