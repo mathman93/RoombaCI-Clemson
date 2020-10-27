@@ -131,7 +131,7 @@ while True:
 		if Roomba.Available() > 0:
 			data_time2 = time.time()
 			bumper_byte, l_counts, r_counts,Lightbump = Roomba.ReadQueryStream(7, 43, 44,45)
-            # 0>8b displays as binary for each bit
+			# 0>8b displays as binary for each bit
 			print("{0:0>8b}, {1}, {2},{3:0>8b}".format(bumper_byte, l_counts, r_counts, Lightbump)) #check syntax
 			delta_l = l_counts-left_start
 			delta_r = r_counts-right_start
@@ -193,7 +193,7 @@ while True:
 			else: 
 				Roomba.Move(movSpd, forwardSpin) # forward and spin
 
-    except KeyboardInterrupt:
+	except KeyboardInterrupt:
 		print('')
 		break # exit while loop
 
