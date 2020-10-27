@@ -55,7 +55,7 @@ while True:
 		var = "{0} {1:09.3f} {2:09.3f}".format(roombaname, message1,message2) # Make the string representation of the number
 		Xbee.write(var.encode()) # Send the number over the Xbee
 		sendtime += sendtime_offset # Increase offset for next message
-	else if variable == 'p':
+	elif variable == 'p':
 		print(Dict)
 
 
