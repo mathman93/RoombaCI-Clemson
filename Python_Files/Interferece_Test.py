@@ -44,38 +44,38 @@ sendtime_offset = 1.0
 basetime = time.time()
 basetime_offset = 0.5
 roombaname = input('enter roombaname: ')
+Dict = {roombaname: [0,0]}
+#for line in sys.stdin:
+while True:
 
-for line in sys.stdin:
-
-
-        #variable=input('input letter: ')
-		#if variabe='s':
-        if 'send' == line.rstrip()
+        variable=input('input letter: ')
+		if variable=='s':
+        #if 'send' == line.rstrip()
 			message1 = input('enter x value: ') # Make this the number  you want to send
             #make this input
 			message2 = input('enter y value: ')
             #same with this
+			Dict[roombaname] = [message1,message2]
 			var = "{0} {1:09.3f} {2:09.3f}".format(roombaname, message1,message2) # Make the string representation of the number
 			Xbee.write(var.encode()) # Send the number over the Xbee
 			sendtime += sendtime_offset # Increase offset for next message
+		else if variable == 'p':
+			print(Dict)
 
 		if Xbee.inWaiting() > 22: # If there is something in the receive buffer
 			message = Xbee.read(Xbee.inWaiting()).decode() # Read all data in
 			print(message) # To see what the string representation is
 			coordinate = message.split() # To split the string into x and y coordinates
-			id = coordinate[0]
-			print(id)
-			absissa = float(coordinate[1])
-			print(absissa)
-			ordinate = float(coordinate[2])
-			print(ordinate)
+			Dict[coordinate[0]] = [coordinate[1],coordinate[2]]
 
-		if (time.time() - basetime) > basetime_offset: # If enough time has passed.
-			if GPIO.input(gled) == True:  # If the LED is on...
-				GPIO.output(gled, GPIO.LOW)  # turn it off
-			else:
-				GPIO.output(gled, GPIO.HIGH) # otherwise, turn it on.
-			basetime += basetime_offset  # set the next base time
+
+
+		#if (time.time() - basetime) > basetime_offset: # If enough time has passed.
+		#	if GPIO.input(gled) == True:  # If the LED is on...
+		#		GPIO.output(gled, GPIO.LOW)  # turn it off
+		#	else:
+		#		GPIO.output(gled, GPIO.HIGH) # otherwise, turn it on.
+		#	basetime += basetime_offset  # set the next base time
 
 	except KeyboardInterrupt:
 		print('The program has ended')
