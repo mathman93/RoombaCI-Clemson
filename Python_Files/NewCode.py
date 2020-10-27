@@ -112,12 +112,8 @@ Roomba.Move(0,0) # Start Roomba moving
 
 
 
-# New code implementation 
 
-
-
-
-
+# New code implementation, We added packet ID 45 
 
 
 Roomba.StartQueryStream(7, 43, 44,45) # Start query stream with specific sensor packets
@@ -181,11 +177,11 @@ while True:
 					last_bump = 3
 				forwardSpin = int(-spinVal / 2)
 
-				 Unimplemented
+				#Unimplemented
 				l_difference = abs(last_encoder_left - l_counts)
 				r_difference = abs(last_encoder_right - r_counts)
 				#if ((l_difference > 300) AND (r_difference > 300)):
-				#	stuck_count += 1
+				#stuck_count += 1
 				last_encoder_left = l_counts
 				last_encoder_right = r_counts'''
 			
