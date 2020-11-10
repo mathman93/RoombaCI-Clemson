@@ -159,13 +159,7 @@ while True:
 			if (bumper_byte % 4) > 0:
 				moveHelper = time.time()
 				
-				#Light Bump logic ID 45
-				if (Lightbump == 1):
-				print("I am stuck")
 				
-				
-				else:
-				printf("I am not stuck")
 				if (bumper_byte % 4) == 1:
 					# right bump
 					print("Right bumper hit!")
