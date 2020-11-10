@@ -151,9 +151,9 @@ while True:
 			left_start = l_counts
 			right_start = r_counts
 			
-            
-            
-            
+			
+			
+			
 			# Bumper logic
 			if (bumper_byte % 4) > 0:
 				moveHelper = time.time()
@@ -187,15 +187,15 @@ while True:
 				#stuck_count += 1
 				last_encoder_left = l_counts
 				last_encoder_right = r_counts
-                
-                #Light Bump logic ID 45
-                if (Lightbump == 1):
-                print("I am stuck")
-                
-                
-                else:
-                printf("I am not stuck")
-                
+				
+				#Light Bump logic ID 45
+				if (Lightbump == 1):
+				print("I am stuck")
+				
+				
+				else:
+				printf("I am not stuck")
+				
 			
 			#timer for the backward movement, then the spin
 			if (time.time() - moveHelper) < backTime:
