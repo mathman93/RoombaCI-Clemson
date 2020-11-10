@@ -116,7 +116,7 @@ Roomba.Move(0,0) # Start Roomba moving
 # New code implementation, We added packet ID 45 and a new varibale called LightBump
 
 
-Roomba.StartQueryStream(7, 43, 44,45) # Start query stream with specific sensor packets
+Roomba.StartQueryStream(7, 43, 44,45,47,50) # Start query stream with specific sensor packets
 # can add other packets later if needed
 while True:
 	try:
@@ -130,9 +130,10 @@ while True:
 
 		if Roomba.Available() > 0:
 			data_time2 = time.time()
-			bumper_byte, l_counts, r_counts,Lightbump = Roomba.ReadQueryStream(7, 43, 44,45)
+			bumper_byte, l_counts, r_counts,Lightbump,Frontright,Frontleft = Roomba.ReadQueryStream(7,43, 44,45,47,50)
 			# 0>8b displays as binary for each bit
 			print("{0:0>8b}, {1}, {2},{3:0>8b}".format(bumper_byte, l_counts, r_counts, Lightbump)) #check syntax
+			print("{0:0>1b}".format(Frontleft,Frontright))
 			delta_l = l_counts-left_start
 			delta_r = r_counts-right_start
 			# Determine the change in theta and what that is currently
@@ -157,6 +158,14 @@ while True:
 			# Bumper logic
 			if (bumper_byte % 4) > 0:
 				moveHelper = time.time()
+				
+				#Light Bump logic ID 45
+				if (Lightbump == 1):
+				print("I am stuck")
+				
+				
+				else:
+				printf("I am not stuck")
 				if (bumper_byte % 4) == 1:
 					# right bump
 					print("Right bumper hit!")
@@ -188,13 +197,7 @@ while True:
 				last_encoder_left = l_counts
 				last_encoder_right = r_counts
 				
-				#Light Bump logic ID 45
-				if (Lightbump == 1):
-				print("I am stuck")
 				
-				
-				else:
-				printf("I am not stuck")
 				
 			
 			#timer for the backward movement, then the spin
