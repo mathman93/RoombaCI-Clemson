@@ -65,7 +65,11 @@ while True:
 			message = Xbee.read(Xbee.inWaiting()).decode() # Read all data in
 			print(message) # To see what the string representation is
 			coordinate = message.split() # To split the string into x and y coordinates
-			Dict[coordinate[0]] = [coordinate[1],coordinate[2]]
+			count=0
+			for x in coordinate range(len(coordinate)/3)):
+				Dict[coordinate[count]] = [coordinate[count+1],coordinate[count+2]]
+				count=count+3
+
 
 
 
