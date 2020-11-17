@@ -69,7 +69,8 @@ if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 	#print(x) # for debugging
 
 # initalize speeds
-movSpd = 138 # initializes move speed
+#movSpd = 138 # initializes move speed
+movSpd = 0  # intiialize to 0 to keep it still in order to create a scale
 spnspd = 75
 
 # initialize timers
