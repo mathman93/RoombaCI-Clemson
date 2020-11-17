@@ -66,7 +66,7 @@ while True:
 			print(message) # To see what the string representation is
 			coordinate = message.split() # To split the string into x and y coordinates
 			count=0
-			for x in coordinate range(len(coordinate)/3)):
+			for x in coordinate range((len(coordinate))/3)):
 				Dict[coordinate[count]] = [coordinate[count+1],coordinate[count+2]]
 				count=count+3
 
