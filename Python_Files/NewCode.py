@@ -3,7 +3,7 @@ NewCode.py
 Purpose: Test code to have Roomba report when it has hit an obstacle or a Light Bumper
 Last Modified: 11/11/19
 '''
-
+# Connor and Julio
 ## Import libraries ##
 import serial
 import time
@@ -134,7 +134,7 @@ while True:
 			bumper_byte, l_counts, r_counts,Lightbump,Frontright,Frontleft = Roomba.ReadQueryStream(7,43, 44,45,47,50)
 			# 0>8b displays as binary for each bit
 			print("{0:0>8b}, {1}, {2},{3:0>8b}".format(bumper_byte, l_counts, r_counts, Lightbump)) #check syntax
-			print("{0},{1}".format(Frontleft,Frontright))
+			print("{0},{1}".format(Frontleft,Frontright)) # The front right bumper reads on the left and the left reads on the right when you run it.
 			delta_l = l_counts-left_start
 			delta_r = r_counts-right_start
 			# Determine the change in theta and what that is currently
