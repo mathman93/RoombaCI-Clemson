@@ -44,19 +44,20 @@ sendtime_offset = 1.0
 basetime = time.time()
 basetime_offset = 0.5
 roombaname = input('enter roombaname: ')
-Dict = {roombaname: [0,0]}
+numOfItems=3
+#Dict = {roombaname: [0,0]}
 #for line in sys.stdin:
 while True:
 	try:
 		variable=input('input letter: ')
+		#send massage command
 		if variable == 's':
-			message1 = input('enter x value: ') # Make this the number  you want to send
+			message1 = input('enter x value: ') #data you want to send
 			message2 = input('enter y value: ')
-			Dict[roombaname] = [message1,message2]
-			#var = "{0} {1:09.3f} {2:09.3f}".format(roombaname, message1,message2) # Make the string representation of the number
-			var = "{} {} {} ".format(roombaname,message1,message2)
+			var = "{0} {1} {2} ".format(roombaname,message1,message2)
 			Xbee.write(var.encode()) # Send the number over the Xbee
 			sendtime += sendtime_offset # Increase offset for next message
+		#print message commmand
 		elif variable == 'p':
 			print(Dict)
 
@@ -66,9 +67,9 @@ while True:
 			print(message) # To see what the string representation is
 			coordinate = message.split() # To split the string into x and y coordinates
 			count=0
-			for x in range(int(len(coordinate)/3)):
-				Dict[coordinate[count]] = [coordinate[count+1],coordinate[count+2]]
-				count=count+3
+			for x in range(int(len(coordinate)/numOfItems)):#goes thorugh and sorts enitre array
+				Dict[coordinate[count]] = [float(coordinate[count+1]),float(coordinate[count+2])]
+				count=count+numOfItems
 
 
 
