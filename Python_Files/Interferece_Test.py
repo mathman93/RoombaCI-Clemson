@@ -1,5 +1,7 @@
 '''
-
+Interference_Test.py
+Purpose: Test code for determining if Xbee messages from multiple Roombas interfere with each otherwise
+Last Updated: December 2020
 '''
 
 import serial
