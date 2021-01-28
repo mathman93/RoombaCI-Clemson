@@ -1,7 +1,7 @@
 ''' Roomba_Control_Test.py
 Purpose: Use Arrow Keys to control Roomba movement
 IMPORTANT: Must be run using Python 3 (python3)
-Last Modified: 6/6/2019
+Last Modified: 1/28/2021
 '''
 ## Import libraries ##
 import serial
@@ -115,10 +115,11 @@ def MyLoop(stdscr):
 	
 	stdscr.nodelay(1) # Don't wait for input when calling getch()
 	
-	Roomba.SendQuery(7,43,44,42,41,45)
-	while Roomba.Available() == 0:
-		pass # Wait for sensor packet values to be returned
-	bumper_byte, l_counts_current, r_counts_current, l_speed, r_speed, light_bumper = Roomba.ReadQuery(7, 43, 44, 42, 41, 45) # Read new wheel counts
+	#Roomba.SendQuery(7,43,44,42,41,45)
+	#while Roomba.Available() == 0:
+	#	pass # Wait for sensor packet values to be returned
+	#bumper_byte, l_counts_current, r_counts_current, l_speed, r_speed, light_bumper = Roomba.ReadQuery(7, 43, 44, 42, 41, 45) # Read new wheel counts
+	bumper_byte, l_counts_current, r_counts_current, l_speed, r_speed, light_bumper = Roomba.Query(7,43,44,42,41,45) # Read initial data
 
 	# Start Query Data Stream
 	Roomba.StartQueryStream(7,43,44,42,41,45)
