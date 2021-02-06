@@ -326,12 +326,12 @@ while True:
 					if delta_l < -1*(2**15): #Checks if the encoder values have rolled over, and if so, subtracts/adds accordingly to assure normal delta values
 						delta_l += (2**16)
 					elif delta_l > (2**15):
-						delta_l -+ (2**16)
+						delta_l -= (2**16)
 					delta_r = right_encoder-right_start
 					if delta_r < -1*(2**15):
 						delta_r += (2**16)
 					elif delta_r > (2**15):
-						delta_r -+ (2**16)
+						delta_r -= (2**16)
 					# Determine the change in theta and what that is currently
 					delta_theta = (delta_l-delta_r)*C_theta
 					old_theta = theta # Heading of last iteration

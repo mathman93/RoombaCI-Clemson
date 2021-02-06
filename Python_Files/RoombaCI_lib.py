@@ -483,9 +483,20 @@ class LSM9DS1_I2C(I2CDevice):
 ##################################################################
 ## iRobot Create 2 (Roomba) Class ##
 class Create_2:
-	ddPin = 0 # Integer specifying ddPin placement on Raspberry Pi
+	# Define internal class variables
+	self.Y_position = 0 # Position of Roomba along y-axis (millimeters)
+	self.X_position = 0 # Position of Roomba along x-axis (millimeters)
+	self.heading = 0 # Heading of Roomba (radians; 0 -> positive x-axis, pi/2 -> positive y_axis)
+	self.total_distance = 0 # Total distance traveled by Roomba (millimeters)
+	self.l_count_last = 0 # Value of last left wheel encoder count (ID:43) reading
+	self.r_count_last = 0 # Value of last right wheel encoder count (ID:44) reading
+	self.ddPin = 0 # Integer specifying ddPin placement on Raspberry Pi
 		# Must be set after creating method object
-
+	self.WHEEL_DIAMETER = 72 # Roomba wheel diameter (millimeters)
+	self.WHEEL_SEPARATION = 235 # Roomba wheel axle length (millimeters)
+	self.WHEEL_COUNTS = 508.8 # encoder counts per revolution of Roomba wheel
+	self.DISTANCE_CONSTANT = (WHEEL_DIAMETER * math.pi)/(WHEEL_COUNTS) # millimeters/count
+	self.THETA_CONSTANT = (WHEEL_DIAMETER * math.pi)/(WHEEL_COUNTS * WHEEL_SEPARATION) # radians/count_diff
 	# Dictionary of packet byte size and sign
 		# False = unsigned; True = signed;
 	packet_dict = {
@@ -563,19 +574,19 @@ class Create_2:
 			baud = integer; Roomba communication baud rate (Ex: 115200) '''
 	def __init__(self, port, baud):
 		self.conn = serial.Serial(port, baud) # Define serial port connection
-
+	# End __init__
 	## Roomba Functions ##
 	''' Send a single byte command directly to the Roomba
 		Only does integers in range [0, 255] '''
 	def DirectWrite(self, num):
 		self.conn.write((num).to_bytes(1, byteorder='big', signed=False))
-
+	# End DirectWrite
 	''' Returns the number of bytes available to read from the buffer
 		Returns:
 			integer; number of bytes currently in the buffer '''
 	def Available(self):
 		return self.conn.inWaiting()
-
+	# End Available
 	''' Returns the bytes in the buffer in the order they were received
 		Parameters:
 			num = integer; number of bytes to read from the buffer
@@ -584,7 +595,7 @@ class Create_2:
 	def DirectRead(self, num):
 		return self.conn.read(num)
 		# Ex: 'Roomba.DirectRead(Roomba.Available()).decode()'; or maybe 'Roomba.conn.read(Roomba.conn.inWaiting())'
-
+	# End DirectRead
 	''' Roomba Wake-up Sequence
 		Parameters:
 			control = integer; Control Command
@@ -597,14 +608,14 @@ class Create_2:
 		self.DirectWrite(control) # Control command
 		# 131 = Safe Mode; 132 = Full Mode (Be ready to catch it!)
 		time.sleep(0.1)
-
+	# End WakeUp
 	''' Dock the Roomba Sequence
 		'''
 	def Dock(self):
 		#self.conn.write(b'\x80\xa5\x04') # Send to Passive Mode, and push Dock button
 		self.conn.write(b'\x8f') # Seek Dock command
 		time.sleep(2.0) # Wait for Dock "happy noise" to play.
-
+	# End Dock
 	''' Roomba Shut-down Sequence
 		Run at end of code to completely close Create_2 connection '''
 	def ShutDown(self, off = False):
@@ -613,7 +624,7 @@ class Create_2:
 			self.conn.write(b'\xad') # Stop Roomba OI (173)
 		time.sleep(0.05)
 		self.conn.close() # Close the Roomba serial port.
-
+	# End ShutDown
 	''' Blinks the clean button on Roomba during startup
 		Helps determine that RPi -> Roomba communication is working '''
 	def BlinkCleanLight(self):
@@ -627,7 +638,7 @@ class Create_2:
 		# Turn off Clean button
 		self.conn.write(b'\x8b\x19\xff\x00') # 139, 25, 255, 0
 		time.sleep(0.05)
-
+	# End BlinkCleanLight
 	''' Send command to Roomba to move
 		Parameters:
 			x = integer; common wheel speed (mm/s); x > 0 -> forward motion
@@ -639,7 +650,7 @@ class Create_2:
 		self.conn.write(b'\x91') # Send command to Roomba to set wheel speeds (145)
 		self.conn.write((RW).to_bytes(2, byteorder='big', signed=True))
 		self.conn.write((LW).to_bytes(2, byteorder='big', signed=True))
-
+	# End Move
 	''' Request and Return a single Roomba sensor packet
 		Parameters:
 			packetID = integer; ID number for Roomba sensor packet
@@ -656,7 +667,7 @@ class Create_2:
 		byte, sign = self.packet_dict[packetID] # Get packet info
 		# Return the value of the requested packet
 		return int.from_bytes(self.conn.read(byte), byteorder='big', signed=sign)
-
+	# End QuerySingle
 	''' Request and Return a list of Roomba sensor packets
 		Combination of SendQuery() and Read(Query)
 		Parameters:
@@ -680,7 +691,7 @@ class Create_2:
 			# Add the sensor value to the list
 			data.append(int.from_bytes(self.conn.read(byte), byteorder='big', signed=sign))
 		return data # Return the list of values
-
+	# End Query
 	''' Request a list of Roomba sensor packets
 		Parameters:
 			*args = integers; sequence of integers representing ID number of Roomba sensor packets
@@ -691,7 +702,7 @@ class Create_2:
 		self.DirectWrite(num) # Number of packets to request
 		for packetID in args:
 			self.DirectWrite(packetID) # Send packet ID for each sensor packet to request
-
+	# End SendQuery
 	''' Return a list of Roomba sensor packets
 		Parameters:
 			*args = integers; sequence of integers representing ID number of Roomba sensor packets
@@ -706,7 +717,7 @@ class Create_2:
 			# Add the sensor value to the list
 			data.append(int.from_bytes(self.conn.read(byte), byteorder='big', signed=sign))
 		return data # Return the list of values
-
+	# End ReadQuery
 	''' Starts Data Stream with specified packets
 		Parameters:
 			*args = integers; sequence of integers representing ID number of Roomba sensor packets
@@ -717,7 +728,7 @@ class Create_2:
 		self.DirectWrite(num) # Number of packets to stream
 		for packetID in args:
 			self.DirectWrite(packetID) # Send packet ID for each sensor packet to request
-
+	# End StartQueryStream
 	''' Reads in data from Roomba sent as a Query Stream
 		The sequence of bytes is very structured
 		Parameters:
@@ -772,18 +783,59 @@ class Create_2:
 			# Returns a zero if a packetID is not found
 
 		return data # Return the list of values
-
-
+	# End ReadQueryStream
 	''' Pause the current Query Stream
 		Does not erase the last set of packets requested '''
 	def PauseQueryStream(self):
 		self.conn.write(b'\x96\x00') # Pause the Roomba data stream (150, 0)
-
+	# End PuaseQueryStream
 	''' Resume the current Query Stream
 		Uses the last set of packets requested '''
 	def ResumeQueryStream(self):
 		self.conn.write(b'\x96\x01') # Resume the Roomba data stream (150, 1)
-
+	# End ResumeQueryStream
+	''' Set initial wheel encoder count values
+		Parameters:
+			lc = Int; value of current left wheel encoder (ID:43) value
+			rc = Int; value of current right wheel encoder (ID:44) value
+	'''
+	def SetWheelEncoderCounts(self, lc ,rc):
+		self.l_count_last = lc
+		self.r_count_last = rc
+		return
+	# End SetWheelEncoderCounts
+	''' Update position of Roomba using wheel encoders
+		Parameters:
+			lc = Int; value of current left wheel encoder (ID:43) value
+			rc = Int; value of current right wheel encoder (ID:44) value
+		Updates internal class variables Y_position. X_position, heading, & total_distance. '''
+	def UpdatePosition(self, lc, rc):
+		l_diff = lc - self.l_count_last
+		r_diff = rc - self.r_count_last
+		 # Check if the encoder values (16-big values) have rolled over.
+		if l_diff < -1*(2**15):	# If too small (less than -32,768)...
+			l_diff += (2**16) # Add 65,536 to normalize value
+		elif l_diff > (2**15): # Else if too large (greater than 32,768)...
+			l_diff -= (2**16) # Subtract 65,536 to normalize value
+		# End if l_diff
+		if r_diff < -1*(2**15):	# If too small (less than -32,768)...
+			r_diff += (2**16) # Add 65,536 to normalize value
+		elif r_diff > (2**15): # Else if too large (greater than 32,768)...
+			r_diff -= (2**16) # Subtract 65,536 to normalize value
+		# End if r_diff
+		d_diff = 0.5*(l_diff + r_diff)*(self.DISTANCE_CONSTANT)
+		h_diff = (l_diff - r_diff)*(self.THETA_CONSTANT)
+		self.total_distance += d_diff
+		if h_diff != 0: # If Roomba turned, it followed a circular arc
+			d_diff *= (2/h_diff)*math.sin(h_diff/2)
+		# End if
+		self.Y_position += d_diff*math.sin(self.heading + 0.5*h_diff)
+		self.X_position += d_diff*math.cos(self.heading + 0.5*h_diff)
+		self.heading += h_diff
+		self.l_count_last = lc
+		self.r_count_last = rc
+		return
+	# End UpdatePosition
 	''' You are not expected to understand this. :)
 		'''
 	def PlaySMB(self):
@@ -795,6 +847,7 @@ class Create_2:
 		#Play song
 		self.conn.write(b'\x8d\x00') # 141, 0
 		time.sleep(2) # Wait for song to play
+	# End PlaySMB
 
 ##################################################################
 ## Additional Functions ##
