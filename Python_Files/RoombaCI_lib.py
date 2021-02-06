@@ -1,9 +1,10 @@
 ''' RoombaCI_lib.py
-Purpose: Python Library with LSM9DS1 class and specific functions
-	and iRobot Create 2 (Roomba) class and specific functions
-Import this file in main Python file to access functions
-Made by: Timothy Anglea, Joshua Harvey, Madeline Corvin
-Last Modified: 06/11/2019
+
+Purpose: Python Library with LSM9DS1 class, iRobot Create 2 (Roomba) class, and specific functions;
+Import this file in your main Python file to access functions;
+
+Made by: Timothy Anglea, Joshua Harvey, Madeline Corvin; 
+Last Modified: 02/06/2021
 '''
 ## Import Libraries ##
 from ctypes import * # May not need this anymore
@@ -479,7 +480,7 @@ class LSM9DS1_I2C(I2CDevice):
 		with device as i2c:
 			address &= 0xFF
 			i2c.write(address, value)   
-
+# End Class LSM9DS1_I2C
 ##################################################################
 ## iRobot Create 2 (Roomba) Class ##
 class Create_2:
@@ -808,7 +809,8 @@ class Create_2:
 		Parameters:
 			lc = Int; value of current left wheel encoder (ID:43) value
 			rc = Int; value of current right wheel encoder (ID:44) value
-		Updates internal class variables Y_position. X_position, heading, & total_distance. '''
+		Updates internal class variables Y_position. X_position, heading, & total_distance.
+	'''
 	def UpdatePosition(self, lc, rc):
 		l_diff = lc - self.l_count_last
 		r_diff = rc - self.r_count_last
@@ -848,9 +850,16 @@ class Create_2:
 		self.conn.write(b'\x8d\x00') # 141, 0
 		time.sleep(2) # Wait for song to play
 	# End PlaySMB
-
+# End Class Create2
 ##################################################################
 ## Additional Functions ##
+''' Displays current date and time to the screen
+	'''
+def DisplayDateTime():
+	# Month day, Year, Hour:Minute:Seconds
+	date_time = time.strftime("%B %d, %Y, %H:%M:%S", time.gmtime())
+	print("Program run: ", date_time)
+# End DisplayDateTime
 ''' Returns Roomba spin amount to achieve desired heading set point
 	Parameters:
 		angle = float; Current direction of Roomba (in degrees)
