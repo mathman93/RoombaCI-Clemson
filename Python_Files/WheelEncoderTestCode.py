@@ -59,7 +59,21 @@ move_dict = {0:[100,0,10], # Move forward
 			1:[0,0,2], # Stop
 			2:[0,60,6], # Spin ~180 degrees
 			3:[0,0,2], # Stop
-			4:[100,0,10]} # Move forward
+			4:[100,0,10], # Move forward
+			5:[0,0,2],
+			6,[0,-60,6],
+			7,[0,0,2],
+			8:[75,25,15],
+			9:[75,-25,15],
+			10:[0,0,2],
+			11:[100,0,10], # Move forward
+			12:[0,0,2], # Stop
+			13:[0,60,6], # Spin ~180 degrees
+			14:[0,0,2], # Stop
+			15:[100,0,10], # Move forward
+			16:[0,0,2]
+			}
+
 # Retrieve and set initial wheel encoder values
 [left_encoder, right_encoder] = Roomba.Query(43,44)
 Roomba.SetWheelEncoderCounts(left_encoder, right_encoder)
@@ -100,7 +114,7 @@ if Roomba.Available()>0: # If data exists in Query Stream...
 if file_create == True:
 	file.close() # Close data file
 # End if file_create
-
+Roomba.PlaySMB() # Indicate proper shutdown
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
 Roomba.ShutDown() # Shutdown Roomba serial connection
