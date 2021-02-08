@@ -57,21 +57,27 @@ if file_create == True:	# Open a text file for data retrieval
 # Dictionary of move commands
 move_dict = {0:[100,0,10], # Move forward
 			1:[0,0,2], # Stop
-			2:[0,60,6], # Spin ~180 degrees
+			2:[0,60,7], # Spin ~180 degrees
 			3:[0,0,2], # Stop
 			4:[100,0,10], # Move forward
 			5:[0,0,2],
-			6:[0,-60,6],
+			6:[0,-60,7],
 			7:[0,0,2],
-			8:[75,25,15],
-			9:[75,-25,15],
+			8:[75,50,15],
+			9:[75,-50,15],
 			10:[0,0,2],
 			11:[100,0,10], # Move forward
 			12:[0,0,2], # Stop
-			13:[0,60,6], # Spin ~180 degrees
+			13:[0,60,7], # Spin ~180 degrees
 			14:[0,0,2], # Stop
 			15:[100,0,10], # Move forward
-			16:[0,0,2]
+			16:[0,0,2],
+			17:[0,-6,7],
+			18:[75,50,15],
+			19:[75,-50,15],
+			20:[75,50,15],
+			21:[75,-50,15],
+			22:[100,75,45]
 			}
 
 # Retrieve and set initial wheel encoder values
@@ -96,7 +102,7 @@ for i in range(len(move_dict.keys())):
 			[left_encoder, right_encoder] = Roomba.ReadQueryStream(43,44) # Read in left and right wheel encoder values
 			Roomba.UpdatePosition(left_encoder, right_encoder) # Update Roomba Position variables
 			# Print and write the time, left encoder, right encoder, x position, y position, and heading
-			print("Time: {0:.6f}\nLeft Encoder:{1}; Right Encoder: {2}\nX Position:{3:.3f}; Y Position:{4:.3f}\nHeading (radians):{5:.6f}; Heading (degrees):{6:.3f}"\
+			print("Time: {0:.6f}\nLeft Encoder: {1}; Right Encoder: {2}\nX Position: {3:.3f} mm; Y Position: {4:.3f} mm\nHeading (radians): {5:.6f}; Heading (degrees): {6:.3f}"\
 				.format(data_time,Roomba.l_count_last,Roomba.r_count_last,Roomba.X_position,Roomba.Y_position,Roomba.heading,Roomba.heading*(180/math.pi)))
 			print("")
 			if file_create == True:
