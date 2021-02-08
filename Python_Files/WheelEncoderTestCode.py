@@ -62,7 +62,7 @@ move_dict = {0:[100,0,10], # Move forward
 			4:[100,0,10]} # Move forward
 # Retrieve and set initial wheel encoder values
 [left_encoder, right_encoder] = Roomba.Query(43,44)
-RoombaCI_lib.SetWheelEncoderCounts(left_encoder, right_encoder)
+Roomba.SetWheelEncoderCounts(left_encoder, right_encoder)
 
 data_start = time.time() # Set time for data reference
 if file_create == True:
@@ -80,7 +80,7 @@ for i in range(len(move_dict.keys())):
 		if Roomba.Available() > 0: # If data is available...
 			data_time = time.time()-data_start # Get time that the data was retrieved
 			[left_encoder, right_encoder] = Roomba.ReadQueryStream(43,44) # Read in left and right wheel encoder values
-			RoombaCI_lib.UpdatePosition(left_encoder, right_encoder) # Update Roomba Position variables
+			Roomba.UpdatePosition(left_encoder, right_encoder) # Update Roomba Position variables
 			# Print and write the time, left encoder, right encoder, x position, y position, and heading
 			print("Time: {0:.6f}\nLeft Encoder:{1}; Right Encoder: {2}\nX Position:{3:.3f}; Y Position:{4:.3f}\nHeading (radians):{5:.6f}; Heading (degrees):{6:.3f}"\
 				.format(data_time,Roomba.l_count_last,Roomba.r_count_last,Roomba.X_position,Roomba.Y_position,Roomba.heading,Roomba.heading*(180/math.pi)))
