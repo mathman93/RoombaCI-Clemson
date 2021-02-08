@@ -485,19 +485,19 @@ class LSM9DS1_I2C(I2CDevice):
 ## iRobot Create 2 (Roomba) Class ##
 class Create_2:
 	# Define internal class variables
-	self.Y_position = 0 # Position of Roomba along y-axis (millimeters)
-	self.X_position = 0 # Position of Roomba along x-axis (millimeters)
-	self.heading = 0 # Heading of Roomba (radians; 0 -> positive x-axis, pi/2 -> positive y_axis)
-	self.total_distance = 0 # Total distance traveled by Roomba (millimeters)
-	self.l_count_last = 0 # Value of last left wheel encoder count (ID:43) reading
-	self.r_count_last = 0 # Value of last right wheel encoder count (ID:44) reading
-	self.ddPin = 0 # Integer specifying ddPin placement on Raspberry Pi
+	Y_position = 0 # Position of Roomba along y-axis (millimeters)
+	X_position = 0 # Position of Roomba along x-axis (millimeters)
+	heading = 0 # Heading of Roomba (radians; 0 -> positive x-axis, pi/2 -> positive y_axis)
+	total_distance = 0 # Total distance traveled by Roomba (millimeters)
+	l_count_last = 0 # Value of last left wheel encoder count (ID:43) reading
+	r_count_last = 0 # Value of last right wheel encoder count (ID:44) reading
+	ddPin = 0 # Integer specifying ddPin placement on Raspberry Pi
 		# Must be set after creating method object
-	self.WHEEL_DIAMETER = 72 # Roomba wheel diameter (millimeters)
-	self.WHEEL_SEPARATION = 235 # Roomba wheel axle length (millimeters)
-	self.WHEEL_COUNTS = 508.8 # encoder counts per revolution of Roomba wheel
-	self.DISTANCE_CONSTANT = (WHEEL_DIAMETER * math.pi)/(WHEEL_COUNTS) # millimeters/count
-	self.THETA_CONSTANT = (WHEEL_DIAMETER * math.pi)/(WHEEL_COUNTS * WHEEL_SEPARATION) # radians/count_diff
+	WHEEL_DIAMETER = 72 # Roomba wheel diameter (millimeters)
+	WHEEL_SEPARATION = 235 # Roomba wheel axle length (millimeters)
+	WHEEL_COUNTS = 508.8 # encoder counts per revolution of Roomba wheel
+	DISTANCE_CONSTANT = (WHEEL_DIAMETER * math.pi)/(WHEEL_COUNTS) # millimeters/count
+	THETA_CONSTANT = (WHEEL_DIAMETER * math.pi)/(WHEEL_COUNTS * WHEEL_SEPARATION) # radians/count_diff
 	# Dictionary of packet byte size and sign
 		# False = unsigned; True = signed;
 	packet_dict = {
