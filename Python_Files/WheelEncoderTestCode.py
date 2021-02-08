@@ -57,22 +57,22 @@ if file_create == True:	# Open a text file for data retrieval
 # Dictionary of move commands
 move_dict = {0:[100,0,10], # Move forward
 			1:[0,0,2], # Stop
-			2:[0,60,7], # Spin ~180 degrees
+			2:[0,60,8], # Spin ~180 degrees
 			3:[0,0,2], # Stop
 			4:[100,0,10], # Move forward
 			5:[0,0,2],
-			6:[0,-60,7],
+			6:[0,-60,8],
 			7:[0,0,2],
 			8:[75,50,15],
 			9:[75,-50,15],
 			10:[0,0,2],
 			11:[100,0,10], # Move forward
 			12:[0,0,2], # Stop
-			13:[0,60,7], # Spin ~180 degrees
+			13:[0,60,8], # Spin ~180 degrees
 			14:[0,0,2], # Stop
 			15:[100,0,10], # Move forward
 			16:[0,0,2],
-			17:[0,-6,7],
+			17:[0,-6,8],
 			18:[75,50,15],
 			19:[75,-50,15],
 			20:[75,50,15],
