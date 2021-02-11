@@ -78,8 +78,8 @@ move_dict = {0:[100,0,10]}''', # Move forward
 			20:[75,50,15], # CW Circular Arc
 			21:[75,-50,15], # CCW Circular ARc
 			22:[100,75,45] # CW Circular Arc (to increase wheel count beyond threshold)
-			}
-'''
+			}'''
+			
 # Retrieve and set initial wheel encoder values
 [left_encoder, right_encoder] = Roomba.Query(43,44)
 Roomba.SetWheelEncoderCounts(left_encoder, right_encoder)
