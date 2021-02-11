@@ -55,7 +55,7 @@ if file_create == True:	# Open a text file for data retrieval
 		# Will overwrite anything that was in the text file previously
 # End if file_create
 # Dictionary of move commands
-move_dict = {0:[100,0,10], # Move forward
+move_dict = {0:[100,0,10]}''', # Move forward
 			1:[0,0,2], # Stop
 			2:[0,60,7], # Spin ~180 degrees
 			3:[0,0,2], # Stop
@@ -79,7 +79,7 @@ move_dict = {0:[100,0,10], # Move forward
 			21:[75,-50,15], # CCW Circular ARc
 			22:[100,75,45] # CW Circular Arc (to increase wheel count beyond threshold)
 			}
-
+'''
 # Retrieve and set initial wheel encoder values
 [left_encoder, right_encoder] = Roomba.Query(43,44)
 Roomba.SetWheelEncoderCounts(left_encoder, right_encoder)
