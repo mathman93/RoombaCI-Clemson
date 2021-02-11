@@ -1,6 +1,6 @@
 ''' WheelEncoderTestCode.py
-Purpose: Read wheel encoder values and calculate trajecotry
-Last Modified: 6/12/2019
+Purpose: Read wheel encoder values and calculate trajectory
+Last Modified: 2/6/2021
 '''
 
 ## Import libraries ##
@@ -12,30 +12,22 @@ import os.path
 import math
 
 ## Variables and Constants ##
-# LED pin numbers
-yled = 5
-rled = 6
-gled = 13
+file_create = False # Boolean to set for creation of data file
 
 ## Functions and Definitions ##
-''' Displays current date and time to the screen
-	'''
-def DisplayDateTime():
-	# Month day, Year, Hour:Minute:Seconds
-	date_time = time.strftime("%B %d, %Y, %H:%M:%S", time.gmtime())
-	print("Program run: ", date_time)
-
 
 ## -- Code Starts Here -- ##
 # Setup Code #
 GPIO.setmode(GPIO.BCM) # Use BCM pin numbering for GPIO
-DisplayDateTime() # Display current date and time
-
+RoombaCI_lib.DisplayDateTime() # Display current date and time
+# LED pin numbers
+yled = 5
+rled = 6
+gled = 13
 # LED Pin setup
 GPIO.setup(yled, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(rled, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(gled, GPIO.OUT, initial=GPIO.LOW)
-
 # Wake Up Roomba Sequence
 GPIO.output(gled, GPIO.HIGH) # Turn on green LED to say we are alive
 print(" Starting ROOMBA... ")
@@ -49,74 +41,86 @@ Roomba.BlinkCleanLight() # Blink the Clean light on Roomba
 if Roomba.Available() > 0: # If anything is in the Roomba receive buffer
 	x = Roomba.DirectRead(Roomba.Available()) # Clear out Roomba boot-up info
 	#print(x) # Include for debugging
-
+# End if Roomba.Available()
+# Indicate completion of Roomba setup
 print(" ROOMBA Setup Complete")
 GPIO.output(gled, GPIO.LOW)
+
 # Main Code #
-# Open a text file for data retrieval
-file_name_input = input("Name for data file: ")
-dir_path = "/home/pi/RoombaCI-Clemson/Data_Files/2019_Summer/" # Directory path to save file
-file_name = os.path.join(dir_path, file_name_input+".txt") # text file extension
-file = open(file_name, "w") # Open a text file for storing data
-	# Will overwrite anything that was in the text file previously
-
-start_time = time.time()
-
+if file_create == True:	# Open a text file for data retrieval
+	file_name_input = input("Name for data file: ") # Ask user for desired file name
+	dir_path = "/home/pi/RoombaCI-Clemson/Data_Files/2021_Spring/" # Directory path to save file
+	file_name = os.path.join(dir_path, file_name_input+".txt") # text file extension
+	file = open(file_name, "w") # Open a text file for storing data
+		# Will overwrite anything that was in the text file previously
+# End if file_create
 # Dictionary of move commands
-dict = {0:[100,0,30]}
-[left_start,right_start]=Roomba.Query(43,44)
+move_dict = {0:[100,0,10], # Move forward
+			1:[0,0,2], # Stop
+			2:[0,60,8], # Spin ~180 degrees
+			3:[0,0,2], # Stop
+			4:[100,0,10], # Move forward
+			5:[0,0,2],
+			6:[0,-60,8],
+			7:[0,0,2],
+			8:[75,50,15],
+			9:[75,-50,15],
+			10:[0,0,2],
+			11:[100,0,10], # Move forward
+			12:[0,0,2], # Stop
+			13:[0,60,8], # Spin ~180 degrees
+			14:[0,0,2], # Stop
+			15:[100,0,10], # Move forward
+			16:[0,0,2],
+			17:[0,-6,8],
+			18:[75,50,15],
+			19:[75,-50,15],
+			20:[75,50,15],
+			21:[75,-50,15],
+			22:[100,75,45]
+			}
 
-# Variables and Constants
-y_position = 0
-x_position = 0
-theta = 0
-wheel_diameter = 72
-counts_per_rev = 508.8
-distance_between_wheels = 235
-C_theta = (wheel_diameter*math.pi)/(counts_per_rev*distance_between_wheels)
-distance_per_count = (wheel_diameter*math.pi)/counts_per_rev
-data_time = time.time()
+# Retrieve and set initial wheel encoder values
+[left_encoder, right_encoder] = Roomba.Query(43,44)
+Roomba.SetWheelEncoderCounts(left_encoder, right_encoder)
 
-file.write("{0},{1},{2},{3},{4},{5}\n".format(0,left_start, right_start,x_position,y_position,theta))
-Roomba.StartQueryStream(43,44)
+data_start = time.time() # Set time for data reference
+if file_create == True:
+	file.write("{0:.6f},{1},{2},{3:.3f},{4:.3f},{5:.6f}\n"\
+		.format(0,Roomba.l_count_last,Roomba.r_count_last,Roomba.X_position,Roomba.Y_position,Roomba.heading))
+# End if file_create
+Roomba.StartQueryStream(43,44) # Start Roomba Query Stream with wheel encoder data
 
-
-for i in range(len(dict.keys())):
-	# Get peices of dictionary and tell the roomba to move
-	[f,s,t] = dict[i]
+for i in range(len(move_dict.keys())):
+	start_time = time.time() # Set timer for next movement
+	# Get peices of dictionary and tell the Roomba to move
+	[f,s,t] = move_dict[i]
 	Roomba.Move(f,s)
-	while time.time() - start_time <=t:
-		# If data is available
-		if Roomba.Available()>0:
-			data_time2 = time.time()
-			# Get left and right encoder values and find the change in each
-			[left_encoder, right_encoder]=Roomba.ReadQueryStream(43,44)
-			delta_l = left_encoder-left_start
-			delta_r = right_encoder-right_start
-			# Determine the change in theta and what that is currently
-			delta_theta = (delta_l-delta_r)*C_theta
-			theta += delta_theta
-			# Determine what method to use to find the change in distance
-			if delta_l-delta_r == 0:
-				delta_d = 0.5*(delta_l+delta_r)*distance_per_count
-			else:
-				delta_d = 2*(235*(delta_l/(delta_l-delta_r)-.5))*math.sin(delta_theta/2)
-			# Find new x and y position
-			x_position = x_position + delta_d*math.cos(theta-.5*delta_theta)
-			y_position = y_position + delta_d*math.sin(theta-.5*delta_theta)
-			# Print and write the time, left encoder, right encoder, x position, y position, and theta
-			print("Time: {0}\nLeft Encoder:{1} Right Encoder: {2}\nX Position:{3} Y Position:{4} Theta:{5}".format(data_time2-data_time,left_encoder,right_encoder,x_position,y_position,theta))
+	while time.time() - start_time <= t: # Wait for movement time to finish
+		if Roomba.Available() > 0: # If data is available...
+			data_time = time.time()-data_start # Get time that the data was retrieved
+			[left_encoder, right_encoder] = Roomba.ReadQueryStream(43,44) # Read in left and right wheel encoder values
+			Roomba.UpdatePosition(left_encoder, right_encoder) # Update Roomba Position variables
+			# Print and write the time, left encoder, right encoder, x position, y position, and heading
+			print("Time: {0:.6f}\nLeft Encoder: {1}; Right Encoder: {2}\nX Position: {3:.3f} mm; Y Position: {4:.3f} mm\nHeading (radians): {5:.6f}; Heading (degrees): {6:.3f}"\
+				.format(data_time,Roomba.l_count_last,Roomba.r_count_last,Roomba.X_position,Roomba.Y_position,Roomba.heading,Roomba.heading*(180/math.pi)))
 			print("")
-			file.write("{0},{1},{2},{3},{4},{5}\n".format(data_time2-data_time,left_encoder, right_encoder,x_position,y_position,theta))
-			left_start = left_encoder
-			right_start = right_encoder
-	start_time = time.time()
-Roomba.Move(0,0)
-Roomba.PauseQueryStream()
-if Roomba.Available()>0:
-	z = Roomba.DirectRead(Roomba.Available())
-	print(z)
-file.close()
+			if file_create == True:
+				file.write("{0:.6f},{1},{2},{3:.3f},{4:.3f},{5:.6f}\n"\
+					.format(data_time,Roomba.l_count_last,Roomba.r_count_last,Roomba.X_position,Roomba.Y_position,Roomba.heading))
+		# End if Roomba.Available()
+	# End while
+# End for
+Roomba.Move(0,0) # Stop moving
+Roomba.PauseQueryStream() # End Roomba Query Stream
+if Roomba.Available()>0: # If data exists in Query Stream...
+	z = Roomba.DirectRead(Roomba.Available()) # Clear out data
+	print(z) # Include for debugging
+# End if Roomba.Available()
+if file_create == True:
+	file.close() # Close data file
+# End if file_create
+Roomba.PlaySMB() # Indicate proper shutdown
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
 Roomba.ShutDown() # Shutdown Roomba serial connection
