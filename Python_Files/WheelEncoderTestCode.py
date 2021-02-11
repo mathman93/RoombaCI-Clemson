@@ -12,7 +12,7 @@ import os.path
 import math
 
 ## Variables and Constants ##
-file_create = False # Boolean to set for creation of data file
+file_create = True # Boolean to set for creation of data file
 
 ## Functions and Definitions ##
 
@@ -103,7 +103,7 @@ for i in range(len(move_dict.keys())):
 			Roomba.UpdatePosition(left_encoder, right_encoder) # Update Roomba Position variables
 			# Print and write the time, left encoder, right encoder, x position, y position, and heading
 			print("Time: {0:.6f}\nLeft Encoder: {1}; Right Encoder: {2}\nX Position: {3:.3f} mm; Y Position: {4:.3f} mm\nHeading (radians): {5:.6f}; Heading (degrees): {6:.3f}"\
-				.format(data_time,Roomba.l_count_last,Roomba.r_count_last,Roomba.X_position,Roomba.Y_position,Roomba.heading,Roomba.heading*(180/math.pi)))
+				.format(data_time,Roomba.l_count_last,Roomba.r_count_last,Roomba.X_position,Roomba.Y_position,Roomba.heading,(Roomba.heading*(180/math.pi))%360))
 			print("")
 			if file_create == True:
 				file.write("{0:.6f},{1},{2},{3:.3f},{4:.3f},{5:.6f}\n"\
