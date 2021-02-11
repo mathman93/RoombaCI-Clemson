@@ -60,24 +60,24 @@ move_dict = {0:[100,0,10], # Move forward
 			2:[0,60,8], # Spin ~180 degrees
 			3:[0,0,2], # Stop
 			4:[100,0,10], # Move forward
-			5:[0,0,2],
-			6:[0,-60,8],
-			7:[0,0,2],
-			8:[75,50,15],
-			9:[75,-50,15],
-			10:[0,0,2],
+			5:[0,0,2], # Stop
+			6:[0,-60,8], # Spin ~-180 degrees
+			7:[0,0,2], # Stop
+			8:[75,50,15], # CW Circular Arc
+			9:[75,-50,15], # CCW Circular Arc
+			10:[0,0,2], # Stop
 			11:[100,0,10], # Move forward
 			12:[0,0,2], # Stop
 			13:[0,60,8], # Spin ~180 degrees
 			14:[0,0,2], # Stop
 			15:[100,0,10], # Move forward
-			16:[0,0,2],
-			17:[0,-6,8],
-			18:[75,50,15],
-			19:[75,-50,15],
-			20:[75,50,15],
-			21:[75,-50,15],
-			22:[100,75,45]
+			16:[0,0,2], # Stop
+			17:[0,-60,8], # Spin ~-180 degrees
+			18:[75,50,15], # CW Circular Arc
+			19:[75,-50,15], # CCW Circular Arc
+			20:[75,50,15], # CW Circular Arc
+			21:[75,-50,15], # CCW Circular ARc
+			22:[100,75,45] # CW Circular Arc (to increase wheel count beyond threshold)
 			}
 
 # Retrieve and set initial wheel encoder values

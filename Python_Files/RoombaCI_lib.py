@@ -812,6 +812,7 @@ class Create_2:
 		Updates internal class variables Y_position. X_position, heading, & total_distance.
 	'''
 	def UpdatePosition(self, lc, rc):
+		# Calculate change in wheel count from previoius values
 		l_diff = lc - self.l_count_last
 		r_diff = rc - self.r_count_last
 		 # Check if the encoder values (16-big values) have rolled over.
@@ -825,15 +826,18 @@ class Create_2:
 		elif r_diff > (2**15): # Else if too large (greater than 32,768)...
 			r_diff -= (2**16) # Subtract 65,536 to normalize value
 		# End if r_diff
+		# Calculate change in distance and heading
 		d_diff = 0.5*(l_diff + r_diff)*(self.DISTANCE_CONSTANT)
 		h_diff = (l_diff - r_diff)*(self.THETA_CONSTANT)
-		self.total_distance += d_diff
+		self.total_distance += d_diff # Update total distance traveled
 		if h_diff != 0: # If Roomba turned, it followed a circular arc
-			d_diff *= (2/h_diff)*math.sin(h_diff/2)
+			d_diff *= (2/h_diff)*math.sin(h_diff/2) # Calculate chord length of circular arc
 		# End if
+		# Update position and heading values
 		self.Y_position += d_diff*math.sin(self.heading + 0.5*h_diff)
 		self.X_position += d_diff*math.cos(self.heading + 0.5*h_diff)
 		self.heading += h_diff
+		# Store current wheel count values for next function call
 		self.l_count_last = lc
 		self.r_count_last = rc
 		return
