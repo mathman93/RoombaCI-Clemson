@@ -1,8 +1,8 @@
 ''' MapAndMove.py
-Purpose: Draws a virtual map with the origin and the coordinates given, and moves from the start to its goal. Also adds points that it bumps into to the map as walls
-	that it will attempt to move around to get to the goal, and keep the walls in memory for its movement in the future
+Purpose: Draws a virtual map with the origin and the coordinates given, and moves from the start to its goal.
+Also adds points that it bumps into to the map as walls	that it will attempt to move around to get to the goal, and keep the walls in memory for its movement in the future
 Written by: David Croft and Sam Buckley
-Last Modified: 7/12/2019
+Last Modified: 2/12/2021
 '''
 
 ## Import libraries ##
@@ -44,27 +44,25 @@ class PriorityQueue:
 	'''
 class GridWorld:
 	def __init__(self):
-		# Points that can connect to other points in the world
-		self.edges = {}
-		# Points that exist in the world
-		self.points = []
-		# Walls that are found in the world
-		self.walls = []
+		self.edges = {} # Points that can connect to other points in the world
+		self.points = [] # Points that exist in the world
+		self.walls = [] # Walls that are found in the world
+	# End __init__
 	# Tells you which points are able to be connected to
 	# Note: ID needs to be a tuple 
 	def neighbors(self,id):
 		return self.edges.get(id,[])
 	# End neighbors
-	# Removes the point from the world at the specified tuple 'xy' from the world 'MyWorld'
-	def removePointFromWorld(self,xy):
-		neighborlist = self.edges.pop(xy)
+	# Removes the point from the world at the specified tuple 'point' from the world 'MyWorld'
+	def removePointFromWorld(self, point):
+		neighborlist = self.edges.pop(point)
 		for p in neighborlist:
-			self.edges[p].remove(xy)
+			self.edges[p].remove(point)
 		# End for
-		self.points.remove(xy)
+		self.points.remove(point)
 	# End removePointFromWorld
 	# Adds an edge from the world between two given tuple coordinate points
-	def addEdgeToWorld(self,point1,point2):
+	def addEdgeToWorld(self, point1, point2):
 		print("{0},{1}".format(point1,point2))
 		if point1 in self.points and point2 in self.points:
 			ls1 = self.edges[point1]
@@ -74,11 +72,11 @@ class GridWorld:
 			ls2.append(point1)
 			self.edges[point2] = ls2
 		else:
-			print("Point is not in world")
+			print("Point is not in world.")
 		# End if
 	# End addEdgeToWorld
 	# Removes an edge from the world between two given tuple coordinate points
-	def removeEdgeFromWorld(self,point1,point2):
+	def removeEdgeFromWorld(self, point1, point2):
 		if point1 in self.points and point2 in self.points:
 			ls1 = self.edges[point1]
 			ls1.remove(point2)
@@ -87,7 +85,7 @@ class GridWorld:
 			ls2.remove(point1)
 			self.edges[point2] = ls2
 		else:
-			print("Point is not in world")
+			print("Point is not in world.")
 		# End if
 	# End removeEdgeFromWorld
 	# Inserts a point into the world and attaches edges to it from all other points as long as there is not a wall in the way
@@ -117,7 +115,6 @@ class GridWorld:
 			print("{0}:{1}".format(point,value)) # Current edges in the world
 		# End for point
 		print("World Walls: {0}".format(self.walls)) # Current walls in the world
-		return
 	# End displayInfo
 # End GridWorld
 
@@ -304,11 +301,12 @@ bump_mode = False # Used to tell whether or not the Roomba has bumped into somet
 
 while True: #Loop that asks for initial x and y coordinates
 	try:
+		print("Where would you like to go?")
 		x_final = int(input("X axis coordinate: "))
 		y_final = int(input("Y axis coordinate: "))
 		break
 	except ValueError:
-		print("Please input a number.")
+		print("Not a valid input. Please enter an integer.")
 		continue
 	# End try
 # End while
@@ -326,7 +324,7 @@ MyWorld.displayInfo()
 
 bump_time = time.time() - 2.0 # Assures that the roomba doesn't start in backup mode
 data_start = time.time()
-while True:
+while True: # Main code execution loop
 	try:
 		for point in path:
 			current_goal = point # Head to the next point in the path
@@ -349,14 +347,13 @@ while True:
 					distance_to_end = math.sqrt((current_goal[0]-Roomba.X_position)**2 +(current_goal[1]-Roomba.Y_position)**2)
 					theta_initial = math.atan2((current_goal[1]-Roomba.Y_position),(current_goal[0]-Roomba.X_position))
 					# Normalize what theta initial is to between 0-2pi
-					if theta_initial < 0: # Might not need this; can just use "if theta_d > math.pi"
-						theta_initial += 2*math.pi
+					#if theta_initial < 0: # Might not need this; can just use "if theta_d > math.pi"
+					#	theta_initial += 2*math.pi
 					# End if theta_initial
-					# Calculate theta_d and normalize it to 0-2pi
+					# Calculate theta_d and normalize it to range [-pi, pi]
 					# This value is the difference between the direction were supposed to be going and the direction we are going
 					theta_d = ((theta_initial-Roomba.heading)%(2*math.pi))
-					# get theta_d between -pi and pi
-					if theta_d > math.pi:
+					if theta_d > math.pi: # get theta_d between -pi and pi
 						theta_d -= 2*math.pi
 					# End if theta_d
 					# Checks if the Roomba has bumped into something, and if so, activates wall detection protocol
@@ -437,7 +434,8 @@ while True:
 						# End if theta_d
 					# End if time.time()
 					Roomba.Move(f,s) # Move with given forward and spin values
-					#print("{0:.6f},{1},{2},{3:.3f},{4:.3f},{5:.6f},{6:.6f},{7:.6f}, bump_count:{8}".format(data_time,left_encoder,right_encoder,Roomba.X_position,Roomba.Y_position,Roomba.heading,distance_to_end,theta_d,bump_count))
+					#print("{0:.6f},{1},{2},{3:.3f},{4:.3f},{5:.6f},{6:.6f},{7:.6f}, bump_count:{8}"\
+					#	.format(data_time,left_encoder,right_encoder,Roomba.X_position,Roomba.Y_position,Roomba.heading,distance_to_end,theta_d,bump_count))
 				# End if Roomba.Available()
 			# End while distance_to_end
 			Roomba.Move(0,0) # Stop Roomba movement (momentarily)
