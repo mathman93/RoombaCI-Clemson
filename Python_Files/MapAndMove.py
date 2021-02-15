@@ -330,7 +330,7 @@ while True: # Main code execution loop
 			current_goal = point # Head to the next point in the path
 			distance_to_end = math.sqrt((current_goal[0]-Roomba.X_position)**2 +(current_goal[1]-Roomba.Y_position)**2) # Distance of straight line between where the Roomba is and where the end point is
 			theta_initial = math.atan2((current_goal[1]-Roomba.Y_position),(current_goal[0]-Roomba.X_position)) # Angle of the line between the x-axis and the initial distance to end line
-			theta_d = theta_initial-theta # Rotation needed from current heading to face goal
+			theta_d = theta_initial - Roomba.heading # Rotation needed from current heading to face goal
 			#print("{0:.6f},{1},{2},{3:.3f},{4:.3f},{5:.6f},{6:.6f},{7:.6f}"\
 			#	.format(time.time()-data_start,left_start,right_start,Roomba.X_position,Roomba.Y_position,theta,distance_to_end,theta_d))
 			Roomba.StartQueryStream(7,43,44,45) # Start getting wheel encoder & bumper values
