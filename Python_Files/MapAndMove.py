@@ -287,7 +287,7 @@ if file_create == True:	# Open a text file for data retrieval
 
 #start_time = time.time() # Not sure what this is for...
 # Retrieve and set initial wheel encoder values
-[left_encoder, right_endcoder] = Roomba.Query(43,44)
+[left_encoder, right_encoder] = Roomba.Query(43,44)
 Roomba.SetWheelEncoderCounts(left_encoder,right_encoder)
 
 # Variables and Constants
