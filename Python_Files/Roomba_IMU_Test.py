@@ -20,7 +20,7 @@ Xbee = serial.Serial('/dev/ttyUSB0', 115200) # Baud rate should be 115200
 yled = 5
 rled = 6
 gled = 13
-file_create = False # Boolean to set for creation of data file
+file_create = True # Boolean to set for creation of data file
 data_counter = 0 # Initialize data_counter
 #global A # Accelerometer transformation matrix
 
@@ -107,9 +107,9 @@ data_time = 0.0
 [ax,ay,az] = imu.acceleration # Read accelerometer component values
 [gx,gy,gz] = imu.gyro # Read gyroscope component values
 [mx,my,mz] = imu.magnetic # Read magnetometer component values
-print("Time: {0:.6f}\nAccel XYZ: {1:.6f}, {2:.6f}, {3:.6f}\nGyro XYZ: {4:.6f}, {5:.6f}, {6:.6f}\nMag XYZ; {7:.6f}, {8:.6f}, {9:.6f}\n "\
+print("Time: {0:.6f}\nAccel XYZ: {1:.6f}, {2:.6f}, {3:.6f}\nGyro XYZ: {4:.6f}, {5:.6f}, {6:.6f}\nMag XYZ; {7:.6f}, {8:.6f}, {9:.6f}"\
 	.format(data_time, ax, ay, az, gx, gy, gz, mx, my, mz))
-print("Left Encoder: {0}; Right Encoder: {1}\nX Position: {2:.3f} mm; Y Position: {3:.3f} mm\nHeading (degrees): {4:.3f}"\
+print("Left Encoder: {0}; Right Encoder: {1}\nX Position: {2:.3f} mm; Y Position: {3:.3f} mm\nHeading (degrees): {4:.3f}\n"\
 	.format(Roomba.l_count_last,Roomba.r_count_last,Roomba.X_position,Roomba.Y_position,(Roomba.heading*(180/math.pi))%360))
 # Write data values to a text file
 if file_create == True:
@@ -134,9 +134,9 @@ for i in range(0, len(move_dict.keys())):
 			[gx,gy,gz] = imu.gyro # Read gyroscope component values
 			[mx,my,mz] = imu.magnetic # Read magnetometer component values
 			Roomba.UpdatePosition(l_counts, r_counts) # Update Roomba Position variables
-			print("Time: {0:.6f}\nAccel XYZ: {1:.6f}, {2:.6f}, {3:.6f}\nGyro XYZ: {4:.6f}, {5:.6f}, {6:.6f}\nMag XYZ; {7:.6f}, {8:.6f}, {9:.6f}\n "\
+			print("Time: {0:.6f}\nAccel XYZ: {1:.6f}, {2:.6f}, {3:.6f}\nGyro XYZ: {4:.6f}, {5:.6f}, {6:.6f}\nMag XYZ; {7:.6f}, {8:.6f}, {9:.6f}"\
 				.format(data_time, ax, ay, az, gx, gy, gz, mx, my, mz))
-			print("Left Encoder: {0}; Right Encoder: {1}\nX Position: {2:.3f} mm; Y Position: {3:.3f} mm\nHeading (degrees): {4:.3f}"\
+			print("Left Encoder: {0}; Right Encoder: {1}\nX Position: {2:.3f} mm; Y Position: {3:.3f} mm\nHeading (degrees): {4:.3f}\n"\
 				.format(Roomba.l_count_last,Roomba.r_count_last,Roomba.X_position,Roomba.Y_position,(Roomba.heading*(180/math.pi))%360))
 			# Write data values to a text file
 			if file_create == True:
