@@ -109,7 +109,7 @@ data_time = 0.0
 [mx,my,mz] = imu.magnetic # Read magnetometer component values
 print("Time: {0:.6f}\nAccel XYZ: {1:.6f}, {2:.6f}, {3:.6f}\nGyro XYZ: {4:.6f}, {5:.6f}, {6:.6f}\nMag XYZ; {7:.6f}, {8:.6f}, {9:.6f}\n "\
 	.format(data_time, ax, ay, az, gx, gy, gz, mx, my, mz))
-print("Left Encoder: {0}; Right Encoder: {1}\nX Position: {2:.3f} mm; Y Position: {3:.3f} mm\nHeading (degrees): {5:.3f}"\
+print("Left Encoder: {0}; Right Encoder: {1}\nX Position: {2:.3f} mm; Y Position: {3:.3f} mm\nHeading (degrees): {4:.3f}"\
 	.format(Roomba.l_count_last,Roomba.r_count_last,Roomba.X_position,Roomba.Y_position,(Roomba.heading*(180/math.pi))%360))
 # Write data values to a text file
 if file_create == True:
@@ -136,7 +136,7 @@ for i in range(0, len(move_dict.keys())):
 			Roomba.UpdatePosition(left_encoder, right_encoder) # Update Roomba Position variables
 			print("Time: {0:.6f}\nAccel XYZ: {1:.6f}, {2:.6f}, {3:.6f}\nGyro XYZ: {4:.6f}, {5:.6f}, {6:.6f}\nMag XYZ; {7:.6f}, {8:.6f}, {9:.6f}\n "\
 				.format(data_time, ax, ay, az, gx, gy, gz, mx, my, mz))
-			print("Left Encoder: {0}; Right Encoder: {1}\nX Position: {2:.3f} mm; Y Position: {3:.3f} mm\nHeading (degrees): {5:.3f}"\
+			print("Left Encoder: {0}; Right Encoder: {1}\nX Position: {2:.3f} mm; Y Position: {3:.3f} mm\nHeading (degrees): {4:.3f}"\
 				.format(Roomba.l_count_last,Roomba.r_count_last,Roomba.X_position,Roomba.Y_position,(Roomba.heading*(180/math.pi))%360))
 			# Write data values to a text file
 			if file_create == True:
