@@ -13,6 +13,10 @@ import math
 
 ## Variables and Constants ##
 file_create = True # Boolean to set for creation of data file
+# LED pin numbers
+yled = 5
+rled = 6
+gled = 13
 
 ## Functions and Definitions ##
 
@@ -20,10 +24,6 @@ file_create = True # Boolean to set for creation of data file
 # Setup Code #
 GPIO.setmode(GPIO.BCM) # Use BCM pin numbering for GPIO
 RoombaCI_lib.DisplayDateTime() # Display current date and time
-# LED pin numbers
-yled = 5
-rled = 6
-gled = 13
 # LED Pin setup
 GPIO.setup(yled, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(rled, GPIO.OUT, initial=GPIO.LOW)
