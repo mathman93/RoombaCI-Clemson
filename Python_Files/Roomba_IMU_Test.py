@@ -133,7 +133,7 @@ for i in range(0, len(move_dict.keys())):
 			[ax,ay,az] = imu.acceleration # Read accelerometer component values
 			[gx,gy,gz] = imu.gyro # Read gyroscope component values
 			[mx,my,mz] = imu.magnetic # Read magnetometer component values
-			Roomba.UpdatePosition(left_encoder, right_encoder) # Update Roomba Position variables
+			Roomba.UpdatePosition(l_counts, r_counts) # Update Roomba Position variables
 			print("Time: {0:.6f}\nAccel XYZ: {1:.6f}, {2:.6f}, {3:.6f}\nGyro XYZ: {4:.6f}, {5:.6f}, {6:.6f}\nMag XYZ; {7:.6f}, {8:.6f}, {9:.6f}\n "\
 				.format(data_time, ax, ay, az, gx, gy, gz, mx, my, mz))
 			print("Left Encoder: {0}; Right Encoder: {1}\nX Position: {2:.3f} mm; Y Position: {3:.3f} mm\nHeading (degrees): {4:.3f}"\
