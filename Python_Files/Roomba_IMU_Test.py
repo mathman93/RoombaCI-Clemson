@@ -20,7 +20,7 @@ Xbee = serial.Serial('/dev/ttyUSB0', 115200) # Baud rate should be 115200
 yled = 5
 rled = 6
 gled = 13
-
+file_create = False # Boolean to set for creation of data file
 data_counter = 0 # Initialize data_counter
 #global A # Accelerometer transformation matrix
 
@@ -35,17 +35,11 @@ move_dict = {
 	}
 
 ## Functions and Definitions ##
-''' Displays current date and time to the screen
-	'''
-def DisplayDateTime():
-	# Month day, Year, Hour:Minute:Seconds
-	date_time = time.strftime("%B %d, %Y, %H:%M:%S", time.gmtime())
-	print("Program run: ", date_time)
 
 ## -- Code Starts Here -- ##
 # Setup Code #
 GPIO.setmode(GPIO.BCM) # Use BCM pin numbering for GPIO
-DisplayDateTime() # Display current date and time
+RoombaCI_lib.DisplayDateTime() # Display current date and time
 
 # LED Pin setup
 GPIO.setup(yled, GPIO.OUT, initial=GPIO.LOW)
@@ -97,28 +91,31 @@ if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 	#print(x) # Include for debugging
 
 # Main Code #
-# Open a text file for data retrieval
-file_name_input = input("Name for data file: ")
-dir_path = "/home/pi/RoombaCI-Clemson/Data_Files/2019_Summer/" # Directory path to save file
-file_name = os.path.join(dir_path, file_name_input+".txt") # text file extension
-datafile = open(file_name, "w") # Open a text file for storing data
-	# Will overwrite anything that was in the text file previously
-
+if file_create == True:	# Open a text file for data retrieval
+	file_name_input = input("Name for data file: ") # Ask user for desired file name
+	dir_path = "/home/pi/RoombaCI-Clemson/Data_Files/2021_Spring/" # Directory path to save file
+	file_name = os.path.join(dir_path, file_name_input+".txt") # text file extension
+	datafile = open(file_name, "w") # Open a text file for storing data
+		# Will overwrite anything that was in the text file previously
+# End if file_create
 basetime = time.time()
-basetime_offset = (1/64)
-Roomba.Move(0,0)
 
 # Read in initial values
 [r_speed,l_speed,l_counts,r_counts] = Roomba.Query(41,42,43,44) # Read Roomba data stream
+Roomba.SetWheelEncoderCounts(l_counts, r_counts)
 data_time = 0.0
 [ax,ay,az] = imu.acceleration # Read accelerometer component values
 [gx,gy,gz] = imu.gyro # Read gyroscope component values
 [mx,my,mz] = imu.magnetic # Read magnetometer component values
-# Write data values to a text file
-datafile.write("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}, {7:.6f}, {8:.6f}, {9:.6f}, {10}, {11}, {12}, {13}\n"\
-	.format(data_time, ax, ay, az, gx, gy, gz, mx, my, mz, l_speed, r_speed, l_counts, r_counts))
-print("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}, {7:.6f}, {8:.6f}, {9:.6f}"\
+print("Time: {0:.6f}\nAccel XYZ: {1:.6f}, {2:.6f}, {3:.6f}\nGyro XYZ: {4:.6f}, {5:.6f}, {6:.6f}\nMag XYZ; {7:.6f}, {8:.6f}, {9:.6f}\n "\
 	.format(data_time, ax, ay, az, gx, gy, gz, mx, my, mz))
+print("Left Encoder: {0}; Right Encoder: {1}\nX Position: {2:.3f} mm; Y Position: {3:.3f} mm\nHeading (degrees): {5:.3f}"\
+	.format(Roomba.l_count_last,Roomba.r_count_last,Roomba.X_position,Roomba.Y_position,(Roomba.heading*(180/math.pi))%360))
+# Write data values to a text file
+if file_create == True:
+	datafile.write("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}, {7:.6f}, {8:.6f}, {9:.6f}, {10}, {11}, {12}, {13}, {14:.6f}\n"\
+		.format(data_time, ax, ay, az, gx, gy, gz, mx, my, mz, l_speed, r_speed, l_counts, r_counts, Roomba.heading))
+# End if file_create
 
 # Start up Roomba query stream
 Roomba.StartQueryStream(41,42,43,44) # Start query stream with specific sensor packets
@@ -136,15 +133,18 @@ for i in range(0, len(move_dict.keys())):
 			[ax,ay,az] = imu.acceleration # Read accelerometer component values
 			[gx,gy,gz] = imu.gyro # Read gyroscope component values
 			[mx,my,mz] = imu.magnetic # Read magnetometer component values
-			# Write data values to a text file
-			datafile.write("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}, {7:.6f}, {8:.6f}, {9:.6f}, {10}, {11}, {12}, {13}\n"\
-				.format(data_time, ax, ay, az, gx, gy, gz, mx, my, mz, l_speed, r_speed, l_counts, r_counts))
-			print("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}, {7:.6f}, {8:.6f}, {9:.6f}"\
+			Roomba.UpdatePosition(left_encoder, right_encoder) # Update Roomba Position variables
+			print("Time: {0:.6f}\nAccel XYZ: {1:.6f}, {2:.6f}, {3:.6f}\nGyro XYZ: {4:.6f}, {5:.6f}, {6:.6f}\nMag XYZ; {7:.6f}, {8:.6f}, {9:.6f}\n "\
 				.format(data_time, ax, ay, az, gx, gy, gz, mx, my, mz))
+			print("Left Encoder: {0}; Right Encoder: {1}\nX Position: {2:.3f} mm; Y Position: {3:.3f} mm\nHeading (degrees): {5:.3f}"\
+				.format(Roomba.l_count_last,Roomba.r_count_last,Roomba.X_position,Roomba.Y_position,(Roomba.heading*(180/math.pi))%360))
+			# Write data values to a text file
+			if file_create == True:
+				datafile.write("{0:.6f}, {1:.6f}, {2:.6f}, {3:.6f}, {4:.6f}, {5:.6f}, {6:.6f}, {7:.6f}, {8:.6f}, {9:.6f}, {10}, {11}, {12}, {13}, {14:.6f}\n"\
+					.format(data_time, ax, ay, az, gx, gy, gz, mx, my, mz, l_speed, r_speed, l_counts, r_counts, Roomba.heading))
+			# End if file_create
 		# End if Roomba.Available() > 0
-		
 	# End while (time.time() - movetime_base) < movetime_offset
-	
 # End for i in range(1, len(move_dict.keys())+1)
 
 Roomba.Move(0,0) # Stop Roomba movement
@@ -152,13 +152,13 @@ Roomba.PauseQueryStream() # Pause Query Stream before ending program
 if Roomba.Available() > 0:
 	x = Roomba.DirectRead(Roomba.Available()) # Clear out residual Roomba data
 	#print(x) # Include for debugging purposes
+if file_create == True:
+	datafile.close()
+# End if file_create
+Roomba.PlaySMB()
 
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
-Roomba.PlaySMB()
-datafile.close()
-GPIO.output(gled, GPIO.LOW) # Turn off green LED
-
 Roomba.ShutDown() # Shutdown Roomba serial connection
 Xbee.close()
 GPIO.cleanup() # Reset GPIO pins for next program
