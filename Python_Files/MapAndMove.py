@@ -15,7 +15,7 @@ import math
 import heapq
 
 ## Variables and Constants ##
-file_create = False # Boolean to set for creation of data file
+file_create = True # Boolean to set for creation of data file
 # LED pin numbers
 yled = 5
 rled = 6
@@ -280,8 +280,10 @@ GPIO.output(gled, GPIO.LOW)
 if file_create == True:	# Open a text file for data retrieval
 	file_name_input = input("Name for data file: ") # Ask user for desired file name
 	dir_path = "/home/pi/RoombaCI-Clemson/Data_Files/2021_Spring/" # Directory path to save file
-	file_name = os.path.join(dir_path, file_name_input+".txt") # text file extension
-	file = open(file_name, "w") # Open a text file for storing data
+	file_name1 = os.path.join(dir_path, file_name_input+"_points.txt") # text file extension
+	file_name2 = os.path.join(dir_path, file_name_input+"_walls.txt") # text file extension
+	file1 = open(file_name1, "w") # Open a text file for storing roomba points
+	file2 = open(file_name2, "w") # Open a text file for storing wall points
 		# Will overwrite anything that was in the text file previously
 # End if file_create
 
@@ -533,20 +535,17 @@ if Roomba.Available() > 0:
 	#print(z) # Include for debugging
 # End if Roomba.Available
 if file_create == True:	
-	for k in range(2):
-		for p in MyWorld.points:
-			file.write("{0}\n".format(p[k]))
-		# End for p
-	# End for k
-	for k in range(2):
-		for p in MyWorld.walls:
-			file.write("{0}\n".format(p[k]))
-		# End for p
-	# End for k
+	for p in MyWorld.points:
+		file1.write("{0},{1}\n".format(p[0],p[1]))
+	# End for p
+	for p in MyWorld.walls:
+		file2.write("{0},{1}\n".format(p[0],p[1]))
+	# End for p
 # End if file_create
 time.sleep(0.1)
 if file_create == True:
-	file.close() # Close data file
+	file1.close() # Close data file
+	file2.close() # Close data file
 # End if file_create
 ## -- Ending Code Starts Here -- ##
 Roomba.ShutDown() # Shutdown Roomba serial connection
