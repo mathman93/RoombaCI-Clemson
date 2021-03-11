@@ -37,9 +37,9 @@ data_counter = 0 # Initialize data_counter
 
 #Alternative test moving the roomba in a
 move_dict = {
-	0: [2.0, 0, 0],
-	1: [15.0, 100, 50],
-	2: [2.0, 0, 0],
+	0: [20.0, 0, 0],
+	#1: [15.0, 100, 50],
+	#2: [2.0, 0, 0],
 	#3: [5.0, 0, 75],
 	#4: [2.0, 0, 0],
 	#5: [10.0, 75, 0],
