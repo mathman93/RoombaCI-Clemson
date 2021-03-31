@@ -16,6 +16,7 @@ import heapq
 
 ## Variables and Constants ##
 file_create = True # Boolean to set for creation of data file
+manual_input = true # Boolean to set manual input of points to explore
 # LED pin numbers
 yled = 5
 rled = 6
@@ -300,18 +301,28 @@ corner_time = 1.5 # Amount of time that it takes before the Roomba starts turnin
 bump_count = 0 # Keeps track of how many times the Roomba has bumped into a wall
 bump_mode = False # Used to tell whether or not the Roomba has bumped into something and is supposed to be "tracking"
 #bump_code = 0 # Used to distinguish if the right, left, or center bumpers are being triggered
+#dxy = 500 # determines the distance between eacch point in the spiral
+#dx = 0 # change in x variable
+#dy = -dxy # change in y variable
 
-while True: #Loop that asks for initial x and y coordinates
-	try:
-		print("Where would you like to go?")
-		x_final = int(input("X axis coordinate: "))
-		y_final = int(input("Y axis coordinate: "))
-		break
-	except ValueError:
-		print("Not a valid input. Please enter an integer.")
-		continue
-	# End try
-# End while
+if manual_input == True:
+	while True: #Loop that asks for initial x and y coordinates
+		try:
+			print("Where would you like to go?")
+			x_final = int(input("X axis coordinate: "))
+			y_final = int(input("Y axis coordinate: "))
+			break
+		except ValueError:
+			print("Not a valid input. Please enter an integer.")
+			continue
+		# End try
+	# End while
+else:
+	# first automated point will always be the same
+	x_final = dxy
+	y_final = 0
+# End if manual_input
+
 start = (0,0) # Starting position in the MyWorld grid
 goal = (x_final,y_final) # Final goal
 MyWorld = makeworld(start,goal) # Creates a grid world for the roomba to move in with two points, the start and goal, and draws a line between them
@@ -492,9 +503,16 @@ while True: # Main code execution loop
 			start = current_point # Set new start point for path to goal
 			while True: # Ask for next x,y coordinates
 				try:
-					print("Where would you like to go next?")
-					x_final = int(input("X axis coordinate: "))
-					y_final = int(input("Y axis coordinate: "))
+					if manual_input == True:
+						print("Where would you like to go next?")
+						x_final = int(input("X axis coordinate: "))
+						y_final = int(input("Y axis coordinate: "))
+					else: # creates a spiral of points with distance dxy
+						if x == y or (x < 0 and x == -y) or (x > 0 and x == dxy-y):
+							dx, dy = -dy, dx
+						x_final += dx
+						y_final += dy
+					#end if manual_input
 					goal = (x_final,y_final)
 					if goal not in MyWorld.points: # If the goal does not already exist in the world...
 						goal_check = True
@@ -510,7 +528,8 @@ while True: # Main code execution loop
 							# Go to find a path to the goal
 						else: # If goal cannot be placed
 							print("An error occured. Goal point cannot be reached.")
-							continue # Ask for a new point
+							if manual_input == True:
+								continue # Ask for a new point
 						# End if goal_check
 					# End if goal
 					break
