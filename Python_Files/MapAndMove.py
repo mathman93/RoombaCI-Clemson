@@ -529,7 +529,7 @@ while True: # Main code execution loop
 						# End for wall
 						if goal_check == True: # If the goal can be placed...
 							MyWorld.integrateIntoWorld(goal) # Add it to the world
-							if manual_input == False
+							if manual_input == False:
 								corner == 0 # reset corner variable if you can get to a point
 							# End if manual_input
 							# Go to find a path to the goal
