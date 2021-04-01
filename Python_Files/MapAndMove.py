@@ -302,8 +302,8 @@ bump_count = 0 # Keeps track of how many times the Roomba has bumped into a wall
 bump_mode = False # Used to tell whether or not the Roomba has bumped into something and is supposed to be "tracking"
 #bump_code = 0 # Used to distinguish if the right, left, or center bumpers are being triggered
 dxy = 500 # determines the distance between eacch point in the spiral
-dx = 0 # change in x variable
-dy = -dxy # change in y variable
+dx = dxy # change in x variable
+dy = 0 # change in y variable
 corner = 0
 
 if manual_input == True:
@@ -320,8 +320,8 @@ if manual_input == True:
 	# End while
 else:
 	# first automated point will always be the same
-	x_final = dxy
-	y_final = 0
+	x_final += dx
+	y_final += dy
 # End if manual_input
 
 start = (0,0) # Starting position in the MyWorld grid
@@ -509,7 +509,7 @@ while True: # Main code execution loop
 						x_final = int(input("X axis coordinate: "))
 						y_final = int(input("Y axis coordinate: "))
 					else: # creates a spiral of points with distance dxy
-						if x == y or (x < 0 and x == -y) or (x > 0 and x == dxy-y): # each time it gets to a corner in the spiral switch the increment variables
+						if x_final == y_final or (x_final < 0 and x_final == -y_final) or (x_final > 0 and x_final == dxy-y_final): # each time it gets to a corner in the spiral switch the increment variables
 							dx, dy = -dy, dx
 							corner_increment = 1
 						else:
