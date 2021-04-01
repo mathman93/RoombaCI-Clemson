@@ -511,6 +511,9 @@ while True: # Main code execution loop
 					else: # creates a spiral of points with distance dxy
 						if x == y or (x < 0 and x == -y) or (x > 0 and x == dxy-y): # each time it gets to a corner switch the increment variables
 							dx, dy = -dy, dx
+							corner_increment = 1
+						else
+							corner_increment = 0
 						x_final += dx
 						y_final += dy
 					#end if manual_input
@@ -527,14 +530,16 @@ while True: # Main code execution loop
 						if goal_check == True: # If the goal can be placed...
 							MyWorld.integrateIntoWorld(goal) # Add it to the world
 							if manual_input == False
-								corner == 0
+								corner == 0 # reset corner variable if you can get to a point
+							# End if manual_input
 							# Go to find a path to the goal
 						else: # If goal cannot be placed
 							print("An error occured. Goal point cannot be reached.")
 							if manual_input == False:
-								corner += 1 # increment variable to determine when to break out of the loop
-								if corner == 4:
+								corner += corner_increment # increment variable to determine when to break out of the loop
+								if corner == 4: # if you reach 4 corners in a row break out of loop
 									break
+								# End if corner
 							continue # Ask for a new point
 						# End if goal_check
 					# End if goal
