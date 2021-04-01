@@ -320,8 +320,8 @@ if manual_input == True:
 	# End while
 else:
 	# first automated point will always be the same
-	x_final += dx
-	y_final += dy
+	x_final = dx
+	y_final = dy
 # End if manual_input
 
 start = (0,0) # Starting position in the MyWorld grid
