@@ -509,10 +509,10 @@ while True: # Main code execution loop
 						x_final = int(input("X axis coordinate: "))
 						y_final = int(input("Y axis coordinate: "))
 					else: # creates a spiral of points with distance dxy
-						if x == y or (x < 0 and x == -y) or (x > 0 and x == dxy-y): # each time it gets to a corner switch the increment variables
+						if x == y or (x < 0 and x == -y) or (x > 0 and x == dxy-y): # each time it gets to a corner in the spiral switch the increment variables
 							dx, dy = -dy, dx
 							corner_increment = 1
-						else
+						else:
 							corner_increment = 0
 						x_final += dx
 						y_final += dy
