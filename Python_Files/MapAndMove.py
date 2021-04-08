@@ -2,7 +2,7 @@
 Purpose: Draws a virtual map with the origin and the coordinates given, and moves from the start to its goal.
 Also adds points that it bumps into to the map as walls	that it will attempt to move around to get to the goal, and keep the walls in memory for its movement in the future
 Written by: David Croft and Sam Buckley
-Last Modified: 2/12/2021
+Last Modified: 4/1/2021
 '''
 
 ## Import libraries ##
@@ -165,16 +165,19 @@ def A_star(start,goal,MyWorld):
 		# End for next
 	# End while
 	# Find the path from the start to end using came_from dictionary
-	current = goal
-	path = []
-	while current != start:
-		print("Current: {0}".format(current))
-		path.append(current)
-		current=came_from[current]
-	# End while
-	path.append(start)
-	path.reverse()
-	return path
+	try:
+		current = goal
+		path = []
+		while current != start:
+			print("Current: {0}".format(current))
+			path.append(current)
+			current=came_from[current]
+		# End while
+		path.append(start)
+		path.reverse()
+		return path
+	except KeyError:
+		return None
 # End A_star
 ''' Calculates a cost used to determine the past path in regards to how the Roomba rotates according to its previous, current, and next locations in its path
 	'''
@@ -254,6 +257,16 @@ def BumpAngle(bumper,l_bumper):
 	# Note, bumper == 0 is never True when BumpAngle is called
 # End BumpAngle
 
+def NextGoal(x,y,dx,dy):
+	if x == y or (x < 0 and x == -y) or (x > 0 and x == dxy-y): # each time it gets to a corner in the spiral switch the increment variables
+		dx, dy = -dy, dx
+		corner_increment = 1
+	else:
+		corner_increment = 0
+	x += dx
+	y += dy
+	return x,y,dx,dy,corner_increment
+# End NextGoal
 ## -- Code Starts Here -- ##
 # Setup Code #
 GPIO.setmode(GPIO.BCM) # Use BCM pin numbering for GPIO
@@ -498,7 +511,14 @@ while True: # Main code execution loop
 				goal_wall_break = False
 				goal = current_point # Will immediately be at end of path, and will give new coordinate prompt
 			# End if goal_wall_break
-			path = A_star(current_point,goal,MyWorld) # Generate a new path with updated walls, points, and edges
+			while True:
+				path = A_star(current_point,goal,MyWorld) # Generate a new path with updated walls, points, and edges
+				if path == None: # if path cannot be reached skip the point and go to the next one. 
+					x_final,y_final,dx,dy,corner_increment = NextGoal(x_final,y_final,dx,dy) 
+				else:
+					break
+				# End if path
+			# End while True
 		else: # Roomba finished getting to goal successfully
 			MyWorld.displayInfo() # Display current information about MyWorld
 			start = current_point # Set new start point for path to goal
@@ -509,13 +529,7 @@ while True: # Main code execution loop
 						x_final = int(input("X axis coordinate: "))
 						y_final = int(input("Y axis coordinate: "))
 					else: # creates a spiral of points with distance dxy
-						if x_final == y_final or (x_final < 0 and x_final == -y_final) or (x_final > 0 and x_final == dxy-y_final): # each time it gets to a corner in the spiral switch the increment variables
-							dx, dy = -dy, dx
-							corner_increment = 1
-						else:
-							corner_increment = 0
-						x_final += dx
-						y_final += dy
+						x_final,y_final,dx,dy,corner_increment = NextGoal(x_final,y_final,dx,dy)
 					#end if manual_input
 					goal = (x_final,y_final)
 					if goal not in MyWorld.points: # If the goal does not already exist in the world...
@@ -550,7 +564,14 @@ while True: # Main code execution loop
 				# End try
 			# End while True
 			MyWorld.displayInfo() # Display current information about MyWorld
-			path = A_star(start,goal,MyWorld) # Find new path to the goal with new coordinate information
+			while True:	
+				path = A_star(start,goal,MyWorld) # Find new path to the goal with new coordinate information
+				if path == None:
+					x_final,y_final,dx,dy,corner_increment = NextGoal(x_final,y_final,dx,dy)
+				else:
+					break
+				# End if path
+			# End While True
 			print(path) # Include for debugging
 			# Go to new goal
 		# End if bump_break
