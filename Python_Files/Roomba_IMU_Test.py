@@ -24,14 +24,26 @@ file_create = True # Boolean to set for creation of data file
 data_counter = 0 # Initialize data_counter
 #global A # Accelerometer transformation matrix
 
+#Forward then stop turn around and move backwards
+#move_dict = {
+#	0: [2.0, 0, 0],
+#	1: [10.0, 75, 0],
+#	2: [2.0, 0, 0],
+#	3: [5.0, 0, 75],
+#	4: [2.0, 0, 0],
+#	5: [10.0, 75, 0],
+#	6: [2.0, 0, 0]
+#	}
+
+#Alternative test moving the roomba in a
 move_dict = {
 	0: [2.0, 0, 0],
-	1: [10.0, 75, 0],
-	2: [2.0, 0, 0],
-	3: [5.0, 0, 75],
-	4: [2.0, 0, 0],
-	5: [10.0, 75, 0],
-	6: [2.0, 0, 0]
+	1: [25.0, 50, 75]
+	#2: [2.0, 0, 0],
+	#3: [5.0, 0, 75],
+	#4: [2.0, 0, 0],
+	#5: [10.0, 75, 0],
+	#6: [2.0, 0, 0]
 	}
 
 ## Functions and Definitions ##
