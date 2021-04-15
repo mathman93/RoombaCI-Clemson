@@ -85,7 +85,7 @@ def Song_Write(songlist,ts,tm):
 def Song_DictCreate(songlist):
     songdict = {}
     for i in range(0,int(len(songlist) / 32)):
-        songdict[i] = songlist[32 * i : 32 * i + 31]
+        songdict[i] = songlist[32 * i : 32 * i + 32]
     return songdict
 
 # plas each 16 note segment by rewirting song 0 with the next song segment
