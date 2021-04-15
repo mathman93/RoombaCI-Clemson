@@ -70,7 +70,7 @@ def Song_Size(songlist):
     return songlist
 
 # plays the song in sections of 32
-def Song_Write(songlist,tm,ts):
+def Song_Write(songlist,ts,tm):
     timetotal = 0
     for i in range(32):
         if i % 2 == 0:
