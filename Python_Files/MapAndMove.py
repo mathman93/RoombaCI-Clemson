@@ -579,7 +579,7 @@ while True: # Main code execution loop
 					MyWorld.integrateIntoWorld(goal) # Add it to the world
 					corner += corner_increment
 					print(corner)
-					if corner == 4
+					if corner == 4:
 						EndProgram = True
 						break
 				else:
