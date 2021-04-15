@@ -59,7 +59,7 @@ FullSongList=  [72,2,30,1,74,2,79,1,81,2,30,1,79,2,30,1,84,2,30,1,83,2,71,2,30,1
 
 timestep = 11 # (1/64)ths of a second
 rest = 30 # Rest note
-tone_mod = -2 # half step modulation of key
+tone_mod = 0 # half step modulation of key
 timetotal = 0 #initializing a value to total the time in a song
 # Program the song onto the Roomba
 
