@@ -59,7 +59,7 @@ FullSongList=  [72,2,30,1,74,2,79,1,81,2,30,1,79,2,30,1,84,2,30,1,83,2,71,2,30,1
 
 timestep = 11 # (1/64)ths of a second
 rest = 30 # Rest note
-tone_mod = -2 # half step modulation of key
+tone_mod = 0 # half step modulation of key
 timetotal = 0 #initializing a value to total the time in a song
 # Program the song onto the Roomba
 
@@ -85,7 +85,7 @@ def Song_Write(songlist,ts,tm):
 def Song_DictCreate(songlist):
     songdict = {}
     for i in range(0,int(len(songlist) / 32)):
-        songdict[i] = songlist[32 * i : 32 * i + 31]
+        songdict[i] = songlist[32 * i : 32 * i + 32]
     return songdict
 
 # plas each 16 note segment by rewirting song 0 with the next song segment
@@ -99,7 +99,8 @@ def Play_Song(songdict,ts,tm):
                 timetotal = Song_Write(songdict[i],ts,tm)
                 Roomba.DirectWrite(141)
                 Roomba.DirectWrite(0)
-                Time.Sleep((timetotal * ts) / 64)
+                print(songdict[i])
+                time.sleep((timetotal * ts) / 64)
             break
 
         except KeyboardInterrupt:
