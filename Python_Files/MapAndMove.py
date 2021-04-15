@@ -314,7 +314,7 @@ corner_time = 1.5 # Amount of time that it takes before the Roomba starts turnin
 bump_count = 0 # Keeps track of how many times the Roomba has bumped into a wall
 bump_mode = False # Used to tell whether or not the Roomba has bumped into something and is supposed to be "tracking"
 #bump_code = 0 # Used to distinguish if the right, left, or center bumpers are being triggered
-dxy = 500 # determines the distance between eacch point in the spiral
+dxy = 1000 # determines the distance between eacch point in the spiral
 dx = dxy # change in x variable
 dy = 0 # change in y variable
 corner = 0
@@ -515,7 +515,7 @@ while True: # Main code execution loop
 				path = A_star(current_point,goal,MyWorld) # Generate a new path with updated walls, points, and edges
 				if path == None: # if path cannot be reached skip the point and go to the next one. 
 					x_final,y_final,dx,dy,corner_increment = NextGoal(x_final,y_final,dx,dy)
-					goal(x_final,y_final) # loops back and tries again
+					goal = (x_final,y_final) # loops back and tries again
 					corner += corner_increment
 				else:
 					break
