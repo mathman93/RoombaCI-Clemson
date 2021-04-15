@@ -84,7 +84,7 @@ def Song_Write(songlist,tm,ts):
 # creates each 16 note segment
 def Song_DictCreate(songlist):
     songdict = {}
-    for i in range(0,len(songlist) / 32):
+    for i in range(0,int(len(songlist) / 32)):
         songdict[i] = songlist[32 * i : 32 * i + 31]
     return songdict
 
