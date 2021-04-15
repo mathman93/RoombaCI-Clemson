@@ -511,10 +511,12 @@ while True: # Main code execution loop
 				goal_wall_break = False
 				goal = current_point # Will immediately be at end of path, and will give new coordinate prompt
 			# End if goal_wall_break
-			while True:
+			while True: # assuming that the manual input will not be put in a location which 
 				path = A_star(current_point,goal,MyWorld) # Generate a new path with updated walls, points, and edges
 				if path == None: # if path cannot be reached skip the point and go to the next one. 
-					x_final,y_final,dx,dy,corner_increment = NextGoal(x_final,y_final,dx,dy) 
+					x_final,y_final,dx,dy,corner_increment = NextGoal(x_final,y_final,dx,dy)
+					goal(x_final,y_final) # loops back and tries again
+					corner += corner_increment
 				else:
 					break
 				# End if path
@@ -543,8 +545,8 @@ while True: # Main code execution loop
 						# End for wall
 						if goal_check == True: # If the goal can be placed...
 							MyWorld.integrateIntoWorld(goal) # Add it to the world
-							if manual_input == False:
-								corner == 0 # reset corner variable if you can get to a point
+							if manual_input == False and corner_increment == 1: 
+								corner = 0 # reset corner variable if you can get to a point that is a corner
 							# End if manual_input
 							# Go to find a path to the goal
 						else: # If goal cannot be placed
@@ -552,6 +554,7 @@ while True: # Main code execution loop
 							if manual_input == False:
 								corner += corner_increment # increment variable to determine when to break out of the loop
 								if corner == 4: # if you reach 4 corners in a row break out of loop
+									EndProgram = True # boolean variable to break out of loop
 									break
 								# End if corner
 							continue # Ask for a new point
@@ -563,11 +566,15 @@ while True: # Main code execution loop
 					continue
 				# End try
 			# End while True
+			if EndProgram == True:
+				break
 			MyWorld.displayInfo() # Display current information about MyWorld
 			while True:	
 				path = A_star(start,goal,MyWorld) # Find new path to the goal with new coordinate information
 				if path == None:
 					x_final,y_final,dx,dy,corner_increment = NextGoal(x_final,y_final,dx,dy)
+					goal = (x_final,y_final)
+					corner += corner_increment
 				else:
 					break
 				# End if path
