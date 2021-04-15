@@ -318,6 +318,7 @@ dxy = 1000 # determines the distance between eacch point in the spiral
 dx = dxy # change in x variable
 dy = 0 # change in y variable
 corner = 0
+EndProgram = False
 
 if manual_input == True:
 	while True: #Loop that asks for initial x and y coordinates
