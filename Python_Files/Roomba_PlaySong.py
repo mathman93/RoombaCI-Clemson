@@ -98,9 +98,9 @@ def Play_Song(songdict,ts,tm):
                 Roomba.DirectWrite(16)
                 timetotal = Song_Write(songdict[i],ts,tm)
                 Roomba.DirectWrite(141)
-                Roomba.DirectWrite(0)
+                Roomba.DirectWrite(i % 4)
                 print(songdict[i])
-                time.sleep(((timetotal * ts) / 64) + 0.5)
+                time.sleep(((timetotal * ts) / 64))
             break
 
         except KeyboardInterrupt:
