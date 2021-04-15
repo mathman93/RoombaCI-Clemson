@@ -592,7 +592,7 @@ while True: # Main code execution loop
 					break
 				# End if path
 			# End While True
-			if EndProgram == True
+			if EndProgram == True:
 				break
 			print(path) # Include for debugging
 			# Go to new goal
