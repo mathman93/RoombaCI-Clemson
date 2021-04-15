@@ -519,10 +519,16 @@ while True: # Main code execution loop
 					goal = (x_final,y_final) # loops back and tries again
 					MyWorld.integrateIntoWorld(goal) # Add it to the world
 					corner += corner_increment
+					print(corner)
+					if corner == 4:
+						EndProgram = True
+						break
 				else:
 					break
 				# End if path
 			# End while True
+			if EndProgram == True:
+				break
 		else: # Roomba finished getting to goal successfully
 			MyWorld.displayInfo() # Display current information about MyWorld
 			start = current_point # Set new start point for path to goal
@@ -586,6 +592,8 @@ while True: # Main code execution loop
 					break
 				# End if path
 			# End While True
+			if EndProgram == True:
+				break
 			print(path) # Include for debugging
 			# Go to new goal
 		# End if bump_break
