@@ -74,7 +74,7 @@ def Song_Write(songlist,tm,ts):
     timetotal = 0
     for i in range(32):
         if i % 2 == 0:
-            Rommba.DirectWrite(songlist[i] + tm) 
+            Roomba.DirectWrite(songlist[i] + tm) 
         else:
             Roomba.DirectWrite(songlist[i] * ts)
             timetotal = timetotal + songlist[i]
