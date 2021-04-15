@@ -517,6 +517,7 @@ while True: # Main code execution loop
 				if path == None: # if path cannot be reached skip the point and go to the next one. 
 					x_final,y_final,dx,dy,corner_increment = NextGoal(x_final,y_final,dx,dy)
 					goal = (x_final,y_final) # loops back and tries again
+					MyWorld.integrateIntoWorld(goal) # Add it to the world
 					corner += corner_increment
 				else:
 					break
@@ -575,7 +576,12 @@ while True: # Main code execution loop
 				if path == None:
 					x_final,y_final,dx,dy,corner_increment = NextGoal(x_final,y_final,dx,dy)
 					goal = (x_final,y_final)
+					MyWorld.integrateIntoWorld(goal) # Add it to the world
 					corner += corner_increment
+					print(corner)
+					if corner == 4
+						EndProgram = True
+						break
 				else:
 					break
 				# End if path
