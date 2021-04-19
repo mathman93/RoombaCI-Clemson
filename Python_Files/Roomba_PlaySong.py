@@ -47,7 +47,7 @@ def Play_Song(songdict,ts,tm):
                 # Play the song
                 Roomba.DirectWrite(141)
                 Roomba.DirectWrite(i % 4)
-                print(songdict[i]) # Include for debugging
+                #print(songdict[i]) # Include for debugging
                 time.sleep(((timetotal * ts) / 64) + 0.01)
             #break
 
@@ -102,9 +102,9 @@ What this is trying to do is to allow any song to be played by only having a tex
 5. play untill song is over or user interupt
 '''
 
-timestep = 11 # (1/64)ths of a second
+timestep = 9 # (1/64)ths of a second
 rest = 30 # Rest note
-tone_mod = -13 # half step modulation of key
+tone_mod = 13 # half step modulation of key
 #timetotal = 0 #initializing a value to total the time in a song
 # Program the song onto the Roomba
 # ^ string holding alternating tone and time values of a song (in this example its Donkey Kong 64 music)
