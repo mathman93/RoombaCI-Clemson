@@ -10,8 +10,6 @@ import RPi.GPIO as GPIO
 import RoombaCI_lib
 
 ## Variables and Constants ##
-global Xbee # Specifies connection to Xbee
-Xbee = serial.Serial('/dev/ttyUSB0', 115200) # Baud rate should be 115200
 # LED pin numbers
 yled = 5
 rled = 6
@@ -43,6 +41,7 @@ def Song_DictCreate(songlist):
     songdict = {}
     for i in range(0,int(len(songlist) / 32)):
         songdict[i] = songlist[32 * i : 32 * i + 32]
+    print(i)
     return songdict
 
 # plas each 16 note segment by rewirting song 0 with the next song segment
