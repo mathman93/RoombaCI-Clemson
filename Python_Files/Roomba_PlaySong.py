@@ -21,7 +21,10 @@ gled = 13
 # finds the length of the song, then adds rests to the end to make it playble
 def Song_Size(songlist):
     while (len(songlist) % 32) != 0:
-        songlist.append(1)
+        if len(songlist) % 2 == 0:
+            songlist.append(15) # note value
+        else:
+            songlist.append(1) # duration value
     return songlist
 
 # plays the song in sections of 32
@@ -57,7 +60,7 @@ def Play_Song(songdict,ts,tm):
                 Roomba.DirectWrite(141)
                 Roomba.DirectWrite(i % 4)
                 print(songdict[i]) # Include for debugging
-                time.sleep(((timetotal * ts) / 64) + 0.05)
+                time.sleep(((timetotal * ts) / 64) + 0.03)
             break
 
         except KeyboardInterrupt:
@@ -102,8 +105,8 @@ What this is trying to do is to allow any song to be played by only having a tex
 
 timestep = 11 # (1/64)ths of a second
 rest = 30 # Rest note
-tone_mod = 0 # half step modulation of key
-timetotal = 0 #initializing a value to total the time in a song
+tone_mod = -2 # half step modulation of key
+#timetotal = 0 #initializing a value to total the time in a song
 # Program the song onto the Roomba
 # ^ string holding alternating tone and time values of a song (in this example its Donkey Kong 64 music)
 FullSongList = [72,2,30,1,74,2,79,1,81,2,30,1,79,2,30,1,84,2,30,1,83,2,79,1,77,2,30,4,\
@@ -115,10 +118,8 @@ songlist = Song_Size(FullSongList)  #resize the song to be a mutple of 16
 songdict = Song_DictCreate(songlist) #creates a dictionary that holds each 16 note segment
 Play_Song(songdict,timestep,tone_mod) # plays the song
 
-
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
-
 Roomba.ShutDown() # Shutdown Roomba serial connection
 GPIO.cleanup() # Reset GPIO pins for next program
 
