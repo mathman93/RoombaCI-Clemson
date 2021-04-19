@@ -49,9 +49,9 @@ def Play_Song(songdict,ts,tm):
                 Roomba.DirectWrite(i % 4)
                 #print(songdict[i]) # Include for debugging
                 time.sleep(((timetotal * ts)+1) / 64)
-            #break
+            break
 
-        except KeyboardInterrupt:
+        except KeyboardInterrupt: # if you want to end the song early
             break
 
 # plays the song in sections of 32
@@ -103,15 +103,15 @@ What this is trying to do is to allow any song to be played by only having a tex
 '''
 
 timestep = 11 # (1/64)ths of a second
-rest = 30 # Rest note
-tone_mod = 20 # half step modulation of key
+rest = 15 # Rest note
+tone_mod = 12 # half step modulation of key
 #timetotal = 0 #initializing a value to total the time in a song
 # Program the song onto the Roomba
 # ^ string holding alternating tone and time values of a song (in this example its Donkey Kong 64 music)
-FullSongList = [72,2,30,1,74,2,79,1,81,2,30,1,79,2,30,1,84,2,30,1,83,2,79,1,77,2,30,4,\
-                71,2,30,1,74,2,77,1,83,2,30,1,81,2,30,1,80,2,30,1,79,2,77,1,76,2,30,4,\
-                72,2,30,1,74,2,79,1,81,2,30,1,79,2,30,1,88,2,30,1,86,2,84,1,81,2,30,4,\
-                81,2,30,1,83,2,84,1,84,2,79,1,76,2,72,1,78,2,30,1,77,2,30,1,76,2,30,4]
+FullSongList = [72,2,rest,1,74,2,79,1,81,2,rest,1,79,2,rest,1,84,2,rest,1,83,2,79,1,77,2,rest,4,\
+                71,2,rest,1,74,2,77,1,83,2,rest,1,81,2,rest,1,80,2,rest,1,79,2,77,1,76,2,rest,4,\
+                72,2,rest,1,74,2,79,1,81,2,rest,1,79,2,rest,1,88,2,rest,1,86,2,84,1,81,2,rest,4,\
+                81,2,rest,1,83,2,84,1,84,2,79,1,76,2,72,1,78,2,rest,1,77,2,rest,1,76,2,rest,4]
 
 #songlist = Song_Size(FullSongList)  #resize the song to be a mutple of 16
 #songdict = Song_DictCreate(songlist) #creates a dictionary that holds each 16 note segment
