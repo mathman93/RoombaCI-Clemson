@@ -40,8 +40,8 @@ def Song_Write(songlist,ts,tm):
 def Song_DictCreate(songlist):
     songdict = {}
     for i in range(0,int(len(songlist) / 32)):
-        songdict[i] = songlist[32 * i : 32 * i + 32]
-    print(i)
+        songdict[i] = songlist[32 * i : 32 * (i+1)]
+    songdict[i+1] = songlist[32*(i+1):] # remaining bit
     return songdict
 
 # plas each 16 note segment by rewirting song 0 with the next song segment
@@ -58,8 +58,8 @@ def Play_Song(songdict,ts,tm):
                 # Play the song
                 Roomba.DirectWrite(141)
                 Roomba.DirectWrite(i % 4)
-                print(songdict[i]) # Include for debugging
-                time.sleep(((timetotal * ts) / 64) + 0.02)
+                #print(songdict[i]) # Include for debugging
+                time.sleep(((timetotal * ts) / 64) + 0.01)
             break
 
         except KeyboardInterrupt:
@@ -113,8 +113,9 @@ FullSongList = [72,2,30,1,74,2,79,1,81,2,30,1,79,2,30,1,84,2,30,1,83,2,79,1,77,2
                 72,2,30,1,74,2,79,1,81,2,30,1,79,2,30,1,88,2,30,1,86,2,84,1,81,2,30,4,\
                 81,2,30,1,83,2,84,1,84,2,79,1,76,2,72,1,78,2,30,1,77,2,30,1,76,2,30,4]
 
-songlist = Song_Size(FullSongList)  #resize the song to be a mutple of 16
-songdict = Song_DictCreate(songlist) #creates a dictionary that holds each 16 note segment
+#songlist = Song_Size(FullSongList)  #resize the song to be a mutple of 16
+#songdict = Song_DictCreate(songlist) #creates a dictionary that holds each 16 note segment
+songdict = Song_DictCreate(FullSongList) #creates a dictionary that holds each 16 note segment
 Play_Song(songdict,timestep,tone_mod) # plays the song
 
 ## -- Ending Code Starts Here -- ##
