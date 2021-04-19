@@ -28,7 +28,7 @@ def Song_Size(songlist):
 # plays the song in sections of 32
 def Song_Write(songlist,ts,tm):
     timetotal = 0
-    for i in range(32):
+    for i in range(len(songlist)):
         if i % 2 == 0:
             Roomba.DirectWrite(songlist[i] + tm) 
         else:
