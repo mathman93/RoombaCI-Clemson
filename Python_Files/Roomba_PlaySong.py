@@ -103,10 +103,10 @@ What this is trying to do is to allow any song to be played by only having a tex
 '''
 
 timestep = 11 # (1/64)ths of a second
-rest = 55 # Rest note
-tone_mod = -40 # half step modulation of key
+tone_mod = -2 # half step modulation of key
 #timetotal = 0 #initializing a value to total the time in a song
 # Program the song onto the Roomba
+rest = 15 - tone_mod # Rest note
 # ^ string holding alternating tone and time values of a song (in this example its Donkey Kong 64 music)
 FullSongList = [72,2,rest,1,74,2,79,1,81,2,rest,1,79,2,rest,1,84,2,rest,1,83,2,79,1,77,2,rest,4,\
                 71,2,rest,1,74,2,77,1,83,2,rest,1,81,2,rest,1,80,2,rest,1,79,2,77,1,76,2,rest,4,\
