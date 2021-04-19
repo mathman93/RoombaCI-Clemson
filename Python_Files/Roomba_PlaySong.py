@@ -16,7 +16,7 @@ rled = 6
 gled = 13
 
 ## Functions and Definitions ##
-# finds the length of the song, then adds rests to the end to make it playble
+# finds the length of the song, then adds rests to the end to make it playble (not needed)
 def Song_Size(songlist):
     while (len(songlist) % 32) != 0:
         if len(songlist) % 2 == 0:
@@ -24,17 +24,6 @@ def Song_Size(songlist):
         else:
             songlist.append(1) # duration value
     return songlist
-
-# plays the song in sections of 32
-def Song_Write(songlist,ts,tm):
-    timetotal = 0
-    for i in range(len(songlist)):
-        if i % 2 == 0:
-            Roomba.DirectWrite(songlist[i] + tm) 
-        else:
-            Roomba.DirectWrite(songlist[i] * ts)
-            timetotal = timetotal + songlist[i]
-    return timetotal
 
 # creates each 16 note segment
 def Song_DictCreate(songlist):
@@ -49,7 +38,7 @@ def Play_Song(songdict,ts,tm):
     while True:
         try:
             for i in songdict.keys():
-                songlength = int(len(songdict[i])/2) # Length of song
+                songlength = int(len(songdict[i])/2) # number of notes in song
                 # Write the song
                 Roomba.DirectWrite(140)
                 Roomba.DirectWrite(i % 4)
@@ -60,10 +49,21 @@ def Play_Song(songdict,ts,tm):
                 Roomba.DirectWrite(i % 4)
                 print(songdict[i]) # Include for debugging
                 time.sleep(((timetotal * ts) / 64) + 0.01)
-            break
+            #break
 
         except KeyboardInterrupt:
             break
+
+# plays the song in sections of 32
+def Song_Write(songlist,ts,tm):
+    timetotal = 0
+    for i in range(len(songlist)):
+        if i % 2 == 0:
+            Roomba.DirectWrite(songlist[i] + tm) 
+        else:
+            Roomba.DirectWrite(songlist[i] * ts)
+            timetotal = timetotal + songlist[i]
+    return timetotal
 
 ## -- Code Starts Here -- ##
 # Setup Code #
@@ -102,9 +102,9 @@ What this is trying to do is to allow any song to be played by only having a tex
 5. play untill song is over or user interupt
 '''
 
-timestep = 10 # (1/64)ths of a second
+timestep = 11 # (1/64)ths of a second
 rest = 30 # Rest note
-tone_mod = -2 # half step modulation of key
+tone_mod = -13 # half step modulation of key
 #timetotal = 0 #initializing a value to total the time in a song
 # Program the song onto the Roomba
 # ^ string holding alternating tone and time values of a song (in this example its Donkey Kong 64 music)
