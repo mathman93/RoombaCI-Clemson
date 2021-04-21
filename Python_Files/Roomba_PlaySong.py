@@ -105,8 +105,8 @@ What this is trying to do is to allow any song to be played by only having a tex
 5. play untill song is over or user interupt
 '''
 
-timestep = 9 # (1/64)ths of a second
-tone_mod = 0 # half step modulation of key
+timestep = 8 # (1/64)ths of a second
+tone_mod = -7 # half step modulation of key
 # Program the song onto the Roomba
 rest = 15 - tone_mod # Rest note
 # ^ string holding alternating tone and time values of a song (in this example its Donkey Kong 64 music)
