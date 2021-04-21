@@ -116,7 +116,7 @@ FullSongList = [72,2,rest,1,74,2,79,1,81,2,rest,1,79,2,rest,1,84,2,rest,1,83,2,7
 #songlist = Song_Size(FullSongList)  #resize the song to be a mutple of 16
 #songdict = Song_DictCreate(songlist) #creates a dictionary that holds each 16 note segment
 songdict = Song_DictCreate(FullSongList) #creates a dictionary that holds each 16 note segment
-Play_Song(songdict,timestep,tone_mod) # plays the song
+Play_Song(songdict,timestep,tone_mod,True) # plays the song
 
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
