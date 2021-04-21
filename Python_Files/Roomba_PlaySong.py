@@ -102,7 +102,7 @@ What this is trying to do is to allow any song to be played by only having a tex
 5. play untill song is over or user interupt
 '''
 
-timestep = 11 # (1/64)ths of a second
+timestep = 8 # (1/64)ths of a second
 tone_mod = -2 # half step modulation of key
 # Program the song onto the Roomba
 rest = 15 - tone_mod # Rest note
@@ -111,7 +111,7 @@ rest = 15 - tone_mod # Rest note
 #                71,2,rest,1,74,2,77,1,83,2,rest,1,81,2,rest,1,80,2,rest,1,79,2,77,1,76,2,rest,4,\
 #                72,2,rest,1,74,2,79,1,81,2,rest,1,79,2,rest,1,88,2,rest,1,86,2,84,1,81,2,rest,4,\
 #                81,2,rest,1,83,2,84,1,84,2,79,1,76,2,72,1,78,2,rest,1,77,2,rest,1,76,2,rest,4]
-FullSongList = [72,1,72,1,74,1,72,1,81,3,81,3,79,6,72,1,72,1,74,1,72,1,79,3,79,3,77,2,76,1,74,3,\
+FullSongList = [72,1,72,1,74,1,72,1,81,3,81,3,79,6,70,1,72,1,74,1,72,1,79,3,79,3,77,2,76,1,74,3,\
                 74,1,74,1,77,1,74,1,77,4,79,2,76,3,74,1,72,4,72,2,79,4,77,8,\
                 72,1,72,1,74,1,72,1,81,3,81,3,79,6,72,1,72,1,74,1,72,1,84,4,76,2,77,3,76,1,74,2,\
                 74,1,74,1,77,1,74,1,77,4,79,2,76,3,74,1,72,4,72,2,79,4,77,8]
