@@ -34,7 +34,7 @@ def Song_DictCreate(songlist):
     return songdict
 
 # plas each 16 note segment by rewirting song 0 with the next song segment
-def Play_Song(songdict,ts,tm):
+def Play_Song(songdict,ts,tm,loop=True):
     while True:
         try:
             for i in songdict.keys():
@@ -49,10 +49,13 @@ def Play_Song(songdict,ts,tm):
                 Roomba.DirectWrite(i % 4)
                 #print(songdict[i]) # Include for debugging
                 time.sleep(((timetotal * ts)+1) / 64)
-            break
-
+            # End for i
+            if loop == False:
+                break
+            # End if loop
         except KeyboardInterrupt: # if you want to end the song early
             break
+    # End while
 
 # plays the song in sections of 32
 def Song_Write(songlist,ts,tm):
@@ -111,9 +114,9 @@ rest = 15 - tone_mod # Rest note
 #                71,2,rest,1,74,2,77,1,83,2,rest,1,81,2,rest,1,80,2,rest,1,79,2,77,1,76,2,rest,4,\
 #                72,2,rest,1,74,2,79,1,81,2,rest,1,79,2,rest,1,88,2,rest,1,86,2,84,1,81,2,rest,4,\
 #                81,2,rest,1,83,2,84,1,84,2,79,1,76,2,72,1,78,2,rest,1,77,2,rest,1,76,2,rest,4]
-FullSongList = [70,1,72,1,75,1,72,1,81,3,81,3,79,6,70,1,72,1,75,1,72,1,79,3,79,3,77,2,76,1,74,3,\
+FullSongList = [72,1,74,1,77,1,74,1,81,3,81,3,79,6,72,1,74,1,77,1,74,1,79,3,79,3,77,2,76,1,74,3,\
                 74,1,74,1,77,1,74,1,77,4,79,2,76,3,74,1,72,4,72,2,79,4,77,6,rest,2,\
-                72,1,72,1,74,1,72,1,81,3,81,3,79,6,72,1,72,1,74,1,72,1,84,4,76,2,77,3,76,1,74,2,\
+                72,1,74,1,77,1,74,1,81,3,81,3,79,6,72,1,74,1,77,1,74,1,84,4,76,2,77,3,76,1,74,2,\
                 74,1,74,1,77,1,74,1,77,4,79,2,76,3,74,1,72,4,72,2,79,4,77,7,rest,1]
 
 #songlist = Song_Size(FullSongList)  #resize the song to be a mutple of 16
