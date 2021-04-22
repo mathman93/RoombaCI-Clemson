@@ -16,3 +16,13 @@ IMU Test Data Files
 5. IMUData_2-18-21.txt
   30 second test where the Roomba moves forward then rotates 180 degrees about the z axis before
   returning to its original position. This test was used to get an initial baseline of IMU data.
+6. Test1 & Test2 _points & _walls
+  Test of ploting MATLAB script. 2 different orientations and starting points in order to 
+  attempt to figure out how to translate one map onto the other
+7. Test3 & Test4 _points & _walls
+  First tests of sprial pattern for autmated mapping. Triggers the key error for both of these
+8. Test5 & Test6 _points & _walls
+  Second round of testing after fixing bugs. The Roomba eventually determines it cannot reach any 
+  points and infinitely increments in a spiral patter.
+9. EdgeTest
+  Test to look at the edges between points and make sure all edges are correct. 
