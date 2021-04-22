@@ -47,7 +47,7 @@ def Play_Song(songdict,ts,tm,loop=False):
                 # Play the song
                 Roomba.DirectWrite(141)
                 Roomba.DirectWrite(i % 4)
-                #print(songdict[i]) # Include for debugging
+                print(songdict[i]) # Include for debugging
                 time.sleep(((timetotal * ts)+1) / 64)
             if loop == False:
                 break
@@ -107,14 +107,15 @@ timestep = 11 # (1/64)ths of a second
 tone_mod = -2 # half step modulation of key
 # Program the song onto the Roomba
 rest = 15 - tone_mod # Rest note
-# ^ string holding alternating tone and time values of a song (in this example its Donkey Kong 64 music)
+
 FullSongList = [72,2,rest,1,74,2,79,1,81,2,rest,1,79,2,rest,1,84,2,rest,1,83,2,79,1,77,2,rest,4,\
                 71,2,rest,1,74,2,77,1,83,2,rest,1,81,2,rest,1,80,2,rest,1,79,2,77,1,76,2,rest,4,\
                 72,2,rest,1,74,2,79,1,81,2,rest,1,79,2,rest,1,88,2,rest,1,86,2,84,1,81,2,rest,4,\
                 81,2,rest,1,83,2,84,1,84,2,79,1,76,2,72,1,78,2,rest,1,77,2,rest,1,76,2,rest,4]
+# ^ string holding alternating tone and time values of a song (in this example its Donkey Kong 64 music)
 
-#songlist = Song_Size(FullSongList)  #resize the song to be a mutple of 16
-#songdict = Song_DictCreate(songlist) #creates a dictionary that holds each 16 note segment
+#songlist = Song_Size(FullSongList)  #resize the song to be a mutple of 16                     | both of these are not needed
+#songdict = Song_DictCreate(songlist) #creates a dictionary that holds each 16 note segment    | due to not needing to be a list of 32's
 songdict = Song_DictCreate(FullSongList) #creates a dictionary that holds each 16 note segment
 Play_Song(songdict,timestep,tone_mod,True) # plays the song
 
@@ -122,60 +123,3 @@ Play_Song(songdict,timestep,tone_mod,True) # plays the song
 # Make sure this code runs to end the program cleanly
 Roomba.ShutDown() # Shutdown Roomba serial connection
 GPIO.cleanup() # Reset GPIO pins for next program
-
-# loop plays song
-#for x in range (len(FullSongList)/32):
-#    Roomba.DirectWrite(140) # Header Opcode
-#    Roomba.DirectWrite(0)   # Song number (0-3)
-#    Roomba.DirectWrite(16)  # Length of song (0-15)
-#    Song_Write(FullSongList)
-#    time.sleep(0.05) # Wait before continuing
-# Define Part 4 (13 notes)
-#Roomba.DirectWrite(140) # Header Opcode
-#Roomba.DirectWrite(3)   # Song number (0-3)
-#Roomba.DirectWrite(13)  # Length of song (0-15)
-#Roomba.DirectWrite(81 + tone_mod)  # Note 1
-##Roomba.DirectWrite(2 * timestep)	# Note 1 duration (in 1/64 of a second)
-#Roomba.DirectWrite(rest)
-#Roomba.DirectWrite(1 * timestep)
-#Roomba.DirectWrite(83 + tone_mod)
-#Roomba.DirectWrite(2 * timestep)
-#Roomba.DirectWrite(84 + tone_mod)
-#Roomba.DirectWrite(1 * timestep)
-#Roomba.DirectWrite(84 + tone_mod)
-#Roomba.DirectWrite(2 * timestep)
-#Roomba.DirectWrite(79 + tone_mod)
-#Roomba.DirectWrite(1 * timestep)
-#Roomba.DirectWrite(76 + tone_mod)
-#Roomba.DirectWrite(2 * timestep)
-#Roomba.DirectWrite(72 + tone_mod)
-#Roomba.DirectWrite(1 * timestep)
-##Roomba.DirectWrite(78 + tone_mod)
-#oomba.DirectWrite(2 * timestep)
-#Roomba.DirectWrite(rest)
-#Roomba.DirectWrite(1 * timestep)
-#Roomba.DirectWrite(77 + tone_mod)
-#Roomba.DirectWrite(2 * timestep)
-#Roomba.DirectWrite(rest)
-#Roomba.DirectWrite(1 * timestep)
-#Roomba.DirectWrite(76 + tone_mod)
-#Roomba.DirectWrite(2 * timestep)
-## Song length = 24 * timestep
-#time.sleep(0.05) # Wait before continuing
-#song_list = [0, 1, 2, 3]
-#while True:
-#	try:
-#		for song in song_list:
-#			# Play DK64 Theme
-#			Roomba.DirectWrite(141) # Header Opcode
-#			Roomba.DirectWrite(song)   # Song number (0-3)
-#			
-#			time.sleep(24 * (timestep / 64)) # Wait for the song to play
-#		
-#	except KeyboardInterrupt:
-#		break
-## -- Ending Code Starts Here -- ##
-# Make sure this code runs to end the program cleanly
-#GPIO.output(gled, GPIO.LOW) # Turn off green LED
-#Roomba.ShutDown() # Shutdown Roomba serial connection
-#GPIO.cleanup() # Reset GPIO pins for next program
