@@ -16,7 +16,7 @@ import heapq
 
 ## Variables and Constants ##
 file_create = True # Boolean to set for creation of data file
-manual_input = False # Boolean to set manual input of points to explore
+manual_input = True # Boolean to set manual input of points to explore
 # LED pin numbers
 yled = 5
 rled = 6
@@ -116,6 +116,7 @@ class GridWorld:
 			print("{0}:{1}".format(point,value)) # Current edges in the world
 		# End for point
 		print("World Walls: {0}".format(self.walls)) # Current walls in the world
+		stuff = input("")
 	# End displayInfo
 # End GridWorld
 
