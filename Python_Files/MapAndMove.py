@@ -64,7 +64,7 @@ class GridWorld:
 	# End removePointFromWorld
 	# Adds an edge from the world between two given tuple coordinate points
 	def addEdgeToWorld(self, point1, point2):
-		print("{0},{1}".format(point1,point2))
+		# print("{0},{1}".format(point1,point2))
 		if point1 in self.points and point2 in self.points:
 			ls1 = self.edges[point1]
 			ls1.append(point2)
@@ -116,7 +116,6 @@ class GridWorld:
 			print("{0}:{1}".format(point,value)) # Current edges in the world
 		# End for point
 		print("World Walls: {0}".format(self.walls)) # Current walls in the world
-		stuff = input("")
 	# End displayInfo
 # End GridWorld
 
