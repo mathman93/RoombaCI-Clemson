@@ -25,25 +25,20 @@ data_counter = 0 # Initialize data_counter
 #global A # Accelerometer transformation matrix
 
 #Forward then stop turn around and move backwards
-#move_dict = {
-#	0: [2.0, 0, 0],
-#	1: [10.0, 75, 0],
-#	2: [2.0, 0, 0],
-#	3: [5.0, 0, 75],
-#	4: [2.0, 0, 0],
-#	5: [10.0, 75, 0],
-#	6: [2.0, 0, 0]
-#	}
-
-#Alternative test moving the roomba in a
+'''move_dict = {
+	0: [2.0, 0, 0],
+	1: [10.0, 75, 0],
+	2: [2.0, 0, 0],
+	3: [5.0, 0, 75],
+	4: [2.0, 0, 0],
+	5: [10.0, 75, 0],
+	6: [2.0, 0, 0]
+	}
+'''
+#Alternative test moving the roomba in a circle
 move_dict = {
 	0: [2.0, 0, 0],
 	1: [25.0, 50, 75]
-	#2: [2.0, 0, 0],
-	#3: [5.0, 0, 75],
-	#4: [2.0, 0, 0],
-	#5: [10.0, 75, 0],
-	#6: [2.0, 0, 0]
 	}
 
 ## Functions and Definitions ##
@@ -110,7 +105,6 @@ if file_create == True:	# Open a text file for data retrieval
 	datafile = open(file_name, "w") # Open a text file for storing data
 		# Will overwrite anything that was in the text file previously
 # End if file_create
-basetime = time.time()
 
 # Read in initial values
 [r_speed,l_speed,l_counts,r_counts] = Roomba.Query(41,42,43,44) # Read Roomba data stream
