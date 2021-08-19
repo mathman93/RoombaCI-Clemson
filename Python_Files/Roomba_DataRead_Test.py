@@ -111,6 +111,7 @@ if file_create == True:	# Open a text file for data retrieval
 	datafile = open(file_name, "w") # Open a text file for storing data
 		# Will overwrite anything that was in the text file previously
 # End if file_create
+for_break = False # To break out of for loop on keyboard interrupt
 
 Roomba.StartQueryStream(7, 43, 44, 45, 46, 47, 48, 49, 50, 51) # Start query stream with specific sensor packets
 time_base = time.time()
