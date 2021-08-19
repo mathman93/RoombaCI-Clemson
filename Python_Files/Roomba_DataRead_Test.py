@@ -43,8 +43,14 @@ DisplayDateTime() # Display current date and time
 ack = input("Do you want to save data to a file (y/n)? ") # user acknowledgement
 if ack in ["y", "Y"]: # If positive
 	file_create = True # create and save data to file
+	file_name_input = input("Name for data file: ") # Ask user for desired file name
+	dir_path = "/home/pi/RoombaCI-Clemson/Data_Files/2021_Fall/" # Directory path to save file
+	file_name = os.path.join(dir_path, file_name_input+".txt") # text file extension
+	datafile = open(file_name, "w") # Open a text file for storing data
+		# Will overwrite anything that was in the text file previously
 else: # otherwise
 	file_create = False # Skip data creation
+# End if
 
 # LED Pin setup
 GPIO.setup(yled, GPIO.OUT, initial=GPIO.LOW)
@@ -104,15 +110,7 @@ query_time_offset = (5/64) # Set time offset for query
 # smallest time offset for query is 15.625 ms.
 '''
 
-if file_create == True:	# Open a text file for data retrieval
-	file_name_input = input("Name for data file: ") # Ask user for desired file name
-	dir_path = "/home/pi/RoombaCI-Clemson/Data_Files/2021_Fall/" # Directory path to save file
-	file_name = os.path.join(dir_path, file_name_input+".txt") # text file extension
-	datafile = open(file_name, "w") # Open a text file for storing data
-		# Will overwrite anything that was in the text file previously
-# End if file_create
 for_break = False # To break out of for loop on keyboard interrupt
-
 Roomba.StartQueryStream(7, 43, 44, 45, 46, 47, 48, 49, 50, 51) # Start query stream with specific sensor packets
 time_base = time.time()
 
