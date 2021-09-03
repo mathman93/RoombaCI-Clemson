@@ -12,7 +12,7 @@ import os.path
 import math
 
 ## Variables and Constants ##
-file_create = True # Boolean to set for creation of data file
+file_create = False # Boolean to set for creation of data file
 # LED pin numbers
 yled = 5
 rled = 6

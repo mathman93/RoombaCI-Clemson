@@ -487,7 +487,7 @@ class Create_2:
 	# Define internal class variables
 	Y_position = 0 # Position of Roomba along y-axis (millimeters)
 	X_position = 0 # Position of Roomba along x-axis (millimeters)
-	heading = 0 # Heading of Roomba (radians; 0 -> positive x-axis, pi/2 -> positive y_axis)
+	heading = 0 # Heading of Roomba (radians; 0 -> positive x-axis, pi/2 -> positive y-axis)
 	total_distance = 0 # Total distance traveled by Roomba (millimeters)
 	l_count_last = 0 # Value of last left wheel encoder count (ID:43) reading
 	r_count_last = 0 # Value of last right wheel encoder count (ID:44) reading

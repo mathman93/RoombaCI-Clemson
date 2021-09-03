@@ -170,7 +170,7 @@ while True:
 					last_bump = 3
 				forwardSpin = int(-spinVal / 2)
 
-				 Unimplemented
+				''' Unimplemented
 				l_difference = abs(last_encoder_left - l_counts)
 				r_difference = abs(last_encoder_right - r_counts)
 				#if ((l_difference > 300) AND (r_difference > 300)):
