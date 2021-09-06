@@ -90,7 +90,7 @@ def MyLoop(stdscr):
 	spin = 0
 	
 	# Get initial angle from IMU
-	Roomba.heading = imu.CalculateHeading()
+	Roomba.heading = math.radians(imu.CalculateHeading())
 	
 	# Display initial information to the screen
 	stdscr.addstr(0,0,"You are now in control of the Roomba.")
@@ -119,6 +119,7 @@ def MyLoop(stdscr):
 				# Record the current time since the beginning of loop
 				current_time = (time.time() - time_base) # Current time of data
 				
+				Roomba.UpdatePosition(l_counts, r_counts)
 				# Measure IMU values
 				accel_x, accel_y, accel_z = imu.acceleration
 				mag_x, mag_y, mag_z = imu.magnetic
