@@ -129,7 +129,7 @@ def MyLoop(stdscr):
 				stdscr.move(5,0)
 				stdscr.clrtoeol() # Clear line
 				stdscr.addstr(5,0,"{0:.4f}, {1:0>8b}, {2}, {3}, {4:0>8b}, {5}, {6}, {7:.3f}, {8:.3f}, {9:.2f};"\
-					.format(current_time, bumper_byte, l_counts, r_counts, light_bumper, l_speed, r_speed, Roomba.Y_position, Roomba.X_position, math.degrees(Roomba.heading)))
+					.format(current_time, bumper_byte, l_counts, r_counts, light_bumper, l_speed, r_speed, Roomba.Y_position, Roomba.X_position, (math.degrees(Roomba.heading))%360))
 				stdscr.move(6,0)
 				stdscr.clrtoeol() # Clear line
 				stdscr.addstr(6,0,"{0:.3f}, {1:.3f}, {2:.3f}; (9.8 m/s^2)".format(accel_x, accel_y, accel_z))
