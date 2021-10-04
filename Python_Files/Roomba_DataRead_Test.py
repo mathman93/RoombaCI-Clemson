@@ -83,12 +83,12 @@ x = imu.acceleration
 x = imu.gyro
 
 # Calibrate IMU
-print(" Calibrating IMU...")
-Roomba.Move(0,75) # Start Roomba spinning
-imu.CalibrateMag() # Calculate magnetometer offset values
-Roomba.Move(0,0) # Stop Roomba spinning
-time.sleep(0.5)
-imu.CalibrateGyro() # Calculate gyroscope offset values
+#print(" Calibrating IMU...")
+#Roomba.Move(0,75) # Start Roomba spinning
+#imu.CalibrateMag() # Calculate magnetometer offset values
+#Roomba.Move(0,0) # Stop Roomba spinning
+#time.sleep(0.5)
+#imu.CalibrateGyro() # Calculate gyroscope offset values
 
 # Display offset values
 print("mx_offset = {:f}; my_offset = {:f}; mz_offset = {:f}"\
