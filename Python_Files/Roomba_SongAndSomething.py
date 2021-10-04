@@ -151,6 +151,7 @@ FullSongList = [72,1,74,1,77,1,74,1,81,3,81,3,79,6,72,1,74,1,77,1,74,1,79,3,79,3
                 74,1,74,1,77,1,74,1,77,4,79,2,76,3,74,1,72,4,72,2,79,4,77,7,rest,1] # A rick roll
 
 i = 0
+ison = 0
 Roomba.StartQueryStream(36,37)
 s1,isp = Roomba.ReadQueryStream(36,37)
 
@@ -171,7 +172,7 @@ while True:
             if ison == 1:
                 GPIO.output(gled, GPIO.LOW) # Turn off green LED
                 ison = 0
-                
+
     except KeyboardInterrupt: # if you want to end the song early
         break
     # End while
