@@ -60,27 +60,18 @@ def Play_Piece(songdict,ts,tm,loop=False):
 '''
 
 def Play_Song(songdict,ts,tm,i,loop=False):
-    while True:
-        try:
-            songlength = int(len(songdict[i])/2) # number of notes in song
-            # Write the song
-            Roomba.DirectWrite(140)
-            Roomba.DirectWrite(i % 4)
-            Roomba.DirectWrite(songlength)
-            timetotal = Song_Write(songdict[i],ts,tm)
-            # Play the song
-            Roomba.DirectWrite(141)
-            Roomba.DirectWrite(i % 4)
-            print(songdict[i]) # Include for debugging
-            print(timetotal)  #how long the roomba should wait
+    songlength = int(len(songdict[i])/2) # number of notes in song
+    # Write the song
+    Roomba.DirectWrite(140)
+    Roomba.DirectWrite(i % 4)
+    Roomba.DirectWrite(songlength)
+    timetotal = Song_Write(songdict[i],ts,tm)
+    # Play the song
+    Roomba.DirectWrite(141)
+    Roomba.DirectWrite(i % 4)
+    print(songdict[i]) # Include for debugging
+    print(timetotal)  #how long the roomba should wait
 
-            # End for i
-            if loop == False:
-                break
-            # End if loop
-        except KeyboardInterrupt: # if you want to end the song early
-            break
-    # End while
 
 
 # plays the song in sections of 32
