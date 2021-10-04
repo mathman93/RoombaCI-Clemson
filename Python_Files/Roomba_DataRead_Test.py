@@ -24,7 +24,7 @@ gled = 13
 # Dictionary of Roomba movements
 move_dict = {
 	0: [1.0, 0, 0],
-	1: [45.0, 0, 50]
+	1: [60.0, 0, 50]
 	}
 
 ## Functions and Definitions ##
