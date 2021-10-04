@@ -25,8 +25,9 @@ def Song_DictCreate(songlist):
     songdict[i+1] = songlist[32*(i+1):] # remaining bit
     return songdict
 
+'''
 # plays each 16 note segment by rewirting song 0 with the next song segment
-def Play_Song(songdict,ts,tm,loop=False,):
+def Play_Piece(songdict,ts,tm,loop=False):
     while True:
         try:
             for i in songdict.keys():
@@ -56,6 +57,31 @@ def Play_Song(songdict,ts,tm,loop=False,):
         except KeyboardInterrupt: # if you want to end the song early
             break
     # End while
+'''
+
+def Play_Song(songdict,ts,tm,i,loop=False):
+    while True:
+        try:
+            songlength = int(len(songdict[i])/2) # number of notes in song
+            # Write the song
+            Roomba.DirectWrite(140)
+            Roomba.DirectWrite(i % 4)
+            Roomba.DirectWrite(songlength)
+            timetotal = Song_Write(songdict[i],ts,tm)
+            # Play the song
+            Roomba.DirectWrite(141)
+            Roomba.DirectWrite(i % 4)
+            print(songdict[i]) # Include for debugging
+            print(timetotal)  #how long the roomba should wait
+
+            # End for i
+            if loop == False:
+                break
+            # End if loop
+        except KeyboardInterrupt: # if you want to end the song early
+            break
+    # End while
+
 
 # plays the song in sections of 32
 def Song_Write(songlist,ts,tm):
@@ -105,7 +131,7 @@ What this is trying to do is to allow any song to be played by only having a tex
 5. play untill song is over or user interupt
 '''
 
-Roomba.StartQueryStream(36,37)
+
 
 timestep = 8 # (1/64)ths of a second
 tone_mod = -7 # half step modulation of key
@@ -124,11 +150,32 @@ FullSongList = [72,1,74,1,77,1,74,1,81,3,81,3,79,6,72,1,74,1,77,1,74,1,79,3,79,3
                 72,1,74,1,77,1,74,1,81,3,81,3,79,6,72,1,74,1,77,1,74,1,84,4,76,2,77,3,76,1,74,2,\
                 74,1,74,1,77,1,74,1,77,4,79,2,76,3,74,1,72,4,72,2,79,4,77,7,rest,1] # A rick roll
 
-
+i = 0
+Roomba.StartQueryStream(36,37)
 s1,isp = Roomba.ReadQueryStream(36,37)
 
-songdict = Song_DictCreate(FullSongList) #creates a dictionary that holds each 16 note segment
-Play_Song(songdict,timestep,tone_mod,True) # plays the song
+while True:
+    try:
+        if Roomba.Available() > 0:
+            sn,isp = Roomba.ReadQueryStream(36,37)
+    
+        if isp == 0:
+                songdict = Song_DictCreate(FullSongList) #creates a dictionary that holds each 16 note segment
+                Play_Song(songdict,timestep,tone_mod,i,True) # plays the song segment at i
+                i = i+1
+    
+        if isp == 1:
+            if ison == 0:
+                GPIO.output(gled, GPIO.HIGH) # Turn on green LED
+                ison = 1
+            if ison == 1:
+                GPIO.output(gled, GPIO.LOW) # Turn off green LED
+                ison = 0
+                
+    except KeyboardInterrupt: # if you want to end the song early
+        break
+    # End while
+
 
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
