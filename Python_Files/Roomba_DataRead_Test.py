@@ -24,12 +24,7 @@ gled = 13
 # Dictionary of Roomba movements
 move_dict = {
 	0: [1.0, 0, 0],
-<<<<<<< Updated upstream
-	1: [60.0, 0, 0]
-=======
-	1: [60.0, 0, 50]
->>>>>>> Stashed changes
-	}
+	1: [60.0, 0, 0] }
 
 ## Functions and Definitions ##
 ''' Displays current date and time to the screen
