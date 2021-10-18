@@ -111,11 +111,11 @@ query_time_offset = (5/64) # Set time offset for query
 '''
 
 for_break = False # To break out of for loop on keyboard interrupt
-Roomba.StartQueryStream(7, 43, 44, 45, 46, 47, 48, 49, 50, 51) # Start query stream with specific sensor packets
 time_base = time.time()
 # Retrieve and set initial wheel encoder values
 [left_encoder, right_encoder] = Roomba.Query(43,44)
 Roomba.SetWheelEncoderCounts(left_encoder, right_encoder)
+Roomba.StartQueryStream(7, 43, 44, 45, 46, 47, 48, 49, 50, 51) # Start query stream with specific sensor packets
 start_time = time.time()
 state = 0
 time_out = 10
@@ -124,7 +124,7 @@ while True:
         if Roomba.Available()>0:
             bumper_byte, l_counts, r_counts, light_bumper, lb_ll, lb_fl, lb_cl, lb_cr, lb_fr, lb_rr = Roomba.ReadQueryStream(7, 43, 44, 45, 46, 47, 48, 49, 50, 51)
             print("{0:.6f}, {1}, {2}, {3:.4f}, {4:0>8b}, {5:0>8b}, {6}, {7}, {8}, {9}, {10}, {11};"\
-                        .format(data_time, l_counts, r_counts, angle, bumper_byte, light_bumper, lb_ll, lb_fl, lb_cl, lb_cr, lb_fr, lb_rr))
+                        .format(l_counts, r_counts, bumper_byte, light_bumper, lb_ll, lb_fl, lb_cl, lb_cr, lb_fr, lb_rr))
             if bumper_byte > 0 and state == 0:
                 state = 1
                 base = time.time()
@@ -136,3 +136,12 @@ while True:
                     break 
     except KeyboardInterrupt:
         break
+Roomba.Move(0,0) # Stop moving
+Roomba.PauseQueryStream() # End Roomba Query Stream
+if Roomba.Available()>0: # If data exists in Query Stream...
+	z = Roomba.DirectRead(Roomba.Available()) # Clear out data
+	print(z) # Include for debugging
+# End if Roomba.Available()
+if file_create == True:
+	file.close() # Close data file
+# End if file_create
