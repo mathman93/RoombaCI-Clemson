@@ -117,6 +117,8 @@ while True:
     try:
         if Roomba.Available() > 0:
             sn,isp = Roomba.ReadQueryStream(36,37)  # if roomba availble, update song number and is song playing
+            print(sn)
+            print(isp) # Include for debugging
     
         if isp == 0:
                 Play_Song(songdict,timestep,tone_mod,i,True) # plays the i'th song segment
