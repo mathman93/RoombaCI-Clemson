@@ -83,7 +83,7 @@ Start of song setup after roomba setup
 
 program objectives
 1. play the currently programed song
-2. while roomba is playing the current song the roomba should be blinging the green LED
+2. while roomba is playing the current song the roomba should be blinking the green LED
 3. later this will be changed out for movement of the roomba while playing a song
 '''
 
@@ -91,15 +91,11 @@ program objectives
 
 timestep = 8 # (1/64)ths of a second
 tone_mod = -7 # half step modulation of key
-# Program the song onto the Roomba
 rest = 15 - tone_mod # Rest note
-
 FullSongList = [72,2,rest,1,74,2,79,1,81,2,rest,1,79,2,rest,1,84,2,rest,1,83,2,79,1,77,2,rest,4,\
                 71,2,rest,1,74,2,77,1,83,2,rest,1,81,2,rest,1,80,2,rest,1,79,2,77,1,76,2,rest,4,\
                 72,2,rest,1,74,2,79,1,81,2,rest,1,79,2,rest,1,88,2,rest,1,86,2,84,1,81,2,rest,4,\
                 81,2,rest,1,83,2,84,1,84,2,79,1,76,2,72,1,78,2,rest,1,77,2,rest,1,76,2,rest,4]
-# ^ string holding alternating tone and time values of a song (in this example its Donkey Kong 64 music)
-
 
 FullSongList = [72,1,74,1,77,1,74,1,81,3,81,3,79,6,72,1,74,1,77,1,74,1,79,3,79,3,77,2,76,1,74,3,\
                 74,1,74,1,77,1,74,1,77,4,79,2,76,3,74,1,72,4,72,2,79,4,77,6,rest,2,\
@@ -108,29 +104,32 @@ FullSongList = [72,1,74,1,77,1,74,1,81,3,81,3,79,6,72,1,74,1,77,1,74,1,79,3,79,3
 
 # declare vars.
 i = 0
-ison = 0
-Roomba.StartQueryStream(36,37)
-s1,isp = Roomba.ReadQueryStream(36,37)
-timer = time.time()
+ison = False
 
+timer = time.time() # start timer
+songdict = Song_DictCreate(FullSongList) # create song dictonary
+
+Roomba.StartQueryStream(36,37)  # start of query stream
+sn,isp = Roomba.ReadQueryStream(36,37)  # get values of song number(sn) and is song playing(isp)
+# start main loop
 while True:
     try:
         if Roomba.Available() > 0:
-            sn,isp = Roomba.ReadQueryStream(36,37)  # if roomba is available get song number and if it's playing a song
+            sn,isp = Roomba.ReadQueryStream(36,37)  # if roomba availble, update song number and is song playing
     
         if isp == 0:
-                songdict = Song_DictCreate(FullSongList) # if roomba is not playing a song, creates a dictionary that holds each 16 note segment
-                Play_Song(songdict,timestep,tone_mod,i,True) # plays the song segment at i
-                i = i+1
+                Play_Song(songdict,timestep,tone_mod,i,True) # plays the i'th song segment
+                i = i+1 # update i
     
         if(time.time() - timer > 0.5):
             timer = time.time() # using a timer, every 0.5 seconds a LED will toggle on/off
-            if ison == 0:
+            if ison == False:
                 GPIO.output(gled, GPIO.HIGH) # Turn on green LED
-                ison = 1
-            if ison == 1:
+                ison = True
+            
+            if ison == True:
                 GPIO.output(gled, GPIO.LOW) # Turn off green LED
-                ison = 0
+                ison = False
 
     except KeyboardInterrupt: # if you want to end the song early
         break
