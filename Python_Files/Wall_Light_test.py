@@ -2,6 +2,7 @@
 Wall Light Test.py
 Purpose: Attempt to use the lightbar to determine distance from approaching wall
 IMPORTANT: Must be run using Python 3 (python3)
+Test
 Last Modified: 10/25/2021
 '''
 ## Import libraries ##
