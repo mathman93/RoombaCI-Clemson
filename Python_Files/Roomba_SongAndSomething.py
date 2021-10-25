@@ -123,7 +123,7 @@ while True:
     
         if isp == 0:
                 Play_Song(songdict,timestep,tone_mod,i,True) # plays the i'th song segment
-                i = i+1 # update i
+                i = (i+1)%4 # update i
     
         if(time.time() - timer > 0.5):
             timer = time.time() # using a timer, every 0.5 seconds a LED will toggle on/off
