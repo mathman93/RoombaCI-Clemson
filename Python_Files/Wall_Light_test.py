@@ -143,5 +143,5 @@ if Roomba.Available()>0: # If data exists in Query Stream...
 	print(z) # Include for debugging
 # End if Roomba.Available()
 if file_create == True:
-	file.close() # Close data file
+	datafile.close() # Close data file
 # End if file_create
