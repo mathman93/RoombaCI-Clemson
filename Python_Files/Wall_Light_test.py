@@ -1,9 +1,9 @@
 '''
-Roomba_DataRead_Test.py
-Purpose: Collect sesnor data and test communication between Roomba and RaspberryPi
-	Form basis of Roomba code for other tests.
+Wall Light Test.py
+Purpose: Attempt to use the lightbar to determine distance from approaching wall
 IMPORTANT: Must be run using Python 3 (python3)
-Last Modified: 8/17/2021
+Test
+Last Modified: 10/25/2021
 '''
 ## Import libraries ##
 import serial
@@ -123,7 +123,7 @@ while True:
     try:  
         if Roomba.Available()>0:
             bumper_byte, l_counts, r_counts, light_bumper, lb_ll, lb_fl, lb_cl, lb_cr, lb_fr, lb_rr = Roomba.ReadQueryStream(7, 43, 44, 45, 46, 47, 48, 49, 50, 51)
-            print("{0:.6f}, {1}, {2}, {3:.4f}, {4:0>8b}, {5:0>8b}, {6}, {7}, {8}, {9}, {10}, {11};"\
+            print("{0:.6f}, {1}, {2}, {3:.4f}, {4:0>8b}, {5:0>8b}, {6}, {7}, {8}, {9};"\
                         .format(l_counts, r_counts, bumper_byte, light_bumper, lb_ll, lb_fl, lb_cl, lb_cr, lb_fr, lb_rr))
             if bumper_byte > 0 and state == 0:
                 state = 1
