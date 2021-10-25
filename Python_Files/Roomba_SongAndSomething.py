@@ -108,9 +108,10 @@ ison = False
 
 timer = time.time() # start timer
 songdict = Song_DictCreate(FullSongList) # create song dictonary
+sn,isp = Roomba.Query(36,37)  # get values of song number(sn) and is song playing(isp)
 
 Roomba.StartQueryStream(36,37)  # start of query stream
-sn,isp = Roomba.ReadQueryStream(36,37)  # get values of song number(sn) and is song playing(isp)
+#sn,isp = Roomba.ReadQueryStream(36,37)  # get values of song number(sn) and is song playing(isp)
 # start main loop
 while True:
     try:
