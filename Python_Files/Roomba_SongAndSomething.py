@@ -105,12 +105,13 @@ FullSongList = [72,1,74,1,77,1,74,1,81,3,81,3,79,6,72,1,74,1,77,1,74,1,79,3,79,3
 # declare vars.
 i = 0
 ison = False
+sn = -1 # Initial value
 
 timer = time.time() # start timer
 songdict = Song_DictCreate(FullSongList) # create song dictonary
-sn,isp = Roomba.Query(36,37)  # get values of song number(sn) and is song playing(isp)
-print(sn)
-print(isp) # include for debugging
+#sn,isp = Roomba.Query(36,37)  # get values of song number(sn) and is song playing(isp)
+#print(sn)
+#print(isp) # include for debugging
 Roomba.StartQueryStream(36,37)  # start of query stream
 #sn,isp = Roomba.ReadQueryStream(36,37)  # get values of song number(sn) and is song playing(isp)
 # start main loop
@@ -121,11 +122,11 @@ while True:
             print(sn)
             print(isp) # Include for debugging
     
-        if isp == 0:
+            if isp == 0:
                 Play_Song(songdict,timestep,tone_mod,i,True) # plays the i'th song segment
                 i = (i+1)%4 # update i
     
-        if(time.time() - timer > 0.5):
+        if (time.time() - timer) > 0.5:
             timer = time.time() # using a timer, every 0.5 seconds a LED will toggle on/off
             if ison == False:
                 GPIO.output(gled, GPIO.HIGH) # Turn on green LED
