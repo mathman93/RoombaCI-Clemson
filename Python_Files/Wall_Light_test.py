@@ -120,22 +120,23 @@ start_time = time.time()
 state = 0
 time_out = 10
 while True:
-    try:  
-        if Roomba.Available()>0:
-            bumper_byte, l_counts, r_counts, light_bumper, lb_ll, lb_fl, lb_cl, lb_cr, lb_fr, lb_rr = Roomba.ReadQueryStream(7, 43, 44, 45, 46, 47, 48, 49, 50, 51)
-            print("{0}, {1}, {2:0>8b}, {3:0>8b}, {4}, {5}, {6}, {7}, {8}, {9};"\
+	try:
+		if Roomba.Available()>0:
+			bumper_byte, l_counts, r_counts, light_bumper, lb_ll, lb_fl, lb_cl, lb_cr, lb_fr, lb_rr = Roomba.ReadQueryStream(7, 43, 44, 45, 46, 47, 48, 49, 50, 51)
+			Roomba.UpdatePosition(l_counts, r_counts)
+			print("{0}, {1}, {2:0>8b}, {3:0>8b}, {4}, {5}, {6}, {7}, {8}, {9};"\
                         .format(l_counts, r_counts, bumper_byte, light_bumper, lb_ll, lb_fl, lb_cl, lb_cr, lb_fr, lb_rr))
-            if bumper_byte > 0 and state == 0:
-                state = 1
-                base = time.time()
-            if bumper_byte == 0:
-                Roomba.Move(100,0)
-            if state == 1:
-                Roomba.Move(-100,0)
-                if time.time() - base > 10:
-                    break 
-    except KeyboardInterrupt:
-        break
+			if bumper_byte > 0 and state == 0:
+				state = 1
+				base = time.time()
+			if bumper_byte == 0:
+				Roomba.Move(100,0)
+			if state == 1:
+				Roomba.Move(-100,0)
+				if time.time() - base > 10:
+					break 
+	except KeyboardInterrupt:
+		break
 Roomba.Move(0,0) # Stop moving
 Roomba.PauseQueryStream() # End Roomba Query Stream
 if Roomba.Available()>0: # If data exists in Query Stream...
