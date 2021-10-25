@@ -15,7 +15,7 @@ import math
 import heapq
 
 ## Variables and Constants ##
-file_create = True # Boolean to set for creation of data file
+file_create = False # Boolean to set for creation of data file
 manual_input = True # Boolean to set manual input of points to explore
 # LED pin numbers
 yled = 5
