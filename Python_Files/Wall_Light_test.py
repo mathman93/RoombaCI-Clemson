@@ -125,7 +125,7 @@ while True:
 			bumper_byte, l_counts, r_counts, light_bumper, lb_ll, lb_fl, lb_cl, lb_cr, lb_fr, lb_rr = Roomba.ReadQueryStream(7, 43, 44, 45, 46, 47, 48, 49, 50, 51)
 			Roomba.UpdatePosition(l_counts, r_counts)
 			
-			print("{0}, {1}, {2:0>8b}, {3:0>8b}, {4}, {5}, {6}, {7}, {8}, {9}; Position: X:{10} Y:{11} Head:{12}"\
+			print("{0}, {1}, {2:0>8b}, {3:0>8b}, {4}, {5}, {6}, {7}, {8}, {9}; Position: X:{10:.2f} Y:{11:.2f} Head:{12:.2f}"\
                         .format(l_counts, r_counts, bumper_byte, light_bumper, lb_ll, lb_fl, lb_cl, lb_cr, lb_fr, lb_rr, Roomba.X_position, Roomba.Y_position, Roomba.heading))
 			if bumper_byte > 0 and state == 0:
 				state = 1
