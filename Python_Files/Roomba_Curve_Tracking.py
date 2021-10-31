@@ -6,16 +6,7 @@ import RoombaCI_lib
 import os.path
 import math
 import heapq
-r = 350
-''' Predicts the future point that the roomba will be at'''
-def futurePoint(velocity,pos):
-	# velocity = [speed,angle]
-	time = (235/2)/velocity[0]
-	xpos = pos[0] + velocity[0] * math.cos(velocity[1]) * time
-	ypos = pos[1] + velocity[0] * math.sin(velocity[1]) * time
-	futurePos = [xpos,ypos]
-	return futurePos
-# end futurePoint
+
 
 # Use dot products and unit vector to find distance along path.
 # Calculate target point a certain amount ahead of this distance along the path
@@ -25,18 +16,27 @@ def futurePoint(velocity,pos):
 
 '''Defining a Path'''
 def path():
-
-'''Distance to Path'''
-def distancePath(path,x_pos,y_pos):
-
-'''Distance of future point from path'''
-def distanceFuture(path,x_pos,y_pos):
+	# Give a path
+	return
 
 
+'''Next point to travel towards along path'''
+def moveNext(start,end,position):
 
+	#magpos = math.sqrt((position[0]-start[0])**2+(position[1]-start[1])**2)
+	magend = math.sqrt((end[0]-start[0])**2 + (end[1]-start[1])**2)
+	uend = []
+	uend[0] = end[0]/magend*1.05
+	uend[1] = end[1]/magend*1.05
+	proj = []
+	proj[0] = position[0]*end[0]/magend*uend[0]
+	proj[1] = position[1]*end[1]/magend*uend[1]
+	# find heading based on current heading
+	# ask how what the heading is based on
+	# give speed of turn and speed of roomba based on how far roomba is from heading
+	
 # End futurePoint
-# 	
-# The above code should calculate both the future point and the distance away from the path
+
 
 
 # Psudeo Code
