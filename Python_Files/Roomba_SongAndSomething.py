@@ -105,8 +105,8 @@ is_on = False
 wsp = 1 # added a var. to see if there was a song playing
 timer = time.time() # start timer
 songdict = Song_DictCreate(FullSongList) # create song dictonary
+sn,isp = Roomba.Query(36,37)
 Roomba.StartQueryStream(36,37)  # start of query stream
-
 Song_Write(songdict[i],timestep,tone_mod,i)
 
 # start main loop
