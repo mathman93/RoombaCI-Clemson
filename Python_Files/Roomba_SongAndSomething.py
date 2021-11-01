@@ -35,7 +35,7 @@ def Play_Song(songdict,ts,tm,i,loop=False):
 
 
 # plays the song in sections of 32
-def Song_Write(songlist,ts,tm):
+def Song_Write(songlist,ts,tm,i):
     songlength = int(len(songdict[i])/2) # number of notes in song
     Roomba.DirectWrite(140)
     Roomba.DirectWrite(i % 4)
@@ -107,7 +107,7 @@ timer = time.time() # start timer
 songdict = Song_DictCreate(FullSongList) # create song dictonary
 Roomba.StartQueryStream(36,37)  # start of query stream
 
-Song_Write(songdict[i],timestep,tone_mod)
+Song_Write(songdict[i],timestep,tone_mod,i)
 
 # start main loop
 while True:
@@ -119,7 +119,7 @@ while True:
             print(isp) # Include for debugging
 
             if isp == 1 and wsp == 0:
-                Song_Write(songdict[i],timestep,tone_mod) # wirtes the i'th song segment 
+                Song_Write(songdict[i],timestep,tone_mod,i) # wirtes the i'th song segment 
 
             if isp == 0 and wsp == 1:
                 Play_Song(songdict,timestep,tone_mod,i,True) # plays the i'th song segment
