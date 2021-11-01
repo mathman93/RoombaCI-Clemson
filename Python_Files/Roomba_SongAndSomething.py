@@ -27,22 +27,19 @@ def Song_DictCreate(songlist):
 
 
 def Play_Song(songdict,ts,tm,i,loop=False):
-    songlength = int(len(songdict[i])/2) # number of notes in song
-    # Write the song
-    Roomba.DirectWrite(140)
-    Roomba.DirectWrite(i % 4)
-    Roomba.DirectWrite(songlength)
-    timetotal = Song_Write(songdict[i],ts,tm)
-    # Play the song
     Roomba.DirectWrite(141)
     Roomba.DirectWrite(i % 4)
     print(songdict[i]) # Include for debugging
-    print(timetotal)  #how long the roomba should wait
+    #print(timetotal)  #how long the roomba should wait
 
 
 
 # plays the song in sections of 32
 def Song_Write(songlist,ts,tm):
+    songlength = int(len(songdict[i])/2) # number of notes in song
+    Roomba.DirectWrite(140)
+    Roomba.DirectWrite(i % 4)
+    Roomba.DirectWrite(songlength)
     timetotal = 0
     for i in range(len(songlist)):
         if i % 2 == 0:
@@ -104,36 +101,41 @@ FullSongList = [72,1,74,1,77,1,74,1,81,3,81,3,79,6,72,1,74,1,77,1,74,1,79,3,79,3
 
 # declare vars.
 i = 0
-ison = False
-
+is_on = False
+wsp = 1 # added a var. to see if there was a song playing
 timer = time.time() # start timer
 songdict = Song_DictCreate(FullSongList) # create song dictonary
-#sn,isp = Roomba.Query(36,37)  # get values of song number(sn) and is song playing(isp)
-#print(sn)
-#print(isp) # include for debugging
 Roomba.StartQueryStream(36,37)  # start of query stream
-#sn,isp = Roomba.ReadQueryStream(36,37)  # get values of song number(sn) and is song playing(isp)
+
+Song_Write(songdict[i],timestep,tone_mod)
+
 # start main loop
 while True:
     try:
+        # playing the song segments
         if Roomba.Available() > 0:
             sn,isp = Roomba.ReadQueryStream(36,37)  # if roomba availble, update song number and is song playing
             print(sn)
             print(isp) # Include for debugging
-    
-            if isp == 0:
+
+            if isp == 1 and wsp == 0:
+                Song_Write(songdict[i],timestep,tone_mod) # wirtes the i'th song segment 
+
+            if isp == 0 and wsp == 1:
                 Play_Song(songdict,timestep,tone_mod,i,True) # plays the i'th song segment
                 i = (i+1)%4 # update i
     
+        # blinking the LED
         if (time.time() - timer) > 0.5:
             timer = time.time() # using a timer, every 0.5 seconds a LED will toggle on/off
-            if ison == False:
+            if is_on == False:
                 GPIO.output(gled, GPIO.HIGH) # Turn on green LED
-                ison = True
+                is_on = True
             
-            if ison == True:
+            if is_on == True:
                 GPIO.output(gled, GPIO.LOW) # Turn off green LED
-                ison = False
+                is_on = False
+        wsp = isp
 
     except KeyboardInterrupt: # if you want to end the song early
         break
