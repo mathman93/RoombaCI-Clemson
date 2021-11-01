@@ -119,11 +119,11 @@ while True:
             print(isp) # Include for debugging
 
             if isp == 1 and wsp == 0:
+                i = (i+1)%4 # update i
                 Song_Write(songdict[i],timestep,tone_mod,i) # wirtes the i'th song segment 
 
-            if isp == 0 and wsp == 1:
+            if isp == 0:
                 Play_Song(songdict,timestep,tone_mod,i,True) # plays the i'th song segment
-                i = (i+1)%4 # update i
     
         # blinking the LED
         if (time.time() - timer) > 0.5:
