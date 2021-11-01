@@ -26,11 +26,9 @@ def Song_DictCreate(songlist):
     return songdict
 
 
-def Play_Song(songdict,ts,tm,i,loop=False):
+def Play_Song(i):
     Roomba.DirectWrite(141)
     Roomba.DirectWrite(i % 4)
-    print(songdict[i]) # Include for debugging
-    #print(timetotal)  #how long the roomba should wait
 
 
 
@@ -94,10 +92,10 @@ FullSongList = [72,2,rest,1,74,2,79,1,81,2,rest,1,79,2,rest,1,84,2,rest,1,83,2,7
                 72,2,rest,1,74,2,79,1,81,2,rest,1,79,2,rest,1,88,2,rest,1,86,2,84,1,81,2,rest,4,\
                 81,2,rest,1,83,2,84,1,84,2,79,1,76,2,72,1,78,2,rest,1,77,2,rest,1,76,2,rest,4]
 
-FullSongList = [72,1,74,1,77,1,74,1,81,3,81,3,79,6,72,1,74,1,77,1,74,1,79,3,79,3,77,2,76,1,74,3,\
+'''FullSongList = [72,1,74,1,77,1,74,1,81,3,81,3,79,6,72,1,74,1,77,1,74,1,79,3,79,3,77,2,76,1,74,3,\
                 74,1,74,1,77,1,74,1,77,4,79,2,76,3,74,1,72,4,72,2,79,4,77,6,rest,2,\
                 72,1,74,1,77,1,74,1,81,3,81,3,79,6,72,1,74,1,77,1,74,1,84,4,76,2,77,3,76,1,74,2,\
-                74,1,74,1,77,1,74,1,77,4,79,2,76,3,74,1,72,4,72,2,79,4,77,7,rest,1] # A rick roll
+                74,1,74,1,77,1,74,1,77,4,79,2,76,3,74,1,72,4,72,2,79,4,77,7,rest,1] # A rick roll'''
 
 # declare vars.
 i = 0
@@ -123,12 +121,13 @@ while True:
                 Song_Write(songdict[i],timestep,tone_mod,i) # wirtes the i'th song segment 
 
             if isp == 0:
-                Play_Song(songdict,timestep,tone_mod,i,True) # plays the i'th song segment
+                Play_Song(i) # plays the i'th song segment
+                print(songdict[i]) # Include for debugging
     
         # blinking the LED
         if (time.time() - timer) > 0.5:
             timer = time.time() # using a timer, every 0.5 seconds a LED will toggle on/off
-            print(is_on)
+            #print(is_on)
 
             if is_on:
                 GPIO.output(gled, GPIO.LOW) # Turn off green LED
@@ -136,7 +135,7 @@ while True:
             else:
                 GPIO.output(gled, GPIO.HIGH) # Turn on green LED
                 is_on = True
-                
+
         wsp = isp
 
     except KeyboardInterrupt: # if you want to end the song early
