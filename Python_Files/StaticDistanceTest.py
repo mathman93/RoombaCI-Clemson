@@ -37,6 +37,17 @@ def DisplayDateTime():
 GPIO.setmode(GPIO.BCM) # Use BCM pin numbering for GPIO
 DisplayDateTime() # Display current date and time
 
+ack = input("Do you want to save data to a file (y/n)? ") # user acknowledgement
+if ack in ["y", "Y"]: # If positive
+	file_create = True # create and save data to file
+	file_name_input = input("Name for data file: ") # Ask user for desired file name
+	dir_path = "/home/pi/RoombaCI-Clemson/Data_Files/2021_Fall/" # Directory path to save file
+	file_name = os.path.join(dir_path, file_name_input+".txt") # text file extension
+	datafile = open(file_name, "w") # Open a text file for storing data
+		# Will overwrite anything that was in the text file previously
+else: # otherwise
+	file_create = False # Skip data creation
+# End if
 
 # LED Pin setup
 GPIO.setup(yled, GPIO.OUT, initial=GPIO.LOW)
@@ -111,6 +122,8 @@ while True:
 			frDist =((1123-593)/(3609-9)) * lb_fr
 			outString = "{0}, {1}, {2}, {3}, {4}, {5}, {6:.2f}".format( lb_ll, lb_fl, lb_cl, lb_cr, lb_fr, lb_rr, frDist)
 			print(outString)
+			if file_create: 
+				datafile.write(outString+"\n")
 	except KeyboardInterrupt:
 		break
 #Roomba.Move(0,0) # Stop moving
@@ -120,7 +133,8 @@ if Roomba.Available()>0: # If data exists in Query Stream...
 	print(z) # Include for debugging
 # End if Roomba.Available()
 # End if file_create
-
+if file_create == True:
+	datafile.close()
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
 Roomba.ShutDown() # Shutdown Roomba serial connection
