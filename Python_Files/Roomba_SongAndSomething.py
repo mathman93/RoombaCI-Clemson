@@ -115,8 +115,8 @@ while True:
         # playing the song segments
         if Roomba.Available() > 0:
             sn,isp = Roomba.ReadQueryStream(36,37)  # if roomba availble, update song number and is song playing
-            print(sn)
-            print(isp) # Include for debugging
+            #print(sn)
+            #print(isp) # Include for debugging
 
             if isp == 1 and wsp == 0:
                 i = (i+1)%4 # update i
@@ -129,10 +129,12 @@ while True:
         if (time.time() - timer) > 0.5:
             timer = time.time() # using a timer, every 0.5 seconds a LED will toggle on/off
             if is_on == False:
+                print(is_on)
                 GPIO.output(gled, GPIO.HIGH) # Turn on green LED
                 is_on = True
-            
+
             if is_on == True:
+                print(is_on)
                 GPIO.output(gled, GPIO.LOW) # Turn off green LED
                 is_on = False
         wsp = isp
