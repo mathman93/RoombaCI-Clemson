@@ -135,6 +135,7 @@ if Roomba.Available()>0: # If data exists in Query Stream...
 # End if file_create
 if file_create == True:
 	datafile.close()
+	print("File saved")
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
 Roomba.ShutDown() # Shutdown Roomba serial connection
