@@ -101,7 +101,7 @@ FullSongList = [72,1,74,1,77,1,74,1,81,3,81,3,79,6,72,1,74,1,77,1,74,1,79,3,79,3
 
 # declare vars.
 i = 0
-is_on = True
+is_on = False
 wsp = 1 # added a var. to see if there was a song playing
 timer = time.time() # start timer
 songdict = Song_DictCreate(FullSongList) # create song dictonary
@@ -130,13 +130,13 @@ while True:
             timer = time.time() # using a timer, every 0.5 seconds a LED will toggle on/off
             print(is_on)
 
-            if not is_on:
-                GPIO.output(gled, GPIO.HIGH) # Turn on green LED
-                is_on = True
-
             if is_on:
                 GPIO.output(gled, GPIO.LOW) # Turn off green LED
                 is_on = False
+            else:
+                GPIO.output(gled, GPIO.HIGH) # Turn on green LED
+                is_on = True
+                
         wsp = isp
 
     except KeyboardInterrupt: # if you want to end the song early
