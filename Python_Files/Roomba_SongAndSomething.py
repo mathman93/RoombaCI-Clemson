@@ -26,23 +26,18 @@ def Song_DictCreate(songlist):
     return songdict
 
 
-def Play_Song(songdict,ts,tm,i,loop=False):
-    songlength = int(len(songdict[i])/2) # number of notes in song
-    # Write the song
-    Roomba.DirectWrite(140)
-    Roomba.DirectWrite(i % 4)
-    Roomba.DirectWrite(songlength)
-    timetotal = Song_Write(songdict[i],ts,tm)
-    # Play the song
+def Play_Song(i):
     Roomba.DirectWrite(141)
     Roomba.DirectWrite(i % 4)
-    print(songdict[i]) # Include for debugging
-    print(timetotal)  #how long the roomba should wait
 
 
 
 # plays the song in sections of 32
-def Song_Write(songlist,ts,tm):
+def Song_Write(songlist,ts,tm,i):
+    songlength = int(len(songdict[i])/2) # number of notes in song
+    Roomba.DirectWrite(140)
+    Roomba.DirectWrite(i % 4)
+    Roomba.DirectWrite(songlength)
     timetotal = 0
     for i in range(len(songlist)):
         if i % 2 == 0:
@@ -97,43 +92,51 @@ FullSongList = [72,2,rest,1,74,2,79,1,81,2,rest,1,79,2,rest,1,84,2,rest,1,83,2,7
                 72,2,rest,1,74,2,79,1,81,2,rest,1,79,2,rest,1,88,2,rest,1,86,2,84,1,81,2,rest,4,\
                 81,2,rest,1,83,2,84,1,84,2,79,1,76,2,72,1,78,2,rest,1,77,2,rest,1,76,2,rest,4]
 
-FullSongList = [72,1,74,1,77,1,74,1,81,3,81,3,79,6,72,1,74,1,77,1,74,1,79,3,79,3,77,2,76,1,74,3,\
+'''FullSongList = [72,1,74,1,77,1,74,1,81,3,81,3,79,6,72,1,74,1,77,1,74,1,79,3,79,3,77,2,76,1,74,3,\
                 74,1,74,1,77,1,74,1,77,4,79,2,76,3,74,1,72,4,72,2,79,4,77,6,rest,2,\
                 72,1,74,1,77,1,74,1,81,3,81,3,79,6,72,1,74,1,77,1,74,1,84,4,76,2,77,3,76,1,74,2,\
-                74,1,74,1,77,1,74,1,77,4,79,2,76,3,74,1,72,4,72,2,79,4,77,7,rest,1] # A rick roll
+                74,1,74,1,77,1,74,1,77,4,79,2,76,3,74,1,72,4,72,2,79,4,77,7,rest,1] # A rick roll'''
 
 # declare vars.
 i = 0
-ison = False
-
+is_on = False
+wsp = 1 # added a var. to see if there was a song playing
 timer = time.time() # start timer
 songdict = Song_DictCreate(FullSongList) # create song dictonary
-#sn,isp = Roomba.Query(36,37)  # get values of song number(sn) and is song playing(isp)
-#print(sn)
-#print(isp) # include for debugging
+sn,isp = Roomba.Query(36,37)
 Roomba.StartQueryStream(36,37)  # start of query stream
-#sn,isp = Roomba.ReadQueryStream(36,37)  # get values of song number(sn) and is song playing(isp)
+Song_Write(songdict[i],timestep,tone_mod,i)
+
 # start main loop
 while True:
     try:
+        # playing the song segments
         if Roomba.Available() > 0:
             sn,isp = Roomba.ReadQueryStream(36,37)  # if roomba availble, update song number and is song playing
-            print(sn)
-            print(isp) # Include for debugging
-    
-            if isp == 0:
-                Play_Song(songdict,timestep,tone_mod,i,True) # plays the i'th song segment
+            #print(sn)
+            #print(isp) # Include for debugging
+
+            if isp == 1 and wsp == 0:
                 i = (i+1)%4 # update i
+                Song_Write(songdict[i],timestep,tone_mod,i) # wirtes the i'th song segment 
+
+            if isp == 0:
+                Play_Song(i) # plays the i'th song segment
+                print(songdict[i]) # Include for debugging
     
+        # blinking the LED
         if (time.time() - timer) > 0.5:
             timer = time.time() # using a timer, every 0.5 seconds a LED will toggle on/off
-            if ison == False:
-                GPIO.output(gled, GPIO.HIGH) # Turn on green LED
-                ison = True
-            
-            if ison == True:
+            #print(is_on)
+
+            if is_on:
                 GPIO.output(gled, GPIO.LOW) # Turn off green LED
-                ison = False
+                is_on = False
+            else:
+                GPIO.output(gled, GPIO.HIGH) # Turn on green LED
+                is_on = True
+
+        wsp = isp
 
     except KeyboardInterrupt: # if you want to end the song early
         break
