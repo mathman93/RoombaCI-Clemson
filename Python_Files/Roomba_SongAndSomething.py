@@ -129,11 +129,11 @@ while True:
         if (time.time() - timer) > 0.5:
             timer = time.time() # using a timer, every 0.5 seconds a LED will toggle on/off
             print(is_on)
-            if is_on == False:
+            if is_on is False:
                 GPIO.output(gled, GPIO.HIGH) # Turn on green LED
                 is_on = True
 
-            if is_on == True:
+            if is_on is True:
                 GPIO.output(gled, GPIO.LOW) # Turn off green LED
                 is_on = False
         wsp = isp
