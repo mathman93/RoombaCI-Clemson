@@ -109,7 +109,7 @@ while True:
 			lb_ll, lb_fl, lb_cl, lb_cr, lb_fr, lb_rr = Roomba.ReadQueryStream( 46, 47, 48, 49, 50, 51)
 			#Roomba.UpdatePosition(l_counts, r_counts)
 			frDist = ((1123-596)/(3609-9)) * lb_fr
-			outString = "{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7:.2f}".format( lb_ll, lb_fl, lb_cl, lb_cr, lb_fr, lb_rr, frDist)
+			outString = "{0}, {1}, {2}, {3}, {4}, {5}, {6:.2f}".format( lb_ll, lb_fl, lb_cl, lb_cr, lb_fr, lb_rr, frDist)
 			print(outString)
 			if time.time() - base > 10:
 				break 
