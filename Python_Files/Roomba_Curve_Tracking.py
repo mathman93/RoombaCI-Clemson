@@ -58,13 +58,12 @@ def seek(start, end, position):
 	return next
 # end of seek
 
-def heading(next,position):
+def heading(next,position,roombah):
 	# Roomba heading = Roomba.heading
 	# Calculate heading for roomba
 	magnext = math.sqrt((next[0]-position[0])**2+(next[1]-position[1])**2)
-	theta_1 = math.acos(next[0]/magnext)
-	theta = Roomba.heading
-	return theta_1-theta
+	theta = math.acos(next[0]/magnext)
+	return theta-roombah
 
 def moveSpeed(theta):
 	theta_turn = math.sin(theta)
@@ -153,38 +152,36 @@ GPIO.output(gled, GPIO.LOW) # Indicate all set sequences are complete
 
 # Main Code #
 
+# initialize the new and old path
+points = [(1000,0),(1000,1000)]
+nextpoint = (1000,1000)
+currentpoint = (0,0)
+
 # Get the initial wheel enocder values
-[left_encoder, right_encoder] = Roomba.Query(43,44)
+Roomba.StartQueryStream(43,44)
+[left_encoder, right_encoder] = Roomba.ReadQueryStream(43,44)
 Roomba.SetWheelEncoderCounts(left_encoder,right_encoder)
 
-# initialize the new and old path
-newpath = ()
-oldpath = ()
 while True:
-	# if this is the first path, set old path to (0,0)
-	if newpath == ():
-		oldpath = (0,0)
-	else:
-		oldpath = newpath
-	# get the new path
-	newpath = path()
 	if Roomba.Available() > 0:
+		[left_encoder,right_encoder] = Roomba.ReadQueryStream(43,44)
 		# update position
 		Roomba.UpdatePosition(left_encoder,right_encoder)
 		xpos = Roomba.X_position
 		ypos = Roomba.Y_position
 		# find seek point
-		seekPoint = seek(oldpath,newpath(xpos,ypos))
+		seekPoint = seek(currentpoint,nextpoint,(xpos,ypos))
 		# check if next point is past end point
 		# if it is go to end point instead
 		# if distance(seekpoint) > distance(end point)
 		# heading(newpath,(xpos,ypos))
 		# else do below
 		# find heading
-		theta = heading(seekPoint,(xpos,ypos))
+		theta = heading(seekPoint,(xpos,ypos),Roomba.heading)
 		# find movement speeds
 		[fspeed,tspeed] = moveSpeed(theta)
 		# give the roomba these speeds
+		Roomba.Move(fspeed,tspeed)
 		
 # Psudeo Code
 # user gives input of a path
