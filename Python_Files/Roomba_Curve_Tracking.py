@@ -150,41 +150,46 @@ if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 # End if Xbee.inWaiting()
 GPIO.output(gled, GPIO.LOW) # Indicate all set sequences are complete
 
-# Main Code #
+# Main Code ##
 
 # initialize the new and old path
-pathpoints = [(0,0),(1000,0),(1000,1000)]
-nextpoint = pathpoints[1]
-currentpoint = pathpoints[0]
-
+# pathpoints = [(0,0),(1000,0),(1000,1000)]
+prev = (0,0)
+nextpoint = (1000,1000)
 # Get the initial wheel enocder values
-Roomba.StartQueryStream(43,44)
-[left_encoder, right_encoder] = Roomba.ReadQueryStream(43,44)
+[left_encoder, right_encoder] = Roomba.Query(43,44)
 Roomba.SetWheelEncoderCounts(left_encoder,right_encoder)
 
+#for i in range(len(pathpoints)-1):
+#	nextpoint = pathpoints[i+1]
+#	prev = pathpoints[i]
+Roomba.StartQueryStream(43,44)
 while True:
-	if Roomba.Available() > 0:
-		[left_encoder,right_encoder] = Roomba.ReadQueryStream(43,44)
-		# update position
-		Roomba.UpdatePosition(left_encoder,right_encoder)
-		xpos = Roomba.X_position
-		ypos = Roomba.Y_position
-		# find seek point
-		seekPoint = seek(currentpoint,nextpoint,(xpos,ypos))
-		# check if next point is past end point
-		# seek distance
-		dseek = math.sqrt((seekPoint[0]-currentpoint[0])**2+(seekPoint[1]-currentpoint[1])**2)
-		# end distance
-		dend = math.sqrt((nextpoint[0]-currentpoint[0])**2+(nextpoint[1]-currentpoint[1])**2)
-		# if it is go to end point instead
-		if dseek > dend:
-			theta = heading(nextpoint,(xpos,ypos))
-		else:
-			theta = heading(seekPoint,(xpos,ypos),Roomba.heading)
-		# find movement speeds
-		[fspeed,tspeed] = moveSpeed(theta)
-		# give the roomba these speeds
-		Roomba.Move(fspeed,tspeed)
+	try:
+		if Roomba.Available() > 0:
+			[left_encoder,right_encoder] = Roomba.ReadQueryStream(43,44)
+			# update position
+			Roomba.UpdatePosition(left_encoder,right_encoder)
+			xpos = Roomba.X_position
+			ypos = Roomba.Y_position
+			# find seek point
+			seekPoint = seek(prev,nextpoint,(xpos,ypos))
+			# check if next point is past end point
+			# seek distance
+			dseek = math.sqrt((seekPoint[0]-prev[0])**2+(seekPoint[1]-prev[1])**2)
+			# end distance
+			dend = math.sqrt((nextpoint[0]-prev[0])**2+(nextpoint[1]-prev[1])**2)
+			# if it is go to end point instead
+			if dseek > dend:
+				theta = heading(nextpoint,(xpos,ypos))
+			else:
+				theta = heading(seekPoint,(xpos,ypos),Roomba.heading)
+			# find movement speeds
+			[fspeed,tspeed] = moveSpeed(theta)
+			# give the roomba these speeds
+			Roomba.Move(fspeed,tspeed)
+	except KeyboardInterrupt:
+		break
 		
 
 Roomba.ShutDown() # Shutdown Roomba serial connection
