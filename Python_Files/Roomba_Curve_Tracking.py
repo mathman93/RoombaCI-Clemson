@@ -181,7 +181,7 @@ while True:
 			dend = math.sqrt((nextpoint[0]-prev[0])**2+(nextpoint[1]-prev[1])**2)
 			# if it is go to end point instead
 			if dseek > dend:
-				theta = heading(nextpoint,(xpos,ypos))
+				theta = heading(nextpoint,(xpos,ypos),Roomba.heading)
 			else:
 				theta = heading(seekPoint,(xpos,ypos),Roomba.heading)
 			# find movement speeds
