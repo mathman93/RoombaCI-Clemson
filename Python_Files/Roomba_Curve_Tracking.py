@@ -57,9 +57,10 @@ def seek(start, end, position):
 
 def heading(next,position,roombah):
 	# Roomba heading = Roomba.heading
-	# Calculate heading for roomba
-	magnext = math.sqrt((next[0]-position[0])**2+(next[1]-position[1])**2)
-	theta = math.acos(next[0]/magnext)
+	# Calculate heading for roomb
+	y = next[1] - position[1]
+	x = next[0] - position[0]
+	theta = math.atan2(y,x)
 	return theta-roombah
 
 def moveSpeed(theta):
