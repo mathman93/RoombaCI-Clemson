@@ -63,7 +63,7 @@ def heading(next,position,roombah):
 	x = next[0] - position[0]
 	theta = math.atan2(y,x)
 	rh = (((theta-roombah) + math.pi) % 2*math.pi) - math.pi
-	return theta-rh
+	return rh
 
 def moveSpeed(theta):
 	theta_turn = math.sin(theta)
@@ -191,6 +191,7 @@ while True:
 				theta = heading(nextpoint,(xpos,ypos),Roomba.heading)
 			else:
 				theta = heading(seekPoint,(xpos,ypos),Roomba.heading)
+			print(theta)
 			# find movement speeds
 			[fspeed,tspeed] = moveSpeed(theta)
 			# give the roomba these speeds
