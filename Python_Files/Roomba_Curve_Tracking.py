@@ -78,10 +78,10 @@ def moveSpeed(theta):
 		forwardspeed = 0
 	# turn somewhat fast and move forward slightly
 	elif(theta_sb < .5):
-		forwardspeed = 20
-	# still needs to turn a bit and but can also start moving
-	elif(theta_sb < .97):
 		forwardspeed = 30
+	# still needs to turn a bit and but can also start moving
+	elif(theta_sb < .90):
+		forwardspeed = 60
 	# pretty much in line and only needs to move forward
 	else:
 		forwardspeed = 100
@@ -198,7 +198,7 @@ while True:
 	except KeyboardInterrupt:
 		break
 		
-
+Roomba.Move(0,0)
 Roomba.ShutDown() # Shutdown Roomba serial connection
 Xbee.close()
 GPIO.cleanup() # Reset GPIO pins for next program
