@@ -1,4 +1,5 @@
 ## Import libraries ##
+from os import supports_follow_symlinks
 import serial
 import time
 import RPi.GPIO as GPIO
@@ -61,32 +62,40 @@ def heading(next,position,roombah):
 	y = next[1] - position[1]
 	x = next[0] - position[0]
 	theta = math.atan2(y,x)
-	return theta-roombah
+	rh = (((theta-roombah) + math.pi) % 2*math.pi) - math.pi
+	return theta-rh
 
 def moveSpeed(theta):
 	theta_turn = math.sin(theta)
 	# do we want to turn left or right
+	t_dir = -1
 	if(theta_turn > 0.05):
 		t_dir = 1
-	elif(theta_turn < 0.05):
-		t_dir = -1
 	# used to find if roomba is going to turn before or while roomba is moving
 	theta_sb = math.cos(theta)
 	# turn fast and don't move forward
 	if(theta_sb < 0):
 		forwardspeed = 0
-		spinspeed = 100
 	# turn somewhat fast and move forward slightly
 	elif(theta_sb < .5):
 		forwardspeed = 20
-		spinspeed = 80
 	# still needs to turn a bit and but can also start moving
 	elif(theta_sb < .97):
 		forwardspeed = 30
-		spinspeed = 60
 	# pretty much in line and only needs to move forward
 	else:
 		forwardspeed = 100
+	
+	# use theta to determine the spin speed
+	if abs(theta) > math.pi/2:
+		spinspeed = 100
+	elif abs(theta) > math.pi/4:
+		spinspeed = 50
+	elif abs(theta) > math.pi/12:
+		spinspeed = 25
+	elif abs(theta) > 0.05:
+		spinspeed = 20
+	else:
 		spinspeed = 0
 	moveList = [forwardspeed,spinspeed*t_dir]
 	return moveList
