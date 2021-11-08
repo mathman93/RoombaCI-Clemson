@@ -162,7 +162,7 @@ GPIO.output(gled, GPIO.LOW) # Indicate all set sequences are complete
 # initialize the new and old path
 # pathpoints = [(0,0),(1000,0),(1000,1000)]
 prev = (0,0)
-nextpoint = (1000,1000)
+nextpoint = (-1000,-1000)
 # Get the initial wheel enocder values
 [left_encoder, right_encoder] = Roomba.Query(43,44)
 Roomba.SetWheelEncoderCounts(left_encoder,right_encoder)
