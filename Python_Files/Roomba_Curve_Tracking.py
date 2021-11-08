@@ -31,29 +31,27 @@ def path():
 def seek(start, end, position):
 	# calculates path vector
 	pathV = []
-	pathV[0] = end[0]-start[0]
-	pathV[1] = end[1]-start[1]
+	pathV.append(end[0]-start[0])
+	pathV.append(end[1]-start[1])
 	# calculates roomba vector
 	roombaV = []
-	roombaV[0] = position[0]-start[0]
-	roombaV[0] = position[1]-start[1]
+	roombaV.append(position[0]-start[0])
+	roombaV.append(position[1]-start[1])
 	# magnitude of the path vector
 	magpath = math.sqrt(pathV[0]**2 + pathV[1]**2)
 	# unit vector of the path
 	upath = []
-	upath[0] = pathV[0]/magpath
-	upath[1] = pathV[1]/magpath
+	upath.append(pathV[0]/magpath)
+	upath.append(pathV[1]/magpath)
 	# dot product calculation
 	dotp = roombaV[0]*pathV[0]+roombaV[1]*pathV[1]
 	# calculates projection to closest point on line
 	proj = []
-	proj[0] = dotp*pathV[0]/(magpath**2)
-	proj[1] = dotp*pathV[1]/(magpath**2)
+	proj.append(dotp*pathV[0]/(magpath**2))
+	proj.append(dotp*pathV[1]/(magpath**2))
 	# calculates next seek point based on projection
-	next = ()
-	next[0] = proj[0] + upath[0]*50
-	next[1] = proj[1] + upath[1]*50
-	# returns the seek point x and y in a list
+	next = (proj[0]+upath[0]*50,proj[1] + upath[1]*50)
+	# returns the seek point x and y in a tuple
 	return next
 # end of seek
 
