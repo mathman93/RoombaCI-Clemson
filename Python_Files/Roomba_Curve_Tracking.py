@@ -1,4 +1,5 @@
 ## Import libraries ##
+from Python_Files.MapAndMove import Roomba
 import serial
 import time
 import RPi.GPIO as GPIO
@@ -16,14 +17,12 @@ import heapq
 
 '''Defining a Path'''
 def path():
-	# Give a path
-	return
+	# ask for input of a path
+	return # return the path
 
 
 '''Next point to travel towards along path'''
-def moveNext(start,end,position):
-
-	# magpos = math.sqrt((position[0]-start[0])**2+(position[1]-start[1])**2)
+def seek(start, end, position):
 	# calculates path vector
 	pathV = []
 	pathV[0] = end[0]-start[0]
@@ -48,40 +47,80 @@ def moveNext(start,end,position):
 	next = []
 	next[0] = proj[0]*1.05
 	next[1] = proj[1]*1.05
+	# returns the seek point x and y in a list
+	return next
+# end of seek
+
+def heading(next,position):
 	# Roomba heading = Roomba.heading
 	# Calculate heading for roomba
 	magnext = math.sqrt((next[0]-position[0])**2+(next[1]-position[1])**2)
 	theta_1 = math.acos(next[0]/magnext)
 	theta = Roomba.heading
-	theta_turn = math.sin(theta_1-theta)
+	return theta_1-theta
+
+def moveSpeed(theta):
+	theta_turn = math.sin(theta)
 	# do we want to turn left or right
 	if(theta_turn > 0.05):
 		t_dir = 1
 	elif(theta_turn < 0.05):
 		t_dir = -1
 	# used to find if roomba is going to turn before or while roomba is moving
-	theta_sb = math.cos(theta_1-theta)
-	# turn fast and move forward slow
-	if(math.pi*-7/12 < theta_sb < math.pi*5/12):
-		forwardspeed = 20
-		spinspeed = 60
-	# turn medium and move forward medium
-	elif(math.pi*-3/12 < theta_sb < math.pi*3/12):
-		forwardspeed = 40
-		spinspeed = 20
-	# do not need to turn and move forward only
-	elif(math.pi/48 < theta_sb < math.pi/48):
-		forwardspeed = 100
-	# angle is too far away and need to turn before moving
-	else:
+	theta_sb = math.cos(theta)
+	# turn fast and don't move forward
+	if(theta_sb < 0):
+		forwardspeed = 0
 		spinspeed = 100
+	# turn somewhat fast and move forward slightly
+	elif(theta_sb < .5):
+		forwardspeed = 20
+		spinspeed = 80
+	# still needs to turn a bit and but can also start moving
+	elif(theta_sb < .97):
+		forwardspeed = 30
+		spinspeed = 60
+	# pretty much in line and only needs to move forward
+	else:
+		forwardspeed = 100
+		spinspeed = 0
 	moveList = [forwardspeed,spinspeed*t_dir]
 	return moveList
-	
-# End futurePoint
+# End moveSpeed
 
+# Get the initial wheel enocder values
+[left_encoder, right_encoder] = Roomba.Query(43,44)
+Roomba.SetWheelEncoderCounts(left_encoder,right_encoder)
 
-
+# initialize the new and old path
+newpath = ()
+oldpath = ()
+while True:
+	# if this is the first path, set old path to (0,0)
+	if newpath == ():
+		oldpath = (0,0)
+	else:
+		oldpath = newpath
+	# get the new path
+	newpath = path()
+	if Roomba.Available() > 0:
+		# update position
+		Roomba.UpdatePosition(left_encoder,right_encoder)
+		xpos = Roomba.X_position
+		ypos = Roomba.Y_position
+		# find seek point
+		seekPoint = seek(oldpath,newpath(xpos,ypos))
+		# check if next point is past end point
+		# if it is go to end point instead
+		# if distance(seekpoint) > distance(end point)
+		# heading(newpath,(xpos,ypos))
+		# else do below
+		# find heading
+		theta = heading(seekPoint,(xpos,ypos))
+		# find movement speeds
+		[fspeed,tspeed] = moveSpeed(theta)
+		# give the roomba these speeds
+		
 # Psudeo Code
 # user gives input of a path
 # Roomba finds where it is in relation to path and the final point on the path
