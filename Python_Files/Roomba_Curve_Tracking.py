@@ -199,7 +199,12 @@ while True:
 	except KeyboardInterrupt:
 		break
 		
-Roomba.Move(0,0)
+Roomba.Move(0,0) # Stop Roomba movement
+Roomba.PauseQueryStream()
+if Roomba.Available() > 0:
+	z = Roomba.DirectRead(Roomba.Available())
+	#print(z) # Include for debugging
+# End if Roomba.Available
 Roomba.ShutDown() # Shutdown Roomba serial connection
 Xbee.close()
 GPIO.cleanup() # Reset GPIO pins for next program
