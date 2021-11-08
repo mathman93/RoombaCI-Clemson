@@ -1,5 +1,4 @@
 ## Import libraries ##
-from Python_Files.MapAndMove import Roomba
 import serial
 import time
 import RPi.GPIO as GPIO
