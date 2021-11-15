@@ -62,6 +62,7 @@ def seek(start, end, position):
 	print(upath)
 	print(dotp)
 	print(proj)
+	print(close)
 	print(next)
 	print("end")
 	return next
