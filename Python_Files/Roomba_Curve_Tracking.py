@@ -163,7 +163,7 @@ GPIO.output(gled, GPIO.LOW) # Indicate all set sequences are complete
 # Main Code ##
 
 # initialize the new and old path
-pathpoints = [(1000,500),(500,1000)]
+pathpoints = [(1000,500),(500,1000),(0,-2000)]
 #prev = (-1000,1000)
 #nextpoint = (-1000,-1000)
 # Get the initial wheel enocder values
