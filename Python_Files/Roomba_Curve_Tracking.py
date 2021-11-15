@@ -201,6 +201,8 @@ while True:
 			else:
 				theta = heading(seekPoint,(xpos,ypos),Roomba.heading)
 			# find movement speeds
+			print("while loop theta")
+			print(theta)
 			[fspeed,tspeed] = moveSpeed(theta)
 			# give the roomba these speeds
 			Roomba.Move(fspeed,tspeed)
