@@ -53,6 +53,11 @@ def seek(start, end, position):
 	# calculates next seek point based on projection
 	next = (proj[0]+upath[0]*50,proj[1] + upath[1]*50)
 	# returns the seek point x and y in a tuple
+	print(pathV)
+	print(roombaV)
+	print(upath)
+	print(proj)
+	print("end")
 	return next
 # end of seek
 
@@ -189,7 +194,6 @@ while True:
 					break
 			# find seek point
 			seekPoint = seek(prev,nextpoint,(xpos,ypos))
-			print(seekPoint)
 			# check if next point is past end point
 			# seek distance
 			dseek = math.sqrt((seekPoint[0]-prev[0])**2+(seekPoint[1]-prev[1])**2)
@@ -200,7 +204,6 @@ while True:
 				theta = heading(nextpoint,(xpos,ypos),Roomba.heading)
 			else:
 				theta = heading(seekPoint,(xpos,ypos),Roomba.heading)
-			print(theta)
 			# find movement speeds
 			[fspeed,tspeed] = moveSpeed(theta)
 			# give the roomba these speeds
