@@ -172,6 +172,7 @@ Roomba.SetWheelEncoderCounts(left_encoder,right_encoder)
 
 for i in range(len(pathpoints)-1):
 	nextpoint = pathpoints[i]
+	print(nextpoint)
 	if i == 0:
 		prev = (0,0)
 	else:
