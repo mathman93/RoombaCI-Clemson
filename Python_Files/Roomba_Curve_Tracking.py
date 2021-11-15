@@ -188,8 +188,8 @@ for i in range(len(pathpoints)-1):
 				if xpos/nextpoint[0] > .99:
 					if ypos/nextpoint[1] > .99:
 						print("Finished with point.\n")
-						#if i == len(pathpoints)-1:
-						#	print("Finished with path.\n")
+						if i == len(pathpoints)-1:
+							print("Finished with path.\n")
 						break
 				# find seek point
 				seekPoint = seek(prev,nextpoint,(xpos,ypos))
