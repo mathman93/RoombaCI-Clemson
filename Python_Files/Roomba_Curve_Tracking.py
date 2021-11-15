@@ -187,6 +187,7 @@ for i in range(len(pathpoints)):
 				Roomba.UpdatePosition(left_encoder,right_encoder)
 				xpos = Roomba.X_position
 				ypos = Roomba.Y_position
+				# changes to next point in the list or finishes the path
 				if xpos/nextpoint[0] > .99:
 					if ypos/nextpoint[1] > .99:
 						print("Finished with point.\n")
