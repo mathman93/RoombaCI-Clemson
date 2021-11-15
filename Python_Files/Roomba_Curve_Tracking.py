@@ -63,7 +63,7 @@ def heading(next,position,roombah):
 	x = next[0] - position[0]
 	theta = math.atan2(y,x)
 	print(theta)
-	rh = (((theta-roombah) + math.pi) % 2*math.pi) - math.pi
+	rh = (((theta-roombah) + math.pi) % (2*math.pi)) - math.pi
 	return rh
 
 def moveSpeed(theta):
