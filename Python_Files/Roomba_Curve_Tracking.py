@@ -188,8 +188,8 @@ for i in range(len(pathpoints)):
 				xpos = Roomba.X_position
 				ypos = Roomba.Y_position
 				# changes to next point in the list or finishes the path
-				if xpos > .99 * nextpoint[0]:
-					if ypos > .99 * nextpoint[1]:
+				if xpos-nextpoint[0] < 10 and xpos-nextpoint[1] > -10:
+					if ypos-nextpoint[1] < 10 and ypos-nextpoint[1] > -10:
 						print("Finished with point.\n")
 						if i == len(pathpoints)-1:
 							print("Finished with path.\n")
