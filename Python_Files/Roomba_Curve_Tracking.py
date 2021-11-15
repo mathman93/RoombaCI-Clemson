@@ -57,6 +57,7 @@ def seek(start, end, position):
 	# calculates next seek point based on projection
 	next = (close[0]+upath[0]*50,close[1] + upath[1]*50)
 	# returns the seek point x and y in a tuple
+	print(position)
 	print(pathV)
 	print(roombaV)
 	print(upath)
