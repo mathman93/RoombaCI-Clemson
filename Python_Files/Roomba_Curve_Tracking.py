@@ -50,11 +50,15 @@ def seek(start, end, position):
 	proj = []
 	proj.append(dotp*pathV[0]/(magpath**2))
 	proj.append(dotp*pathV[1]/(magpath**2))
-	print(proj)
-	print("Proj^")
 	# calculates next seek point based on projection
 	next = (proj[0]+upath[0]*50,proj[1] + upath[1]*50)
 	# returns the seek point x and y in a tuple
+	print(pathV)
+	print(roombaV)
+	print(upath)
+	print(dotp)
+	print(proj)
+	print("end")
 	return next
 # end of seek
 
