@@ -66,10 +66,9 @@ def heading(next,position,roombah):
 	return rh
 
 def moveSpeed(theta):
-	theta_turn = math.sin(theta)
 	# do we want to turn left or right
 	t_dir = -1
-	if(theta_turn > 0.05):
+	if(theta > 0.05):
 		t_dir = 1
 	# used to find if roomba is going to turn before or while roomba is moving
 	theta_sb = math.cos(theta)
@@ -160,45 +159,54 @@ GPIO.output(gled, GPIO.LOW) # Indicate all set sequences are complete
 # Main Code ##
 
 # initialize the new and old path
-# pathpoints = [(0,0),(1000,0),(1000,1000)]
-prev = (0,0)
-nextpoint = (-1000,-1000)
+pathpoints = [(1000,500),(500,1000)]
+#prev = (0,0)
+#nextpoint = (-1000,-1000)
 # Get the initial wheel enocder values
 [left_encoder, right_encoder] = Roomba.Query(43,44)
 Roomba.SetWheelEncoderCounts(left_encoder,right_encoder)
 
-#for i in range(len(pathpoints)-1):
-#	nextpoint = pathpoints[i+1]
-#	prev = pathpoints[i]
-Roomba.StartQueryStream(43,44)
-while True:
-	try:
-		if Roomba.Available() > 0:
-			[left_encoder,right_encoder] = Roomba.ReadQueryStream(43,44)
-			# update position
-			Roomba.UpdatePosition(left_encoder,right_encoder)
-			xpos = Roomba.X_position
-			ypos = Roomba.Y_position
-			# find seek point
-			seekPoint = seek(prev,nextpoint,(xpos,ypos))
-			# check if next point is past end point
-			# seek distance
-			dseek = math.sqrt((seekPoint[0]-prev[0])**2+(seekPoint[1]-prev[1])**2)
-			# end distance
-			dend = math.sqrt((nextpoint[0]-prev[0])**2+(nextpoint[1]-prev[1])**2)
-			# if it is go to end point instead
-			if dseek > dend:
-				theta = heading(nextpoint,(xpos,ypos),Roomba.heading)
-			else:
-				theta = heading(seekPoint,(xpos,ypos),Roomba.heading)
-			print(theta)
-			# find movement speeds
-			[fspeed,tspeed] = moveSpeed(theta)
-			# give the roomba these speeds
-			Roomba.Move(fspeed,tspeed)
-	except KeyboardInterrupt:
-		break
-		
+for i in range(len(pathpoints)-1):
+	nextpoint = pathpoints[i]
+	if i == 0:
+		prev = (0,0)
+	else:
+		prev = pathpoints[i-1]
+	Roomba.StartQueryStream(43,44)
+	while True:
+		try:
+			if Roomba.Available() > 0:
+				[left_encoder,right_encoder] = Roomba.ReadQueryStream(43,44)
+				# update position
+				Roomba.UpdatePosition(left_encoder,right_encoder)
+				xpos = Roomba.X_position
+				ypos = Roomba.Y_position
+				if xpos/nextpoint[0] > .99:
+					if ypos/nextpoint[1] > .99:
+						print("Finished with point.\n")
+						if i == len(pathpoints)-1:
+							print("Finished with path.\n")
+						break
+				# find seek point
+				seekPoint = seek(prev,nextpoint,(xpos,ypos))
+				# check if next point is past end point
+				# seek distance
+				dseek = math.sqrt((seekPoint[0]-prev[0])**2+(seekPoint[1]-prev[1])**2)
+				# end distance
+				dend = math.sqrt((nextpoint[0]-prev[0])**2+(nextpoint[1]-prev[1])**2)
+				# if it is go to end point instead
+				if dseek > dend:
+					theta = heading(nextpoint,(xpos,ypos),Roomba.heading)
+				else:
+					theta = heading(seekPoint,(xpos,ypos),Roomba.heading)
+				print(theta)
+				# find movement speeds
+				[fspeed,tspeed] = moveSpeed(theta)
+				# give the roomba these speeds
+				Roomba.Move(fspeed,tspeed)
+		except KeyboardInterrupt:
+			break
+	# end while loop	
 Roomba.Move(0,0)
 Roomba.ShutDown() # Shutdown Roomba serial connection
 Xbee.close()
