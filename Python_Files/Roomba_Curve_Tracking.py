@@ -184,11 +184,12 @@ while True:
 			if xpos/nextpoint[0] > .99:
 				if ypos/nextpoint[1] > .99:
 					print("Finished with point.\n")
-					if i == len(pathpoints)-1:
-						print("Finished with path.\n")
+					#if i == len(pathpoints)-1:
+					#	print("Finished with path.\n")
 					break
 			# find seek point
 			seekPoint = seek(prev,nextpoint,(xpos,ypos))
+			print(seekPoint)
 			# check if next point is past end point
 			# seek distance
 			dseek = math.sqrt((seekPoint[0]-prev[0])**2+(seekPoint[1]-prev[1])**2)
