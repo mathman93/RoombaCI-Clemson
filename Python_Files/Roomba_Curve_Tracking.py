@@ -195,6 +195,8 @@ while True:
 					break
 			# find seek point
 			seekPoint = seek(prev,nextpoint,(xpos,ypos))
+			print(seekPoint)
+			print("^next")
 			# check if next point is past end point
 			# seek distance
 			dseek = math.sqrt((seekPoint[0]-prev[0])**2+(seekPoint[1]-prev[1])**2)
