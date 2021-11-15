@@ -170,7 +170,7 @@ pathpoints = [(1000,500),(500,1000)]
 [left_encoder, right_encoder] = Roomba.Query(43,44)
 Roomba.SetWheelEncoderCounts(left_encoder,right_encoder)
 
-for i in range(len(pathpoints)-1):
+for i in range(len(pathpoints)):
 	startnext = 1
 	nextpoint = pathpoints[i]
 	print(nextpoint)
