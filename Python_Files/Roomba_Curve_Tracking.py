@@ -50,15 +50,19 @@ def seek(start, end, position):
 	proj = []
 	proj.append(dotp*pathV[0]/(magpath**2))
 	proj.append(dotp*pathV[1]/(magpath**2))
+	# closest point on path
+	close = []
+	close.append(start[0]+proj[0])
+	close.append(start[1]+proj[1])
 	# calculates next seek point based on projection
-	next = (proj[0]+upath[0]*50,proj[1] + upath[1]*50)
+	next = (close[0]+upath[0]*50,close[1] + upath[1]*50)
 	# returns the seek point x and y in a tuple
 	print(pathV)
 	print(roombaV)
 	print(upath)
 	print(dotp)
 	print(proj)
-	
+	print(next)
 	print("end")
 	return next
 # end of seek
@@ -196,7 +200,6 @@ while True:
 					break
 			# find seek point
 			seekPoint = seek(prev,nextpoint,(xpos,ypos))
-			print(seekPoint)
 			# check if next point is past end point
 			# seek distance
 			dseek = math.sqrt((seekPoint[0]-prev[0])**2+(seekPoint[1]-prev[1])**2)
