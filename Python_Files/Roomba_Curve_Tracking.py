@@ -78,21 +78,21 @@ def moveSpeed(theta):
 		forwardspeed = 0
 	# turn somewhat fast and move forward slightly
 	elif(theta_sb < .5):
-		forwardspeed = 30
+		forwardspeed = 50
 	# still needs to turn a bit and but can also start moving
 	elif(theta_sb < .90):
-		forwardspeed = 60
+		forwardspeed = 100
 	# pretty much in line and only needs to move forward
 	else:
-		forwardspeed = 100
+		forwardspeed = 150
 	
 	# use theta to determine the spin speed
 	if abs(theta) > math.pi/2:
 		spinspeed = 100
 	elif abs(theta) > math.pi/4:
-		spinspeed = 50
+		spinspeed = 75
 	elif abs(theta) > math.pi/12:
-		spinspeed = 25
+		spinspeed = 50
 	elif abs(theta) > 0.05:
 		spinspeed = 20
 	else:
@@ -161,7 +161,7 @@ GPIO.output(gled, GPIO.LOW) # Indicate all set sequences are complete
 
 # initialize the new and old path
 #pathpoints = [(1000,500),(500,1000)]
-prev = (0,0)
+prev = (-1000,1000)
 nextpoint = (-1000,-1000)
 # Get the initial wheel enocder values
 [left_encoder, right_encoder] = Roomba.Query(43,44)
