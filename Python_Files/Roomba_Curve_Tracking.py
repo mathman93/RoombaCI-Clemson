@@ -171,6 +171,7 @@ pathpoints = [(1000,500),(500,1000)]
 Roomba.SetWheelEncoderCounts(left_encoder,right_encoder)
 
 for i in range(len(pathpoints)-1):
+	startnext = 1
 	nextpoint = pathpoints[i]
 	print(nextpoint)
 	if i == 0:
@@ -178,7 +179,7 @@ for i in range(len(pathpoints)-1):
 	else:
 		prev = pathpoints[i-1]
 	Roomba.StartQueryStream(43,44)
-	while True:
+	while startnext:
 		try:
 			if Roomba.Available() > 0:
 				[left_encoder,right_encoder] = Roomba.ReadQueryStream(43,44)
@@ -191,7 +192,7 @@ for i in range(len(pathpoints)-1):
 						print("Finished with point.\n")
 						if i == len(pathpoints)-1:
 							print("Finished with path.\n")
-						break
+						startnext = 0
 				# find seek point
 				seekPoint = seek(prev,nextpoint,(xpos,ypos))
 				# check if next point is past end point
