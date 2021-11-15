@@ -57,6 +57,7 @@ def seek(start, end, position):
 	print(roombaV)
 	print(upath)
 	print(proj)
+	print(next)
 	print("end")
 	return next
 # end of seek
