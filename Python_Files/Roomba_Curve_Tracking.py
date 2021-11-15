@@ -62,7 +62,6 @@ def heading(next,position,roombah):
 	y = next[1] - position[1]
 	x = next[0] - position[0]
 	theta = math.atan2(y,x)
-	print(theta)
 	rh = (((theta-roombah) + math.pi) % (2*math.pi)) - math.pi
 	return rh
 
@@ -190,6 +189,7 @@ while True:
 					break
 			# find seek point
 			seekPoint = seek(prev,nextpoint,(xpos,ypos))
+			print(seekPoint)
 			# check if next point is past end point
 			# seek distance
 			dseek = math.sqrt((seekPoint[0]-prev[0])**2+(seekPoint[1]-prev[1])**2)
@@ -201,8 +201,6 @@ while True:
 			else:
 				theta = heading(seekPoint,(xpos,ypos),Roomba.heading)
 			# find movement speeds
-			print("while loop theta")
-			print(theta)
 			[fspeed,tspeed] = moveSpeed(theta)
 			# give the roomba these speeds
 			Roomba.Move(fspeed,tspeed)
