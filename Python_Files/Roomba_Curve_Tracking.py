@@ -53,12 +53,6 @@ def seek(start, end, position):
 	# calculates next seek point based on projection
 	next = (proj[0]+upath[0]*50,proj[1] + upath[1]*50)
 	# returns the seek point x and y in a tuple
-	print(pathV)
-	print(roombaV)
-	print(upath)
-	print(proj)
-	print(next)
-	print("end")
 	return next
 # end of seek
 
@@ -68,6 +62,7 @@ def heading(next,position,roombah):
 	y = next[1] - position[1]
 	x = next[0] - position[0]
 	theta = math.atan2(y,x)
+	print(theta)
 	rh = (((theta-roombah) + math.pi) % 2*math.pi) - math.pi
 	return rh
 
@@ -195,8 +190,6 @@ while True:
 					break
 			# find seek point
 			seekPoint = seek(prev,nextpoint,(xpos,ypos))
-			print(seekPoint)
-			print("^next")
 			# check if next point is past end point
 			# seek distance
 			dseek = math.sqrt((seekPoint[0]-prev[0])**2+(seekPoint[1]-prev[1])**2)
