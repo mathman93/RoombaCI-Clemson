@@ -167,9 +167,8 @@ while True:
 
     except KeyboardInterrupt: # if you want to end the song early
         break
-    Roomba.Move(0,0) #stop roomba movement
     # End while
-
+Roomba.Move(0,0) #stop roomba movement
 
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
