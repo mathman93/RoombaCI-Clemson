@@ -72,7 +72,7 @@ def heading(next,position,roombah):
 def moveSpeed(theta):
 	# do we want to turn left or right
 	t_dir = -1
-	if(theta > 0.05):
+	if(theta > 0):
 		t_dir = 1
 	# used to find if roomba is going to turn before or while roomba is moving
 	theta_sb = math.cos(theta)
@@ -163,7 +163,7 @@ GPIO.output(gled, GPIO.LOW) # Indicate all set sequences are complete
 # Main Code ##
 
 # initialize the new and old path
-pathpoints = [(1000,500),(500,500),(0,-1000)]
+pathpoints = [(500,500),(-500,500),(-500,-500),(500,-500),(500,500),(0,0)]
 counter = 0
 #prev = (-1000,1000)
 #nextpoint = (-1000,-1000)
@@ -172,6 +172,8 @@ counter = 0
 Roomba.SetWheelEncoderCounts(left_encoder,right_encoder)
 
 for i in range(len(pathpoints)):
+	# slows the roomba down the closer it gets to stop point
+	fspeedcoeff = 1
 	startnext = 1
 	nextpoint = pathpoints[i]
 	print(nextpoint)
@@ -198,22 +200,26 @@ for i in range(len(pathpoints)):
 				# position of roomba distance
 				dpos = math.sqrt((xpos-prev[0])**2+(ypos-prev[1])**2)
 				# if it is go to end point instead
+				if dpos * 10/9 > dend:
+					fspeedcoeff = 1- dpos/dend + .5
 				if dseek > dend:
 					theta = heading(nextpoint,(xpos,ypos),Roomba.heading)
-					print("Finished with point.\n")
+					# slows the roomba down the closer it gets to stop point
 					if i == len(pathpoints)-1:
-						print("Finished with path.\n")
 						if dpos > dend:
+							print("Finished with path.\n")
 							startnext = 0
 					else:
+						print("Finished with point.\n")
 						startnext = 0
 				else:
 					theta = heading(seekPoint,(xpos,ypos),Roomba.heading)
 				# find movement speeds
 				[fspeed,tspeed] = moveSpeed(theta)
 				# give the roomba these speeds
-				Roomba.Move(fspeed,tspeed)
-				if counter == 50:
+				Roomba.Move((int)(fspeed*fspeedcoeff),tspeed)
+				if counter == 25:
+					print((int)(fspeed*fspeedcoeff))
 					print(xpos,ypos)
 					counter = 0
 				counter+=1
