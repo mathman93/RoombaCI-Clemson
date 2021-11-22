@@ -200,8 +200,8 @@ for i in range(len(pathpoints)):
 				# position of roomba distance
 				dpos = math.sqrt((xpos-prev[0])**2+(ypos-prev[1])**2)
 				# if it is go to end point instead
-				if dpos * 10/9 > dend:
-					fspeedcoeff = 1 - dpos/dend + .25
+				if dpos * 20/17 > dend:
+					fspeedcoeff = 1 - dpos/dend + .1
 				if dseek > dend:
 					theta = heading(nextpoint,(xpos,ypos),Roomba.heading)
 					# slows the roomba down the closer it gets to stop point
