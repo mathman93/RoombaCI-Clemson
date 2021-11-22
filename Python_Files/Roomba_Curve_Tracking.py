@@ -72,7 +72,7 @@ def heading(next,position,roombah):
 def moveSpeed(theta):
 	# do we want to turn left or right
 	t_dir = -1
-	if(theta > 0.05):
+	if(theta > 0):
 		t_dir = 1
 	# used to find if roomba is going to turn before or while roomba is moving
 	theta_sb = math.cos(theta)
@@ -165,8 +165,6 @@ GPIO.output(gled, GPIO.LOW) # Indicate all set sequences are complete
 # initialize the new and old path
 pathpoints = [(500,500),(500,1000),(0,-1000)]
 counter = 0
-# slows the roomba down the closer it gets to stop point
-fspeedcoeff = 1
 #prev = (-1000,1000)
 #nextpoint = (-1000,-1000)
 # Get the initial wheel enocder values
@@ -174,6 +172,8 @@ fspeedcoeff = 1
 Roomba.SetWheelEncoderCounts(left_encoder,right_encoder)
 
 for i in range(len(pathpoints)):
+	# slows the roomba down the closer it gets to stop point
+	fspeedcoeff = 1
 	startnext = 1
 	nextpoint = pathpoints[i]
 	print(nextpoint)
