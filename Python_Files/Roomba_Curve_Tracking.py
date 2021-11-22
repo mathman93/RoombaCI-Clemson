@@ -216,7 +216,7 @@ for i in range(len(pathpoints)):
 				# find movement speeds
 				[fspeed,tspeed] = moveSpeed(theta)
 				# give the roomba these speeds
-				Roomba.Move(fspeed*fspeedcoeff,tspeed)
+				Roomba.Move((int)(fspeed*fspeedcoeff),tspeed)
 				if counter == 50:
 					print(xpos,ypos)
 					counter = 0
