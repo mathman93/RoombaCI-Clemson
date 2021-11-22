@@ -198,16 +198,19 @@ for i in range(len(pathpoints)):
 				dend = math.sqrt((nextpoint[0]-prev[0])**2+(nextpoint[1]-prev[1])**2)
 				# position of roomba distance
 				dpos = math.sqrt((xpos-prev[0])**2+(ypos-prev[1])**2)
-				# if it is go to end point instead
+				# changes the speed of the roomba if it is close to next point (within 85%)
 				if dpos * 20/17 > dend:
 					fspeedcoeff = 1 - dpos/dend + .15
+				# if it is go to end point instead
 				if dseek > dend:
 					theta = heading(nextpoint,(xpos,ypos),Roomba.heading)
-					# slows the roomba down the closer it gets to stop point
+					# if this is the last point on the path
 					if i == len(pathpoints)-1:
+						# if it is slightly past end point
 						if dpos > dend:
 							print("Finished with path.\n")
 							startnext = 0
+					# else print position and say its finished with point and go to next point
 					else:
 						print(xpos,ypos)
 						print("Finished with point.\n")
@@ -221,6 +224,7 @@ for i in range(len(pathpoints)):
 		except KeyboardInterrupt:
 			break
 	# end while loop
+# prints final position roomba ended at
 print("Final Position")
 print(xpos,ypos)	
 Roomba.Move(0,0)
