@@ -201,7 +201,7 @@ for i in range(len(pathpoints)):
 				dpos = math.sqrt((xpos-prev[0])**2+(ypos-prev[1])**2)
 				# if it is go to end point instead
 				if dpos * 10/9 > dend:
-					fspeedcoeff = 1- dpos/dend + .5
+					fspeedcoeff = 1 - dpos/dend + .25
 				if dseek > dend:
 					theta = heading(nextpoint,(xpos,ypos),Roomba.heading)
 					# slows the roomba down the closer it gets to stop point
@@ -210,6 +210,7 @@ for i in range(len(pathpoints)):
 							print("Finished with path.\n")
 							startnext = 0
 					else:
+						print(xpos,ypos)
 						print("Finished with point.\n")
 						startnext = 0
 				else:
@@ -225,7 +226,9 @@ for i in range(len(pathpoints)):
 				counter+=1
 		except KeyboardInterrupt:
 			break
-	# end while loop	
+	# end while loop
+print("Final Position")
+print(xpos,ypos)	
 Roomba.Move(0,0)
 Roomba.ShutDown() # Shutdown Roomba serial connection
 Xbee.close()
