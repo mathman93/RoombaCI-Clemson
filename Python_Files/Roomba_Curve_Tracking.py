@@ -163,7 +163,7 @@ GPIO.output(gled, GPIO.LOW) # Indicate all set sequences are complete
 # Main Code ##
 
 # initialize the new and old path
-pathpoints = [(1000,500),(500,1000),(0,-2000)]
+pathpoints = [(1000,500),(500,500),(0,-1000)]
 counter = 0
 #prev = (-1000,1000)
 #nextpoint = (-1000,-1000)
@@ -213,7 +213,7 @@ for i in range(len(pathpoints)):
 				[fspeed,tspeed] = moveSpeed(theta)
 				# give the roomba these speeds
 				Roomba.Move(fspeed,tspeed)
-				if counter == 100:
+				if counter == 50:
 					print(xpos,ypos)
 					counter = 0
 				counter+=1
