@@ -44,16 +44,17 @@ def Song_Write(songlist,ts,tm,i):
             timetotal = timetotal + songlist[i]
     return timetotal
 
-def Movement_Sync_list(songlist,ts):
+def Movement_Sync_list(songlist,ts,rest):
+    t_list = 0
     t = 0
-    y = 0
     for i in range(len(songlist)):
-       if (songlist[i] == rest):
-           y = y + 1
-       if (i % 2 == 1):
-           t[y] = t[y] + songlist[i]
-
-    return(t)
+       if (i % 2 == 0):
+           if songlist[t] == rest:
+               t_list.append(t * ts)
+               t = 0
+       else:
+            t = t + t_list[i]
+    return(t_list)
 
 ## -- Code Starts Here -- ##
 # Setup Code #
@@ -113,7 +114,7 @@ spin = False
 wsp = 1 # added a var. to see if there was a song playing
 timer = time.time() # start timer
 timer2 = time.time() #start a second timer for movement
-t = Movement_Sync_list(FullSongList,timestep)
+t_list = Movement_Sync_list(FullSongList,timestep,rest)
 songdict = Song_DictCreate(FullSongList) # create song dictonary
 sn,isp = Roomba.Query(36,37)
 Roomba.StartQueryStream(36,37)  # start of query stream
@@ -137,21 +138,18 @@ while True:
                 print(songdict[i]) # Include for debugging
 
             # moving the Roomba, needs to be under Roomba.Available (update to sync with song)
-            if (time.time() - timer2) > (0.015625 * t[y]) :
+            if (time.time() - timer2) > (0.015625 * t_list[y]) :
                 timer2 = time.time() # using a timer, every 0.5 seconds the roomba will spin a diffrent direction / Roomba.Move(f,s)
                 Roomba.Move(0,0) #stop roomba movement
                 if spin:
                     Roomba.Move(0,100) # spin clockwise
-                    y = y + 1
-                    if y > len(t):
-                        y = 0
                     spin = False
                 else:
                     Roomba.Move(0,-100) # spin counterclockwise
-                    y = y + 1
-                    if y > len(t):
-                        y = 0
                     spin = True
+                y = y + 1
+                if y == len(t_list):
+                   y = 0
             
 
         # blinking the LED
