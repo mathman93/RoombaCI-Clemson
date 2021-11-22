@@ -49,12 +49,13 @@ def Movement_Sync_list(songlist,ts,rest):
     t = 0
     for i in range(len(songlist)):
        if (i % 2 == 0):
-           if songlist[t] == rest:
+           if songlist[i] == rest:
                t_list.append(t * ts)
                t = 0
        else:
-            t = t + t_list[i]
-    return(t_list)
+            t = t + songlist[i]
+    print(t_list)
+    return t_list
 
 ## -- Code Starts Here -- ##
 # Setup Code #
