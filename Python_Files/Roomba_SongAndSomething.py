@@ -45,7 +45,7 @@ def Song_Write(songlist,ts,tm,i):
     return timetotal
 
 def Movement_Sync_list(songlist,ts,rest):
-    t_list = 0
+    t_list = []
     t = 0
     for i in range(len(songlist)):
        if (i % 2 == 0):
@@ -150,7 +150,6 @@ while True:
                 y = y + 1
                 if y == len(t_list):
                    y = 0
-            
 
         # blinking the LED
         if (time.time() - timer) > 0.5:
