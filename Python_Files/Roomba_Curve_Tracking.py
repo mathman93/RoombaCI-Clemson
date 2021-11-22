@@ -164,7 +164,6 @@ GPIO.output(gled, GPIO.LOW) # Indicate all set sequences are complete
 
 # initialize the new and old path
 pathpoints = [(500,500),(-500,500),(-500,-500),(500,-500),(500,500),(0,0)]
-counter = 0
 #prev = (-1000,1000)
 #nextpoint = (-1000,-1000)
 # Get the initial wheel enocder values
@@ -200,8 +199,8 @@ for i in range(len(pathpoints)):
 				# position of roomba distance
 				dpos = math.sqrt((xpos-prev[0])**2+(ypos-prev[1])**2)
 				# if it is go to end point instead
-				if dpos * 10/9 > dend:
-					fspeedcoeff = 1 - dpos/dend + .25
+				if dpos * 20/17 > dend:
+					fspeedcoeff = 1 - dpos/dend + .1
 				if dseek > dend:
 					theta = heading(nextpoint,(xpos,ypos),Roomba.heading)
 					# slows the roomba down the closer it gets to stop point
@@ -219,11 +218,6 @@ for i in range(len(pathpoints)):
 				[fspeed,tspeed] = moveSpeed(theta)
 				# give the roomba these speeds
 				Roomba.Move((int)(fspeed*fspeedcoeff),tspeed)
-				if counter == 25:
-					print((int)(fspeed*fspeedcoeff))
-					print(xpos,ypos)
-					counter = 0
-				counter+=1
 		except KeyboardInterrupt:
 			break
 	# end while loop
