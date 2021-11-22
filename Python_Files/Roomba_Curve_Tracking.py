@@ -187,13 +187,6 @@ for i in range(len(pathpoints)):
 				Roomba.UpdatePosition(left_encoder,right_encoder)
 				xpos = Roomba.X_position
 				ypos = Roomba.Y_position
-				# changes to next point in the list or finishes the path
-				if xpos-nextpoint[0] < 10 and xpos-nextpoint[1] > -10:
-					if ypos-nextpoint[1] < 10 and ypos-nextpoint[1] > -10:
-						print("Finished with point.\n")
-						if i == len(pathpoints)-1:
-							print("Finished with path.\n")
-						startnext = 0
 				# find seek point
 				seekPoint = seek(prev,nextpoint,(xpos,ypos))
 				# check if next point is past end point
@@ -201,9 +194,16 @@ for i in range(len(pathpoints)):
 				dseek = math.sqrt((seekPoint[0]-prev[0])**2+(seekPoint[1]-prev[1])**2)
 				# end distance
 				dend = math.sqrt((nextpoint[0]-prev[0])**2+(nextpoint[1]-prev[1])**2)
+				# position of roomba distance
+				dpos = math.sqrt((xpos-prev[0])**2+(ypos-prev[1])**2)
 				# if it is go to end point instead
 				if dseek > dend:
 					theta = heading(nextpoint,(xpos,ypos),Roomba.heading)
+					if dpos > dend:
+						print("Finished with point.\n")
+						if i == len(pathpoints)-1:
+							print("Finished with path.\n")
+						startnext = 0
 				else:
 					theta = heading(seekPoint,(xpos,ypos),Roomba.heading)
 				# find movement speeds
