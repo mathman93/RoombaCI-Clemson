@@ -175,7 +175,9 @@ GPIO.output(gled, GPIO.LOW) # Indicate all set sequences are complete
 # Main Code ##
 
 # initialize the new and old path
-pathpoints = [(326,735),(-654,358),(-845,-356),(985,-423),(786,548),(0,0)]
+pathpoints = [(500,500)]
+# gives first point to find path between this point and the next
+startofpath = (500,-500)
 #prev = (-1000,1000)
 #nextpoint = (-1000,-1000)
 # Get the initial wheel enocder values
@@ -183,7 +185,8 @@ pathpoints = [(326,735),(-654,358),(-845,-356),(985,-423),(786,548),(0,0)]
 Roomba.SetWheelEncoderCounts(left_encoder,right_encoder)
 Roomba.StartQueryStream(43,44)
 data_timer = time.time()
-
+datafile.write("{0:.6f}, {1:.3f}, {2:.3f}, {3:.4f}, {4:.3f}, {5:.3f}, {6:.3f}, {7:.3f};\n"\
+	.format(0, Roomba.X_position, Roomba.Y_position, Roomba.heading, 0, 0, 0, 0))
 for i in range(len(pathpoints)):
 	# slows the roomba down the closer it gets to stop point
 	fspeedcoeff = 1
@@ -191,7 +194,7 @@ for i in range(len(pathpoints)):
 	nextpoint = pathpoints[i]
 	print(nextpoint)
 	if i == 0:
-		prev = (0,0)
+		prev = startofpath
 	else:
 		prev = pathpoints[i-1]
 	#Roomba.StartQueryStream(43,44)
