@@ -242,7 +242,7 @@ for i in range(len(pathpoints)):
 
 				if file_create == True:
 					# Write data values to a text file (MATLAB format)
-					datafile.write("{0:.6f}, {1:.3f}, {2:.3f}, {3:.4f}, {4:.3f}, {5:.3f}, {6:.3f}, {7:.3f};\n"\
+					datafile.write("{0:.6f}, {1:.3f}, {2:.3f}, {3:.4f}, {4:.3f}, {5:.3f}, {6:.3f}, {7:.3f}\n"\
 						.format(data_time, Roomba.X_position, Roomba.Y_position, Roomba.heading, seekPoint[0], seekPoint[1], nextpoint[0], nextpoint[1]))
 				# End if
 
