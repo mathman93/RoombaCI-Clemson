@@ -56,6 +56,11 @@ def seek(start, end, position):
 	close.append(start[1]+proj[1])
 	# calculates next seek point based on projection
 	next = (close[0]+upath[0]*50,close[1] + upath[1]*50)
+	if file_create == True:
+			# Write data values to a text file (MATLAB format)
+			datafile.write("{0:.6f}, {1:.3f}, {2:.3f}, {3:.4f}, {4:.3f}, {5:.3f}, {6:.3f}, {7:.3f}\n"\
+				.format(data_time, Roomba.X_position, Roomba.Y_position, Roomba.heading, close[0], close[1], next[0], next[1]))
+		# End if
 	# returns the seek point x and y in a tuple
 	return next
 # end of seek
@@ -175,9 +180,9 @@ GPIO.output(gled, GPIO.LOW) # Indicate all set sequences are complete
 # Main Code ##
 
 # initialize the new and old path
-pathpoints = [(1000,500),(0,1000),(500,0),(500,1000),(0,0)]
+pathpoints = [(500,500)]
 # gives first point to find path between this point and the next
-startofpath = (0,0)
+startofpath = (500,-500)
 #prev = (-1000,1000)
 #nextpoint = (-1000,-1000)
 # Get the initial wheel enocder values
@@ -185,8 +190,10 @@ startofpath = (0,0)
 Roomba.SetWheelEncoderCounts(left_encoder,right_encoder)
 Roomba.StartQueryStream(43,44)
 data_timer = time.time()
-datafile.write("{0:.6f}, {1:.3f}, {2:.3f}, {3:.4f}, {4:.3f}, {5:.3f}, {6:.3f}, {7:.3f};\n"\
-	.format(0, Roomba.X_position, Roomba.Y_position, Roomba.heading, 0, 0, startofpath[0], startofpath[1]))
+# adds initial data point
+if file_create == True:
+	datafile.write("{0:.6f}, {1:.3f}, {2:.3f}, {3:.4f}, {4:.3f}, {5:.3f}, {6:.3f}, {7:.3f}\n"\
+		.format(0, Roomba.X_position, Roomba.Y_position, Roomba.heading, 0, 0, 500, 0))
 for i in range(len(pathpoints)):
 	# slows the roomba down the closer it gets to stop point
 	fspeedcoeff = 1
@@ -239,12 +246,6 @@ for i in range(len(pathpoints)):
 				[fspeed,tspeed] = moveSpeed(theta)
 				# give the roomba these speeds
 				Roomba.Move((int)(fspeed*fspeedcoeff),tspeed)
-
-				if file_create == True:
-					# Write data values to a text file (MATLAB format)
-					datafile.write("{0:.6f}, {1:.3f}, {2:.3f}, {3:.4f}, {4:.3f}, {5:.3f}, {6:.3f}, {7:.3f}\n"\
-						.format(data_time, Roomba.X_position, Roomba.Y_position, Roomba.heading, seekPoint[0], seekPoint[1], nextpoint[0], nextpoint[1]))
-				# End if
 
 		except KeyboardInterrupt:
 			break
