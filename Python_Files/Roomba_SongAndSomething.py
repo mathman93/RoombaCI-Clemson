@@ -27,13 +27,13 @@ def Song_DictCreate(songlist):
 
 def Play_Song(i):
     Roomba.DirectWrite(141)
-    Roomba.DirectWrite(i % 4)
+    Roomba.DirectWrite(0)
 
 # plays the song in sections of 32
 def Song_Write(songlist,ts,tm,i):
     songlength = int(len(songdict[i])/2) # number of notes in song
     Roomba.DirectWrite(140)
-    Roomba.DirectWrite(i % 4)
+    Roomba.DirectWrite(0)
     Roomba.DirectWrite(songlength)
     timetotal = 0
     for i in range(len(songlist)):
@@ -116,6 +116,7 @@ wsp = 1 # added a var. to see if there was a song playing
 timer = time.time() # start timer
 timer2 = time.time() #start a second timer for movement
 t_list = Movement_Sync_list(FullSongList,timestep,rest)
+
 songdict = Song_DictCreate(FullSongList) # create song dictonary
 sn,isp = Roomba.Query(36,37)
 Roomba.StartQueryStream(36,37)  # start of query stream
@@ -140,13 +141,13 @@ while True:
 
             # moving the Roomba, needs to be under Roomba.Available (update to sync with song)
             if (time.time() - timer2) > (0.015625 * t_list[y]) :
-                timer2 = time.time() # using a timer, every 0.5 seconds the roomba will spin a diffrent direction / Roomba.Move(f,s)
+                timer2 = time.time() 
                 Roomba.Move(0,0) #stop roomba movement
                 if spin:
-                    Roomba.Move(0,100) # spin clockwise
+                    Roomba.Move(0,0) # spin clockwise
                     spin = False
                 else:
-                    Roomba.Move(0,-100) # spin counterclockwise
+                    Roomba.Move(0,0) # spin counterclockwise
                     spin = True
                 y = y + 1
                 if y == len(t_list):
