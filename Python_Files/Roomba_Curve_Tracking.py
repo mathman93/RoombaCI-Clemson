@@ -175,7 +175,7 @@ GPIO.output(gled, GPIO.LOW) # Indicate all set sequences are complete
 # Main Code ##
 
 # initialize the new and old path
-pathpoints = [(1000,500),(0,1000),(500,0),(500,500),(0,0)]
+pathpoints = [(1000,500),(0,1000),(500,0),(500,1000),(0,0)]
 # gives first point to find path between this point and the next
 startofpath = (0,0)
 #prev = (-1000,1000)
