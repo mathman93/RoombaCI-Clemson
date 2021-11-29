@@ -27,13 +27,13 @@ def Song_DictCreate(songlist):
 
 def Play_Song(i):
     Roomba.DirectWrite(141)
-    Roomba.DirectWrite(0)
+    Roomba.DirectWrite(i % 2)
 
 # plays the song in sections of 32
 def Song_Write(songlist,ts,tm,i):
     songlength = int(len(songdict[i])/2) # number of notes in song
     Roomba.DirectWrite(140)
-    Roomba.DirectWrite(0)
+    Roomba.DirectWrite(i % 2)
     Roomba.DirectWrite(songlength)
     timetotal = 0
     for i in range(len(songlist)):
