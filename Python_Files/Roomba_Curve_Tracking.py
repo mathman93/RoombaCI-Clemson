@@ -109,6 +109,18 @@ def moveSpeed(theta):
 GPIO.setmode(GPIO.BCM) # Use BCM pin numbering for GPIO
 RoombaCI_lib.DisplayDateTime() # Display current date and time
 
+ack = input("Do you want to save data to a file (y/n)? ") # user acknowledgement
+if ack in ["y", "Y"]: # If positive
+	file_create = True # create and save data to file
+	file_name_input = input("Name for data file: ") # Ask user for desired file name
+	dir_path = "/home/pi/RoombaCI-Clemson/Data_Files/2021_Fall/" # Directory path to save file
+	file_name = os.path.join(dir_path, file_name_input+".txt") # text file extension
+	datafile = open(file_name, "w") # Open a text file for storing data
+		# Will overwrite anything that was in the text file previously
+else: # otherwise
+	file_create = False # Skip data creation
+# End if
+
 # LED Pin setup
 GPIO.setup(yled, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(rled, GPIO.OUT, initial=GPIO.LOW)
@@ -163,13 +175,18 @@ GPIO.output(gled, GPIO.LOW) # Indicate all set sequences are complete
 # Main Code ##
 
 # initialize the new and old path
-pathpoints = [(326,735),(-654,358),(-845,-356),(985,-423),(786,548),(0,0)]
+pathpoints = [(500,500)]
+# gives first point to find path between this point and the next
+startofpath = (500,-500)
 #prev = (-1000,1000)
 #nextpoint = (-1000,-1000)
 # Get the initial wheel enocder values
 [left_encoder, right_encoder] = Roomba.Query(43,44)
 Roomba.SetWheelEncoderCounts(left_encoder,right_encoder)
-
+Roomba.StartQueryStream(43,44)
+data_timer = time.time()
+datafile.write("{0:.6f}, {1:.3f}, {2:.3f}, {3:.4f}, {4:.3f}, {5:.3f}, {6:.3f}, {7:.3f};\n"\
+	.format(0, Roomba.X_position, Roomba.Y_position, Roomba.heading, 0, 0, 0, 0))
 for i in range(len(pathpoints)):
 	# slows the roomba down the closer it gets to stop point
 	fspeedcoeff = 1
@@ -177,14 +194,15 @@ for i in range(len(pathpoints)):
 	nextpoint = pathpoints[i]
 	print(nextpoint)
 	if i == 0:
-		prev = (0,0)
+		prev = startofpath
 	else:
 		prev = pathpoints[i-1]
-	Roomba.StartQueryStream(43,44)
+	#Roomba.StartQueryStream(43,44)
 	while startnext:
 		try:
 			if Roomba.Available() > 0:
 				[left_encoder,right_encoder] = Roomba.ReadQueryStream(43,44)
+				data_time = time.time()-data_timer
 				# update position
 				Roomba.UpdatePosition(left_encoder,right_encoder)
 				xpos = Roomba.X_position
@@ -221,6 +239,13 @@ for i in range(len(pathpoints)):
 				[fspeed,tspeed] = moveSpeed(theta)
 				# give the roomba these speeds
 				Roomba.Move((int)(fspeed*fspeedcoeff),tspeed)
+
+				if file_create == True:
+					# Write data values to a text file (MATLAB format)
+					datafile.write("{0:.6f}, {1:.3f}, {2:.3f}, {3:.4f}, {4:.3f}, {5:.3f}, {6:.3f}, {7:.3f}\n"\
+						.format(data_time, Roomba.X_position, Roomba.Y_position, Roomba.heading, seekPoint[0], seekPoint[1], nextpoint[0], nextpoint[1]))
+				# End if
+
 		except KeyboardInterrupt:
 			break
 	# end while loop
@@ -228,6 +253,15 @@ for i in range(len(pathpoints)):
 print("Final Position")
 print(xpos,ypos)	
 Roomba.Move(0,0)
+Roomba.PauseQueryStream() # Pause Query Stream before ending program
+if Roomba.Available() > 0:
+	x = Roomba.DirectRead(Roomba.Available()) # Clear out residual Roomba data
+	#print(x) # Include for debugging purposes
+
+if file_create == True:
+	datafile.close()
+	Roomba.PlaySMB()
+# End if
 Roomba.ShutDown() # Shutdown Roomba serial connection
 Xbee.close()
 GPIO.cleanup() # Reset GPIO pins for next program
