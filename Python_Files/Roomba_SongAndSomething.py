@@ -31,7 +31,7 @@ def Play_Song(j):
 
 # plays the song in sections of 32
 def Song_Write(songlist,ts,tm,j):
-    songlength = int(len(songlist/2)) # number of notes in song
+    songlength = int(len(songlist)/2) # number of notes in song
     Roomba.DirectWrite(140)
     Roomba.DirectWrite(j)
     Roomba.DirectWrite(songlength)
