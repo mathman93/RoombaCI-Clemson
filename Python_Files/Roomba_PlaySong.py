@@ -41,12 +41,12 @@ def Play_Song(songdict,ts,tm,loop=False):
                 songlength = int(len(songdict[i])/2) # number of notes in song
                 # Write the song
                 Roomba.DirectWrite(140)
-                Roomba.DirectWrite(i % 4)
+                Roomba.DirectWrite(1)
                 Roomba.DirectWrite(songlength)
                 timetotal = Song_Write(songdict[i],ts,tm)
                 # Play the song
                 Roomba.DirectWrite(141)
-                Roomba.DirectWrite(i % 4)
+                Roomba.DirectWrite(1)
                 print(songdict[i]) # Include for debugging
                 time.sleep(((timetotal * ts)+1) / 64)
             # End for i
