@@ -25,15 +25,15 @@ def Song_DictCreate(songlist):
     songdict[i+1] = songlist[32*(i+1):] # remaining bit
     return songdict
 
-def Play_Song(i):
+def Play_Song(j):
     Roomba.DirectWrite(141)
-    Roomba.DirectWrite(i % 2)
+    Roomba.DirectWrite(j)
 
 # plays the song in sections of 32
-def Song_Write(songlist,ts,tm,i):
-    songlength = int(len(songdict[i])/2) # number of notes in song
+def Song_Write(songlist,ts,tm,j):
+    songlength = int(len(songlist/2)) # number of notes in song
     Roomba.DirectWrite(140)
-    Roomba.DirectWrite(i % 2)
+    Roomba.DirectWrite(j)
     Roomba.DirectWrite(songlength)
     timetotal = 0
     for i in range(len(songlist)):
@@ -117,7 +117,7 @@ wsp = 1 # added a var. to see if there was a song playing
 timer = time.time() # start timer
 timer2 = time.time() #start a second timer for movement
 t_list = Movement_Sync_list(FullSongList,timestep,rest)
-
+j = 0 # song position, i is song dictonary position
 songdict = Song_DictCreate(FullSongList) # create song dictonary
 sn,isp = Roomba.Query(36,37)
 Roomba.StartQueryStream(36,37)  # start of query stream
@@ -133,11 +133,12 @@ while True:
             # writing the song segment
             if isp == 1 and wsp == 0:
                 i = (i+1)%(len(songdict)) # update i, changed to use the number elements in the song dictonary
-                Song_Write(songdict[i],timestep,tone_mod,i) # wirtes the i'th song segment 
+                j = (j+1) % 2
+                Song_Write(songdict[i],timestep,tone_mod,j) # wirtes the i'th song segment 
 
             # playing the song segment
             if isp == 0:
-                Play_Song(i) # plays the i'th song segment
+                Play_Song(j) # plays the i'th song segment
                 print(songdict[i]) # Include for debugging
 
             # moving the Roomba, needs to be under Roomba.Available (update to sync with song)
