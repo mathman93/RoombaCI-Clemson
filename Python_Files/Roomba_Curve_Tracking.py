@@ -186,7 +186,7 @@ Roomba.SetWheelEncoderCounts(left_encoder,right_encoder)
 Roomba.StartQueryStream(43,44)
 data_timer = time.time()
 datafile.write("{0:.6f}, {1:.3f}, {2:.3f}, {3:.4f}, {4:.3f}, {5:.3f}, {6:.3f}, {7:.3f};\n"\
-	.format(0, Roomba.X_position, Roomba.Y_position, Roomba.heading, 0, 0, 0, 0))
+	.format(0, Roomba.X_position, Roomba.Y_position, Roomba.heading, 0, 0, startofpath[0], startofpath[1]))
 for i in range(len(pathpoints)):
 	# slows the roomba down the closer it gets to stop point
 	fspeedcoeff = 1
