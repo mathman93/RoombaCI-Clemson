@@ -85,7 +85,7 @@ def moveSpeed(theta):
 	if(theta_sb < 0):
 		forwardspeed = 0
 	# turn somewhat fast and move forward slightly
-	elif(theta_sb < .5):
+	elif(theta_sb < .70):
 		forwardspeed = 50
 	# still needs to turn a bit and but can also start moving
 	elif(theta_sb < .90):
