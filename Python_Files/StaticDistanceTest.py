@@ -1,11 +1,8 @@
 '''
-Roomba_DataRead_Test.py
-Purpose: Collect sesnor data and test communication between Roomba and RaspberryPi
-	Form basis of Roomba code for other tests.
-IMPORTANT: Must be run using Python 3 (python3)
-Last Modified: 8/17/2021
+StaticDistanceTest.py
+Purpose: Estimate distance between lightbar sensors and an object
+Last Modified: 10/25/2021
 '''
-## Import libraries ##
 import serial
 import time
 import RPi.GPIO as GPIO
@@ -24,7 +21,8 @@ gled = 13
 # Dictionary of Roomba movements
 move_dict = {
 	0: [1.0, 0, 0],
-	1: [60.0, 0, 0] }
+	1: [60.0, 0, 50]
+	}
 
 ## Functions and Definitions ##
 ''' Displays current date and time to the screen
@@ -110,69 +108,35 @@ query_time_offset = (5/64) # Set time offset for query
 '''
 
 for_break = False # To break out of for loop on keyboard interrupt
-Roomba.StartQueryStream(7, 43, 44, 45, 46, 47, 48, 49, 50, 51) # Start query stream with specific sensor packets
 time_base = time.time()
-
-for i in range(0, len(move_dict.keys())):
-	[movetime_offset, forward, spin] = move_dict[i] # Read values from dictionary
-	Roomba.Move(forward, spin)
-	movetime_base = time.time()
-	while (time.time() - movetime_base) < movetime_offset:
-		try:
-			'''# Request data packet from Roomba (QuerySingle)
-			if (time.time() - query_time) > query_time_offset: # If enough time has passed
-				bumper_byte = Roomba.QuerySingle(7) # Ask for Bumper byte packet (1 byte)
-				print(bumper_byte)
-				query_time += query_time_offset # offset query time for next query
-			# End if
-			'''
-			'''# Request data packets from Roomba (Query)
-			if (time.time() - query_time) > query_time_offset: # If enough time has passed
-				bumper_byte, l_wheel, r_wheel, light_bumper = Roomba.Query(7, 43, 44, 45) # Ask for specific sensor packets
-				# Print data to screen (MATLAB format)
-				print("{0}, {1:0>8b}, {2}, {3}, {4:0>8b};".format(data_counter, bumper_byte, l_wheel, r_wheel, light_bumper))
-				data_counter += 1 # Increment counter for the next data sample
-				query_time += query_time_offset # offset query time for next query
-			# End if
-			'''
-			# Read query stream for specific packets (ReadQueryStream)
-			if Roomba.Available() > 0:
-				data_time = time.time() - time_base
-				bumper_byte, l_counts, r_counts, light_bumper, lb_ll, lb_fl, lb_cl, lb_cr, lb_fr, lb_rr = Roomba.ReadQueryStream(7, 43, 44, 45, 46, 47, 48, 49, 50, 51)
-				angle = imu.CalculateHeading()
-				# Print data values out to the monitor
-				print("{0:.6f}, {1}, {2}, {3:.4f}, {4:0>8b}, {5:0>8b}, {6}, {7}, {8}, {9}, {10}, {11};"\
-					.format(data_time, l_counts, r_counts, angle, bumper_byte, light_bumper, lb_ll, lb_fl, lb_cl, lb_cr, lb_fr, lb_rr))
-				if file_create == True:
-					# Write data values to a text file (MATLAB format)
-					datafile.write("{0:.6f}, {1}, {2}, {3:.4f}, {4:0>8b}, {5:0>8b}, {6}, {7}, {8}, {9}, {10}, {11};\n"\
-						.format(data_time, l_counts, r_counts, angle, bumper_byte, light_bumper, lb_ll, lb_fl, lb_cl, lb_cr, lb_fr, lb_rr))
-				# End if
-			# End if
-		except KeyboardInterrupt:
-			print('') # print new line
-			for_break = True
-			break # exit while loop
-	# End while
-	if for_break == True:
+Roomba.StartQueryStream(46, 47, 48, 49, 50, 51) # Start query stream with specific sensor packets
+start_time = time.time()
+state = 0
+frDist = 0
+time_out = 10
+while True:
+	try:
+		if Roomba.Available()>0:
+			lb_ll, lb_fl, lb_cl, lb_cr, lb_fr, lb_rr = Roomba.ReadQueryStream( 46, 47, 48, 49, 50, 51)
+			#Roomba.UpdatePosition(l_counts, r_counts)
+			frDist =((1123-593)/(3609-9)) * lb_fr
+			outString = "{0}, {1}, {2}, {3}, {4}, {5}, {6:.2f}".format( lb_ll, lb_fl, lb_cl, lb_cr, lb_fr, lb_rr, frDist)
+			print(outString)
+			if file_create: 
+				datafile.write(outString+"\n")
+	except KeyboardInterrupt:
 		break
-	# End if
-# End for
-
-Roomba.Move(0,0) # Stop Roomba movement
-Roomba.PauseQueryStream() # Pause Query Stream before ending program
-if Roomba.Available() > 0:
-	x = Roomba.DirectRead(Roomba.Available()) # Clear out residual Roomba data
-	#print(x) # Include for debugging purposes
-
-## -- Ending Code Starts Here -- ##
-# Make sure this code runs to end the program cleanly
+#Roomba.Move(0,0) # Stop moving
+Roomba.PauseQueryStream() # End Roomba Query Stream
+if Roomba.Available()>0: # If data exists in Query Stream...
+	z = Roomba.DirectRead(Roomba.Available()) # Clear out data
+	print(z) # Include for debugging
+# End if Roomba.Available()
+# End if file_create
 if file_create == True:
 	datafile.close()
-	Roomba.PlaySMB()
-# End if
-GPIO.output(gled, GPIO.LOW) # Turn off green LED
-
+	print("File saved")
+## -- Ending Code Starts Here -- ##
+# Make sure this code runs to end the program cleanly
 Roomba.ShutDown() # Shutdown Roomba serial connection
-Xbee.close()
 GPIO.cleanup() # Reset GPIO pins for next program
