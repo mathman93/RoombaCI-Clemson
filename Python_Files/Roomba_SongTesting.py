@@ -107,10 +107,10 @@ while(True):
         break
     elif str == "2"
         FullSongList = comps.Comp_dict[str]
-        break
-    else
+        break'''
+    else:
         print("Song Name not Valid")
-        continue '''
+        continue 
 # declare vars.
 i = 0
 y = 0
