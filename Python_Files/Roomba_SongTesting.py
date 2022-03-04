@@ -102,7 +102,7 @@ str = input("Which song would you like to play? Enter 1 for DK or 2 for RickRoll
 
 if str == "1":
     FullSongList = comps.DKTest
-else if str == "2"
+elif str == "2"
 FullSongList = comps.RickRoll
 else
 print("Song Name not Valid")
