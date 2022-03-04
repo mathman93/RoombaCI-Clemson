@@ -106,6 +106,7 @@ while true:
         FullSongList = comps.RickRoll
     else:
         print("Song Name not Valid")
+        continue
 # declare vars.
 i = 0
 y = 0
