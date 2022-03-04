@@ -103,7 +103,7 @@ str = input("Which song would you like to play? Enter 1 for DK or 2 for RickRoll
 if str == "1":
     FullSongList = comps.DKTest
 elif str == "2":
-FullSongList = comps.RickRoll
+    FullSongList = comps.RickRoll
 else:
 print("Song Name not Valid")
 # declare vars.
