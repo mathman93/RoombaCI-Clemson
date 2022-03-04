@@ -102,6 +102,7 @@ while True:
     list = comps.Comp_dict.keys()
     if str in list:
         FullSongList = comps.Comp_dict[str]
+        break
     else:
         print("Song Name not Valid")
         continue 
