@@ -4,6 +4,7 @@ timestep = 8 # (1/64)ths of a second
 tone_mod = -7 # half step modulation of key
 rest = 15 - tone_mod # Rest note
 
+Comp_dict = {"1": DKTest, "2": RickRoll}
 DKTest = [72,2,rest,1,74,2,79,1,81,2,rest,1,79,2,rest,1,84,2,rest,1,83,2,79,1,77,2,rest,4,\
                 71,2,rest,1,74,2,77,1,83,2,rest,1,81,2,rest,1,80,2,rest,1,79,2,77,1,76,2,rest,4,\
                 72,2,rest,1,74,2,79,1,81,2,rest,1,79,2,rest,1,88,2,rest,1,86,2,84,1,81,2,rest,4,\
