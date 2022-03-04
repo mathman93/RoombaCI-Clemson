@@ -99,8 +99,10 @@ tone_mod = -7 # half step modulation of key
 rest = 15 - tone_mod #Rest note
 while(True):
     str = input("Which song would you like to play? Enter 1 for DK or 2 for RickRoll");
-
-    if str == "1":
+    list = comps.Comp_dict.keys()
+    if str is in list:
+            FullSongList = comps.Comp_dict[str]
+   ''' if str == "1":
         FullSongList = comps.Comp_dict[str]
         break
     elif str == "2":
@@ -108,7 +110,7 @@ while(True):
         break
     else:
         print("Song Name not Valid")
-        continue
+        continue '''
 # declare vars.
 i = 0
 y = 0
