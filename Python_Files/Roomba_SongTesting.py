@@ -8,7 +8,7 @@ import serial
 import time
 import RPi.GPIO as GPIO
 import RoombaCI_lib
-import RoombaCi_comps as comps
+import RoombaCI_comps as comps
 ## Variables and Constants ##
 # LED pin numbers
 yled = 5
