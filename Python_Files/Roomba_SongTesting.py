@@ -97,15 +97,15 @@ program objectives
 timestep = 8 # (1/64)ths of a second
 tone_mod = -7 # half step modulation of key
 rest = 15 - tone_mod #Rest note
+while true:
+    str = input("Which song would you like to play? Enter 1 for DK or 2 for RickRoll");
 
-str = input("Which song would you like to play? Enter 1 for DK or 2 for RickRoll");
-
-if str == "1":
-    FullSongList = comps.DKTest
-elif str == "2":
-    FullSongList = comps.RickRoll
-else:
-    print("Song Name not Valid")
+    if str == "1":
+        FullSongList = comps.DKTest
+    elif str == "2":
+        FullSongList = comps.RickRoll
+    else:
+        print("Song Name not Valid")
 # declare vars.
 i = 0
 y = 0
