@@ -102,8 +102,10 @@ while(True):
 
     if str == "1":
         FullSongList = comps.DKTest
+        break
     elif str == "2":
         FullSongList = comps.RickRoll
+        break
     else:
         print("Song Name not Valid")
         continue
