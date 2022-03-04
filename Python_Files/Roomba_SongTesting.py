@@ -100,7 +100,7 @@ rest = 15 - tone_mod #Rest note
 while(True):
     str = input("Which song would you like to play? Enter 1 for DK or 2 for RickRoll");
     list = comps.Comp_dict.keys()
-    if str is in list:
+    if str in list:
             FullSongList = comps.Comp_dict[str]
    ''' if str == "1":
         FullSongList = comps.Comp_dict[str]
