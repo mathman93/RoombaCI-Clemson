@@ -102,13 +102,13 @@ while(True):
     list = comps.Comp_dict.keys()
     if str in list:
         FullSongList = comps.Comp_dict[str]
-   ''' if str == "1":
+   ''' if str == "1"
         FullSongList = comps.Comp_dict[str]
         break
-    elif str == "2":
+    elif str == "2"
         FullSongList = comps.Comp_dict[str]
         break
-    else:
+    else
         print("Song Name not Valid")
         continue '''
 # declare vars.
