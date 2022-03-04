@@ -105,7 +105,7 @@ if str == "1":
 elif str == "2":
     FullSongList = comps.RickRoll
 else:
-print("Song Name not Valid")
+    print("Song Name not Valid")
 # declare vars.
 i = 0
 y = 0
