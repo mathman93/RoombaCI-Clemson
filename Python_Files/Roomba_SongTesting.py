@@ -102,7 +102,8 @@ while True:
     compstr = input("Which song would you like to play? Enter DK for Donkey Kong or RickRoll for Rick Roll")
     list = comps.Comp_dict.keys()
     if compstr in list:
-        partstr = input("Which part would you like to play? Enter 1-4 to select a part")
+        print(comps.Comp_dict[compstr].keys())
+        partstr = input("Which part would you like to play?")
         list = comps.Comp_dict[compstr].keys()
         if partstr in list:
             FullSongList = comps.Comp_dict[compstr][partstr]
