@@ -1,5 +1,6 @@
 
 ''' Purpose: Store compositions for use in Roomba_SongTesting'''
+#work on making file structure cleaner, need to get which composition from user, then which part
 timestep = 8 # (1/64)ths of a second
 tone_mod = -7 # half step modulation of key
 rest = 15 - tone_mod # Rest note
@@ -14,4 +15,4 @@ RickRoll = [72,1,74,1,77,1,74,1,81,3,81,3,79,6,72,1,74,1,77,1,74,1,79,3,79,3,77,
                 74,1,74,1,77,1,74,1,77,4,79,2,76,3,74,1,72,4,72,2,79,4,77,6,rest,2,\
                 72,1,74,1,77,1,74,1,81,3,81,3,79,6,72,1,74,1,77,1,74,1,84,4,76,2,77,3,76,1,74,2,\
                 74,1,74,1,77,1,74,1,77,4,79,2,76,3,74,1,72,4,72,2,79,4,77,7,rest,1] # A rick roll
-Comp_dict = {"1": DKTest, "2": RickRoll}
+Comp_dict = {"DK": {"1" : DKTest}, "RickRoll": {"1", RickRoll}}
