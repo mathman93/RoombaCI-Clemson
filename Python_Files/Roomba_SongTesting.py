@@ -104,6 +104,7 @@ while True:
     if compstr in list:
         for key in comps.Comp_dict[compstr].keys():
             print(key)
+            print(" ")
         partstr = input("Which part would you like to play? ")
         list = comps.Comp_dict[compstr].keys()
         if partstr in list:
