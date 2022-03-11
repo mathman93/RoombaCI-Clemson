@@ -99,12 +99,12 @@ tone_mod = -7 # half step modulation of key
 rest = 15 - tone_mod #Rest note
 while True:
 #clean up the user interface
-    compstr = input("Which song would you like to play? Enter DK for Donkey Kong or RickRoll for Rick Roll")
+    compstr = input("Which song would you like to play? Enter DK for Donkey Kong or RickRoll for Rick Roll ")
     list = comps.Comp_dict.keys()
     if compstr in list:
         for key in comps.Comp_dict[compstr].keys():
             print(key)
-        partstr = input("Which part would you like to play?")
+        partstr = input("Which part would you like to play? ")
         list = comps.Comp_dict[compstr].keys()
         if partstr in list:
             FullSongList = comps.Comp_dict[compstr][partstr]
