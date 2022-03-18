@@ -842,9 +842,49 @@ class Create_2:
 		self.r_count_last = rc
 		return
 	# End UpdatePosition
+
+	''' Writes the given set of note-duration pairs to a Roomba song slot
+		Parameters:
+			songlist = list; list of (max 16) note-duration pairs for the song
+			song_index = Int; Roomba song number to write to
+			tm = Int; tone modulation value for changing the key
+		Returns:
+			timetotal = Int; Number of time units (1/64 second) needed to play songlist
+	'''
+	def Write_Song(self, songlist, song_index, tm):
+		songlength = int(len(songlist)/2) # number of note-duration pairs in the song
+		self.DirectWrite(140) # Roomba op-code for writing song to memory
+		self.DirectWrite(song_index) # Roomba song index
+		self.DirectWrite(songlength) # Number of note-duration pairs in the song
+		timetotal = 0 # Number of time units (1/64 sec.) the song will play
+		for i in range(len(songlist)):
+			if i % 2 == 0: # For notes
+				self.DirectWrite(songlist[i] + tm) 
+			else: # For durations
+				self.DirectWrite(songlist[i])
+				timetotal = timetotal + songlist[i] # Update time units of the song
+			# End if
+		# End for
+		return timetotal
+	# End Write_Song
+	''' Play indicated song number on the Roomba
+		Parameters:
+			song_index = Int; Roomba song number to play [0,3]
+		You will need to wait until the current song has played
+			before playing another song
+	'''
+	def Play_Song(self, song_index):
+		self.DirectWrite(141)
+		self.DirectWrite(song_index)
+	# End Play_Song
 	''' You are not expected to understand this. :)
 		'''
 	def PlaySMB(self):
+		smb = [76,8,76,12,15,4,76,12,15,4,72,8,76,12,15,4,79,12,15,20,67,12]
+		wait = self.Write_Song(smb,0,0)
+		self.Play_Song(0)
+		time.sleep(wait/64)
+		'''
 		#Define SMB Theme song
 		self.conn.write(b'\x8c\x00\x0b') # 140, 0, 11
 		self.conn.write(b'\x4c\x08\x4c\x0c\x1e\x04\x4c\x0c\x1e\x04\x48\x08\x4c\x0c\x1e\x04\x4f\x0c\x1e\x14\x43\x0c')
@@ -853,6 +893,7 @@ class Create_2:
 		#Play song
 		self.conn.write(b'\x8d\x00') # 141, 0
 		time.sleep(2) # Wait for song to play
+		'''
 	# End PlaySMB
 # End Class Create2
 ##################################################################
