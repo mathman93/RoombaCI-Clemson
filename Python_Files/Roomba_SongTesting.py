@@ -24,7 +24,7 @@ def Song_DictCreate(songlist):
         songdict[i] = songlist[32 * i : 32 * (i+1)]
     songdict[i+1] = songlist[32*(i+1):] # remaining bit
     return songdict
-
+'''
 def Play_Song(j):
     Roomba.DirectWrite(141)
     Roomba.DirectWrite(j)
@@ -43,7 +43,7 @@ def Song_Write(songlist,ts,tm,j):
             Roomba.DirectWrite(songlist[i] * ts)
             timetotal = timetotal + songlist[i]
     return timetotal
-
+'''
 def Movement_Sync_list(songlist,ts,rest):
     t_list = []
     t = 0
