@@ -94,7 +94,7 @@ program objectives
 
 '''main program starts'''
 
-timestep = 8 # (1/64)ths of a second
+#timestep = 8 # (1/64)ths of a second
 tone_mod = -7 # half step modulation of key
 rest = 15 - tone_mod #Rest note
 while True:
@@ -121,7 +121,7 @@ spin = False
 wsp = 1 # added a var. to see if there was a song playing
 timer = time.time() # start timer
 timer2 = time.time() #start a second timer for movement
-t_list = Movement_Sync_list(FullSongList,timestep,rest)
+#t_list = Movement_Sync_list(FullSongList,timestep,rest)
 j = 0 # song position, i is song dictonary position
 songdict = Song_DictCreate(FullSongList) # create song dictonary
 sn,isp = Roomba.Query(36,37)
