@@ -133,36 +133,40 @@ Roomba.Write_Song(songdict[i],j,tone_mod) # writing the first song segment befor
 
 # start main loop
 while True:
-    try:
-        # playing the song segments
-        if Roomba.Available() > 0:
-            sn,isp = Roomba.ReadQueryStream(36,37)  # if roomba availble, update song number and is song playing
-            print(isp) # Include for debugging
-            # writing the song segment
-            if isp == 1 and wsp == 0:
-                i = (i+1)%(len(songdict)) # update i, changed to use the number elements in the song dictonary
-                j = (j+1) % 2
-                Roomba.Write_Song(songdict[i],j,tone_mod) # wirtes the i'th song segment 
+	try:
+		# playing the song segments
+		if Roomba.Available() > 0:
+			sn,isp = Roomba.ReadQueryStream(36,37)  # if roomba availble, update song number and is song playing
+			#print(isp) # Include for debugging
+			# writing the song segment
+			if isp == 1 and wsp == 0:
+				i = (i+1)%(len(songdict)) # update i, changed to use the number elements in the song dictonary
+				j = (j+1) % 2
+				Roomba.Write_Song(songdict[i],j,tone_mod) # wirtes the i'th song segment 
+			# End if isp == 1
+			# playing the song segment
+			if isp == 0:
+				Roomba.Play_Song(j) # plays the i'th song segment
+				print(songdict[i]) # Include for debugging
+			# End if isp == 0
+		# End if Roomba.Available
+		# blinking the LED
+		if (time.time() - timer) > 0.5:
+			timer = time.time() # using a timer, every 0.5 seconds a LED will toggle on/off
+			if is_on:
+				GPIO.output(gled, GPIO.LOW) # Turn off green LED
+				is_on = False
+			else:
+				GPIO.output(gled, GPIO.HIGH) # Turn on green LED
+				is_on = True
+			# End if is_on
+		# End if timer
+		wsp = isp
 
-            # playing the song segment
-            if isp == 0:
-                Roomba.Play_Song(j) # plays the i'th song segment
-                print(songdict[i]) # Include for debugging
-
-        # blinking the LED
-        if (time.time() - timer) > 0.5:
-            timer = time.time() # using a timer, every 0.5 seconds a LED will toggle on/off
-            if is_on:
-                GPIO.output(gled, GPIO.LOW) # Turn off green LED
-                is_on = False
-            else:
-                GPIO.output(gled, GPIO.HIGH) # Turn on green LED
-                is_on = True
-        wsp = isp
-
-    except KeyboardInterrupt: # if you want to end the song early
-        break
-    # End while
+	except KeyboardInterrupt: # if you want to end the song early
+		break
+	# End try
+# End while
 Roomba.Move(0,0) #stop roomba movement
 
 ## -- Ending Code Starts Here -- ##
