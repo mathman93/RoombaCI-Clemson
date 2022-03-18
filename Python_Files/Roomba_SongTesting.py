@@ -99,7 +99,7 @@ tone_mod = -7 # half step modulation of key
 rest = 15 - tone_mod #Rest note
 while True:
 #clean up the user interface
-    compstr = input("Which song would you like to play? Enter DK for Donkey Kong or RickRoll for Rick Roll ")
+    compstr = input("Which song would you like to play? (Enter DK for Donkey Kong or RickRoll for Rick Roll) ")
     list = comps.Comp_dict.keys()
     if compstr in list:
         for key in comps.Comp_dict[compstr].keys():
@@ -125,8 +125,8 @@ t_list = Movement_Sync_list(FullSongList,timestep,rest)
 j = 0 # song position, i is song dictonary position
 songdict = Song_DictCreate(FullSongList) # create song dictonary
 sn,isp = Roomba.Query(36,37)
-Roomba.StartQueryStream(36,37)  # start of query stream
-Song_Write(songdict[i],timestep,tone_mod,i) # writing the first song segment before te start of the main loop
+Roomba.StartQueryStream(36,37) # start of query stream
+Roomba.Write_Song(songdict[i],j,tone_mod) # writing the first song segment before te start of the main loop
 
 # start main loop
 while True:
@@ -139,32 +139,16 @@ while True:
             if isp == 1 and wsp == 0:
                 i = (i+1)%(len(songdict)) # update i, changed to use the number elements in the song dictonary
                 j = (j+1) % 2
-                Song_Write(songdict[i],timestep,tone_mod,j) # wirtes the i'th song segment 
+                Roomba.Write_Song(songdict[i],j,tone_mod) # wirtes the i'th song segment 
 
             # playing the song segment
             if isp == 0:
-                Play_Song(j) # plays the i'th song segment
+                Roomba.Play_Song(j) # plays the i'th song segment
                 print(songdict[i]) # Include for debugging
-
-            # moving the Roomba, needs to be under Roomba.Available (update to sync with song)
-            if (time.time() - timer2) > (0.015625 * t_list[y]) :
-                timer2 = time.time() 
-                Roomba.Move(0,0) #stop roomba movement
-                if spin:
-                    Roomba.Move(0,0) # spin clockwise
-                    spin = False
-                else:
-                    Roomba.Move(0,0) # spin counterclockwise
-                    spin = True
-                y = y + 1
-                if y == len(t_list):
-                   y = 0
 
         # blinking the LED
         if (time.time() - timer) > 0.5:
             timer = time.time() # using a timer, every 0.5 seconds a LED will toggle on/off
-            #print(is_on)
-
             if is_on:
                 GPIO.output(gled, GPIO.LOW) # Turn off green LED
                 is_on = False
