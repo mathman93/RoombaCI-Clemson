@@ -134,7 +134,7 @@ while True:
         # playing the song segments
         if Roomba.Available() > 0:
             sn,isp = Roomba.ReadQueryStream(36,37)  # if roomba availble, update song number and is song playing
-            
+            print(isp) # Include for debugging
             # writing the song segment
             if isp == 1 and wsp == 0:
                 i = (i+1)%(len(songdict)) # update i, changed to use the number elements in the song dictonary
