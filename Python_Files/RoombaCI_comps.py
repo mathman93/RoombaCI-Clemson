@@ -14,9 +14,9 @@ RickRoll = [72,8,74,8,77,8,74,8,81,24,81,24,79,48,72,8,74,8,77,8,74,8,79,24,79,2
 
 #class Music:
 Comp_dict = {"DK": {"1" : DKTest
-						},
-			"RickRoll": {"1" : RickRoll
 					},
+			"RickRoll": {"1" : RickRoll
+						},
 			"Rick&DK":{"1" : RickRoll,
 						"2": DKTest
 						}
