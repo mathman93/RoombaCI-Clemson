@@ -57,6 +57,39 @@ def Movement_Sync_list(songlist,ts,rest):
     print(t_list)
     return t_list
 
+
+def NoteReturn(note):
+    list = comps.Note_dict.keys()
+    if note in list:
+        return (comps.Note_dict[note])
+    else:
+        print("Note not valid")
+        note = input("Enter a valid note G1-Ab5")
+        NoteReturn(note)
+def SongSelect()
+    list = comps.Comp_dict.keys()
+    for key in list
+        print(key)
+        print(" ")
+    compstr = input("Which song would you like to play?")
+    
+    if compstr in list:
+        for key in comps.Comp_dict[compstr].keys():
+            print(key)
+            print(" ")
+        partstr = input("Which part would you like to play? ")
+        list = comps.Comp_dict[compstr].keys()
+        if partstr in list:
+            FullSongList = PartReturn(compstr,partstr)
+            return FullSongList
+    else:
+        print("Song Name not Valid")
+        continue 
+
+def PartReturn(compstr,partstr)
+    return comps.Comp_dict[compstr][partstr]
+
+    
 ## -- Code Starts Here -- ##
 # Setup Code #
 GPIO.setmode(GPIO.BCM) # Use BCM pin numbering for GPIO
@@ -99,6 +132,9 @@ tone_mod = -7 # half step modulation of key
 rest = 15 - tone_mod #Rest note
 while True:
 #clean up the user interface
+# added function to select song, needs some work 
+    SongSelect()
+    '''
     compstr = input("Which song would you like to play? Enter DK for Donkey Kong or RickRoll for Rick Roll ")
     list = comps.Comp_dict.keys()
     if compstr in list:
@@ -112,7 +148,8 @@ while True:
             break
     else:
         print("Song Name not Valid")
-        continue 
+        continue
+        '''
 # declare vars.
 i = 0
 y = 0
