@@ -176,7 +176,7 @@ while True:
             if isp == 1 and wsp == 0:
                 i = (i+1)%(len(songdict)) # update i, changed to use the number elements in the song dictonary
                 j = (j+1) % 2
-                Song_Write(songdict[i],timestep,tone_mod,j) # wirtes the i'th song segment 
+                Song_Write(songdict[i],tone_mod,j) # wirtes the i'th song segment 
 
             # playing the song segment
             if isp == 0:
