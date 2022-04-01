@@ -38,9 +38,9 @@ def Song_Write(songlist,ts,tm,j):
     timetotal = 0
     for i in range(len(songlist)):
         if i % 2 == 0:
-            Roomba.DirectWrite(songlist[i] + tm) 
+            Roomba.DirectWrite(NoteReturn(songlist[i]) + tm) 
         else:
-            Roomba.DirectWrite(songlist[i] * ts)
+            Roomba.DirectWrite(NoteReturn(songlist[i]) * ts)
             timetotal = timetotal + songlist[i]
     return timetotal
 
@@ -49,7 +49,7 @@ def Movement_Sync_list(songlist,ts,rest):
     t = 0
     for i in range(len(songlist)):
        if (i % 2 == 0):
-           if songlist[i] == rest:
+           if NoteReturn(songlist[i]) == 30:
                t_list.append(t * ts)
                t = 0
        else:
@@ -67,6 +67,7 @@ def NoteReturn(note):
         note = input("Enter a valid note G1-Ab5")
         NoteReturn(note)
 def SongSelect():
+    
     list = comps.Comp_dict.keys()
     for key in list
         print(key)
