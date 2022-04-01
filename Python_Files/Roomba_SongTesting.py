@@ -132,7 +132,7 @@ rest = 15 - tone_mod #Rest note
 #while True:
 #clean up the user interface
 # added function to select song, needs some work 
-SongSelect()
+FullSongList = SongSelect()
 '''
     compstr = input("Which song would you like to play? Enter DK for Donkey Kong or RickRoll for Rick Roll ")
     list = comps.Comp_dict.keys()
