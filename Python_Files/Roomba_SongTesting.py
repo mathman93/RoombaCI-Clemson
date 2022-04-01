@@ -69,7 +69,7 @@ def NoteReturn(note):
 def SongSelect():
     
     list = comps.Comp_dict.keys()
-    for key in list
+    for key in list:
         print(key)
         print(" ")
     compstr = input("Which song would you like to play?")
