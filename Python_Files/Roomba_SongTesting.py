@@ -30,7 +30,7 @@ def Play_Song(j):
     Roomba.DirectWrite(j)
 
 # plays the song in sections of 32
-def Song_Write(songlist,ts,tm,j):
+def Song_Write(songlist,tm,j):
     songlength = int(len(songlist)/2) # number of notes in song
     Roomba.DirectWrite(140)
     Roomba.DirectWrite(j)
@@ -40,7 +40,7 @@ def Song_Write(songlist,ts,tm,j):
         if i % 2 == 0:
             Roomba.DirectWrite(NoteReturn(songlist[i]) + tm) 
         else:
-            Roomba.DirectWrite(songlist[i] * ts)
+            Roomba.DirectWrite(songlist[i])
             timetotal = timetotal + songlist[i]
     return timetotal
 
@@ -69,9 +69,9 @@ def NoteReturn(note):
 def SongSelect():
     while True:
         list = comps.Comp_dict.keys()
-            for key in list:
-                print(key)
-                print(" ")
+        for key in list:
+            print(key)
+            print(" ")
         compstr = input("Which song would you like to play?")
         if compstr in list:
             for key in comps.Comp_dict[compstr].keys():
