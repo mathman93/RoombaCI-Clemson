@@ -40,7 +40,7 @@ def Song_Write(songlist,ts,tm,j):
         if i % 2 == 0:
             Roomba.DirectWrite(NoteReturn(songlist[i]) + tm) 
         else:
-            Roomba.DirectWrite(NoteReturn(songlist[i]) * ts)
+            Roomba.DirectWrite(songlist[i] * ts)
             timetotal = timetotal + songlist[i]
     return timetotal
 
