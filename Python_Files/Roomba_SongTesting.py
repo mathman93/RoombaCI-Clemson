@@ -67,23 +67,22 @@ def NoteReturn(note):
         note = input("Enter a valid note G1-Ab5")
         NoteReturn(note)
 def SongSelect():
-    
-    list = comps.Comp_dict.keys()
-    for key in list:
-        print(key)
-        print(" ")
-    compstr = input("Which song would you like to play?")
-    
-    if compstr in list:
-        for key in comps.Comp_dict[compstr].keys():
-            print(key)
-        partstr = input("Which part would you like to play?")
-        list = comps.Comp_dict[compstr].keys()
-        if partstr in list:
-            FullSongList = PartReturn(compstr,partstr)
-            return FullSongList
-    else:
-        print("Song Name not Valid")
+    while True:
+        list = comps.Comp_dict.keys()
+            for key in list:
+                print(key)
+                print(" ")
+        compstr = input("Which song would you like to play?")
+        if compstr in list:
+            for key in comps.Comp_dict[compstr].keys():
+                print(key)
+            partstr = input("Which part would you like to play?")
+            list = comps.Comp_dict[compstr].keys()
+            if partstr in list:
+                FullSongList = PartReturn(compstr,partstr)
+                return FullSongList
+        else:
+            print("Song Name not Valid")
          
 
 def PartReturn(compstr,partstr):
@@ -130,7 +129,7 @@ program objectives
 timestep = 8 # (1/64)ths of a second
 tone_mod = -7 # half step modulation of key
 rest = 15 - tone_mod #Rest note
-while True:
+#while True:
 #clean up the user interface
 # added function to select song, needs some work 
     SongSelect()
