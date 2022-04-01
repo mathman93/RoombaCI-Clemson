@@ -78,7 +78,7 @@ def SongSelect():
         for key in comps.Comp_dict[compstr].keys():
             print(key)
         partstr = input("Which part would you like to play?")
-        list = comps.Comp_dict[compstr].keys()
+        list = comps.Comp_dict[partstr].keys()
         if partstr in list:
             FullSongList = PartReturn(compstr,partstr)
             return FullSongList
