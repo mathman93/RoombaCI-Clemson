@@ -38,7 +38,7 @@ def Song_Write(songlist,tm,j):
     timetotal = 0
     for i in range(len(songlist)):
         if i % 2 == 0:
-            Roomba.DirectWrite(NoteReturn(songlist[i]) + tm) 
+            Roomba.DirectWrite(comps.Note_dict[songlist[i]] + tm) 
         else:
             Roomba.DirectWrite(songlist[i])
             timetotal = timetotal + songlist[i]
