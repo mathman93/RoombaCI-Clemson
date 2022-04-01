@@ -66,7 +66,7 @@ def NoteReturn(note):
         print("Note not valid")
         note = input("Enter a valid note G1-Ab5")
         NoteReturn(note)
-def SongSelect()
+def SongSelect():
     list = comps.Comp_dict.keys()
     for key in list
         print(key)
@@ -84,9 +84,9 @@ def SongSelect()
             return FullSongList
     else:
         print("Song Name not Valid")
-        continue 
+         
 
-def PartReturn(compstr,partstr)
+def PartReturn(compstr,partstr):
     return comps.Comp_dict[compstr][partstr]
 
     
