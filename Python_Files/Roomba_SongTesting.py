@@ -49,7 +49,7 @@ def Movement_Sync_list(songlist,ts,rest):
     t = 0
     for i in range(len(songlist)):
        if (i % 2 == 0):
-           if NoteReturn(songlist[i]) == 30:
+           if comps.Note_dict[songlist[i]] == 30:
                t_list.append(t * ts)
                t = 0
        else:
@@ -83,7 +83,8 @@ def SongSelect():
                 return FullSongList
         else:
             print("Song Name not Valid")
-         
+            continue
+             
 
 def PartReturn(compstr,partstr):
     return comps.Comp_dict[compstr][partstr]
