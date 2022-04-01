@@ -133,7 +133,7 @@ rest = 15 - tone_mod #Rest note
 #clean up the user interface
 # added function to select song, needs some work 
 SongSelect()
-    '''
+'''
     compstr = input("Which song would you like to play? Enter DK for Donkey Kong or RickRoll for Rick Roll ")
     list = comps.Comp_dict.keys()
     if compstr in list:
@@ -148,7 +148,7 @@ SongSelect()
     else:
         print("Song Name not Valid")
         continue
-        '''
+'''
 # declare vars.
 i = 0
 y = 0
