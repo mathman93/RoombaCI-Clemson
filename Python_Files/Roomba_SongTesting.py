@@ -62,10 +62,10 @@ def NoteReturn(note):
     list = comps.Note_dict.keys()
     if note in list:
         return (comps.Note_dict[note])
-    else:
-        print("Note not valid")
-        note = input("Enter a valid note G1-Ab5")
-        NoteReturn(note)
+    #else:
+    #    print("Note not valid")
+    #    note = input("Enter a valid note G1-Ab5")
+    #    NoteReturn(note)
 def SongSelect():
     while True:
         list = comps.Comp_dict.keys()
