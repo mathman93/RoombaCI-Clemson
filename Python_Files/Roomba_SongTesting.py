@@ -38,7 +38,7 @@ def Song_Write(songlist,tm,j):
     timetotal = 0
     for i in range(len(songlist)):
         if i % 2 == 0:
-            Roomba.DirectWrite(NoteReturn(songlist[i]) + tm) 
+            Roomba.DirectWrite(comps.Note_dict[songlist[i]] + tm) 
         else:
             Roomba.DirectWrite(songlist[i])
             timetotal = timetotal + songlist[i]
@@ -162,7 +162,7 @@ j = 0 # song position, i is song dictonary position
 songdict = Song_DictCreate(FullSongList) # create song dictonary
 sn,isp = Roomba.Query(36,37)
 Roomba.StartQueryStream(36,37)  # start of query stream
-Song_Write(songdict[i],timestep,tone_mod,i) # writing the first song segment before te start of the main loop
+Song_Write(songdict[i],tone_mod,i) # writing the first song segment before te start of the main loop
 
 # start main loop
 while True:
