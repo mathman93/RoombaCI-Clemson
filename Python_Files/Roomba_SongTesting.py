@@ -91,6 +91,8 @@ def PartReturn(compstr,partstr):
 
     
 ## -- Code Starts Here -- ##
+global Xbee # Specifies connection to Xbee
+Xbee = serial.Serial('/dev/ttyUSB0', 115200) # Baud rate should be 115200
 # Setup Code #
 GPIO.setmode(GPIO.BCM) # Use BCM pin numbering for GPIO
 RoombaCI_lib.DisplayDateTime() # Display current date and time
@@ -164,6 +166,18 @@ songdict = Song_DictCreate(FullSongList) # create song dictonary
 sn,isp = Roomba.Query(36,37)
 Roomba.StartQueryStream(36,37)  # start of query stream
 Song_Write(songdict[i],tone_mod,i) # writing the first song segment before te start of the main loop
+
+message = '1' # Change this to any character string you want
+Xbee.write(message.encode()) # Send the number over the Xbee
+while True: # Wait for everyone loop
+	# time if statement
+
+	# receive if statement
+	if Xbee.inWaiting() > 0: # If there is something in the receive buffer
+		message = Xbee.read(Xbee.inWaiting()).decode() # Read all data in
+		print(message) # To see what the message is
+		# Reset timer
+# End while loop
 
 # start main loop
 while True:
