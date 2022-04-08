@@ -15,7 +15,11 @@ RickRoll = ["C5",8,"D5",8,"F5",8,"D5",8,"A5",24,"A5",24,"G5",48,"C5",8,"D5",8,"F
                 "D5",8,"D5",8,"F5",8,"D5",8,"F5",32,"G5",16,"E5",24,"D5",8,"C5",32,"C5",16,"G5",32,"F5",48,"r",16,\
                 "C5",8,"D5",8,"F5",8,"D5",8,"A5",24,"A5",24,"G5",48,"C5",8,"D5",8,"F5",8,"D5",8,"C6",32,"E5",16,"F5",24,"E5",8,"D5",16,\
                 "D5",8,"D5",8,"F5",8,"D5",8,"F5",32,"G5",16,"E5",24,"D5",8,"C5",32,"C5",16,"G5",32,"F5",56,"r",4] # Never Gonna Give You Up, composed by Rick Astley
-Comp_dict = {"DK": {"1" : DKTest}, "RickRoll": {"1" : RickRoll}}
+
+BaldiSong = ["G4",16,"G5",16,"G4",16,"G5",16,"G4",16,"G5",16,"G4",16,"G5",16,"A4",16,"A5",16,"A4",16,"A5",16,"A4",16,"A5",16,"A4",16,"A5",16] # Hayride Too I Don't Even Care, composed by Cady McGonigal 
+
+
+Comp_dict = {"DK": {"1" : DKTest}, "RickRoll": {"1" : RickRoll}, "Baldi": {"1": BaldiSong}}
 
 
 Note_dict = {"r":30, "G1":31, "Ab1":32, "A1":33,"Bb1":34, "B1":35,"C2":36, "Db2":37,
