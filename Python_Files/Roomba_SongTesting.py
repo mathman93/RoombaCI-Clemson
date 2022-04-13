@@ -171,7 +171,7 @@ message = '1' # Change this to any character string you want
 Xbee.write(message.encode()) # Send the number over the Xbee
 while True: # Wait for everyone loop
 	# time if statement
-    `   if(time.time()-timer)>5:
+        if(time.time()-timer)>5:
             break
 	# receive if statement
 	if Xbee.inWaiting() > 0: # If there is something in the receive buffer
