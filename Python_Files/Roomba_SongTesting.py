@@ -159,7 +159,7 @@ is_on = False
 spin = False
 wsp = 1 # added a var. to see if there was a song playing
 timer = time.time() # start timer
-timer2 = time.time() #start a second timer for movement
+waitTimer = time.time() #start a second timer for movement
 t_list = Movement_Sync_list(FullSongList,timestep,rest)
 j = 0 # song position, i is song dictonary position
 songdict = Song_DictCreate(FullSongList) # create song dictonary
@@ -171,14 +171,23 @@ message = '1' # Change this to any character string you want
 Xbee.write(message.encode()) # Send the number over the Xbee
 while True: # Wait for everyone loop
 	# time if statement
+<<<<<<< Updated upstream
 	if(time.time()-timer)>5:
 		break
+=======
+        if(time.time()-waitTimer)>5:
+            break
+>>>>>>> Stashed changes
 	# receive if statement
 	if Xbee.inWaiting() > 0: # If there is something in the receive buffer
 		message = Xbee.read(Xbee.inWaiting()).decode() # Read all data in
 		#print(message) # To see what the message is
 		# Reset timer
+<<<<<<< Updated upstream
 		timer = time.time()
+=======
+                waitTimer = time.time()
+>>>>>>> Stashed changes
 # End while loop
 
 # start main loop
