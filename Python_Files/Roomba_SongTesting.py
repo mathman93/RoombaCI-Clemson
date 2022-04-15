@@ -200,7 +200,7 @@ while True:
                 print(songdict[i]) # Include for debugging
 
             # moving the Roomba, needs to be under Roomba.Available (update to sync with song)
-            if (time.time() - timer2) > (0.015625 * t_list[y]) :
+          '''  if (time.time() - timer2) > (0.015625 * t_list[y]) :
                 timer2 = time.time() 
                 Roomba.Move(0,0) #stop roomba movement
                 if spin:
@@ -211,7 +211,7 @@ while True:
                     spin = True
                 y = y + 1
                 if y == len(t_list):
-                   y = 0
+               '''    y = 0
 
         # blinking the LED
         if (time.time() - timer) > 0.5:
