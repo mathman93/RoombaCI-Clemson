@@ -136,22 +136,6 @@ rest = 15 - tone_mod #Rest note
 #clean up the user interface
 # added function to select song, needs some work 
 FullSongList = SongSelect()
-'''
-    compstr = input("Which song would you like to play? Enter DK for Donkey Kong or RickRoll for Rick Roll ")
-    list = comps.Comp_dict.keys()
-    if compstr in list:
-        for key in comps.Comp_dict[compstr].keys():
-            print(key)
-            print(" ")
-        partstr = input("Which part would you like to play? ")
-        list = comps.Comp_dict[compstr].keys()
-        if partstr in list:
-            FullSongList = comps.Comp_dict[compstr][partstr]
-            break
-    else:
-        print("Song Name not Valid")
-        continue
-'''
 # declare vars.
 i = 0
 y = 0
