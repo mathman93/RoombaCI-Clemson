@@ -21,7 +21,7 @@ BaldiSong = ["G4",16,"G5",16,"G4",16,"G5",16,"G4",16,"G5",16,"G4",16,"G5",16,"A4
 
 VoiceOfPeaceT = ["Bb3",128,"C4",64, "C4", 96, "D4", 32, "C4", 64,"Ab3", 64, "Bb3",192, "C4", 32, "C4", 32, "C4", 32, "Bb3", 32, "C4",32,"D4",32,"Eb4",32,"D4",32,"Eb4",32,"D4",32,"C4",128,"Eb4",64,"G5",32,"F5",32,"D4",32,"C4",32,"D4",32,"F5",32,"G5",64,"D5",64,"Eb5",96,"D5",32,"C5",64,"Ab4",64,"Bb4",256]
                 
-Comp_dict = {"DK": {"1" : DKTest}, "RickRoll": {"1" : RickRoll}, "Baldi": {"1": BaldiSong}}
+Comp_dict = {"DK": {"1" : DKTest}, "RickRoll": {"1" : RickRoll}, "Baldi": {"1": BaldiSong}, "VOP":{"1":VoiceOfPeaceT}}
 
 
 Note_dict = {"r":30, "G1":31, "Ab1":32, "A1":33,"Bb1":34, "B1":35,"C2":36, "Db2":37,
