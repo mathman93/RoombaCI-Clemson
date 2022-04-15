@@ -171,23 +171,17 @@ message = '1' # Change this to any character string you want
 Xbee.write(message.encode()) # Send the number over the Xbee
 while True: # Wait for everyone loop
 	# time if statement
-<<<<<<< Updated upstream
-	if(time.time()-timer)>5:
-		break
-=======
+	#if(time.time()-timer)>5:
+	#	break
         if(time.time()-waitTimer)>5:
-            break
->>>>>>> Stashed changes
+                break
 	# receive if statement
 	if Xbee.inWaiting() > 0: # If there is something in the receive buffer
 		message = Xbee.read(Xbee.inWaiting()).decode() # Read all data in
 		#print(message) # To see what the message is
 		# Reset timer
-<<<<<<< Updated upstream
-		timer = time.time()
-=======
+		#timer = time.time()
                 waitTimer = time.time()
->>>>>>> Stashed changes
 # End while loop
 
 # start main loop
