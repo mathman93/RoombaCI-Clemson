@@ -20,10 +20,10 @@ gled = 13
 # creates each 16 note segment
 def Song_DictCreate(songlist):
     songdict = {} # Initialize diction for Roomba songs
-    n = len(songlist) # number of note/duration entries in songlist
-    if n < 33:
+    n = len(songlist) # number of entries in songlist (should be even)
+    if n < 33: # i.e., songlist has 16 or fewer note duration pairs...
         songdict[0] = songlist[0:] # Only need one entry in songdict
-    else:
+    else: # if n > 33
         for i in range(0,int((n-1)/32)):
             songdict[i] = songlist[32 * i : 32 * (i+1)]
         # End for
