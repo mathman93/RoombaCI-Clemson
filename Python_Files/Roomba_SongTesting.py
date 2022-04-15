@@ -163,24 +163,23 @@ waitTimer = time.time() #start a second timer for movement
 t_list = Movement_Sync_list(FullSongList,timestep,rest)
 j = 0 # song position, i is song dictonary position
 songdict = Song_DictCreate(FullSongList) # create song dictonary
-sn,isp = Roomba.Query(36,37)
-Roomba.StartQueryStream(36,37)  # start of query stream
 Song_Write(songdict[i],tone_mod,i) # writing the first song segment before te start of the main loop
 
 message = '1' # Change this to any character string you want
 Xbee.write(message.encode()) # Send the number over the Xbee
 while True: # Wait for everyone loop
 	# time if statement
-	if(time.time()-timer)>5:
+	if(time.time()-waitTimer)>5:
 		break
 	# receive if statement
 	if Xbee.inWaiting() > 0: # If there is something in the receive buffer
 		message = Xbee.read(Xbee.inWaiting()).decode() # Read all data in
 		#print(message) # To see what the message is
 		# Reset timer
-		timer = time.time()
+		waitTimer = time.time()
 # End while loop
-
+sn,isp = Roomba.Query(36,37)
+Roomba.StartQueryStream(36,37)  # start of query stream
 # start main loop
 while True:
     try:
