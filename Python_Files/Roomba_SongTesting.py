@@ -136,22 +136,6 @@ rest = 15 - tone_mod #Rest note
 #clean up the user interface
 # added function to select song, needs some work 
 FullSongList = SongSelect()
-'''
-    compstr = input("Which song would you like to play? Enter DK for Donkey Kong or RickRoll for Rick Roll ")
-    list = comps.Comp_dict.keys()
-    if compstr in list:
-        for key in comps.Comp_dict[compstr].keys():
-            print(key)
-            print(" ")
-        partstr = input("Which part would you like to play? ")
-        list = comps.Comp_dict[compstr].keys()
-        if partstr in list:
-            FullSongList = comps.Comp_dict[compstr][partstr]
-            break
-    else:
-        print("Song Name not Valid")
-        continue
-'''
 # declare vars.
 i = 0
 y = 0
@@ -163,24 +147,23 @@ waitTimer = time.time() #start a second timer for movement
 t_list = Movement_Sync_list(FullSongList,timestep,rest)
 j = 0 # song position, i is song dictonary position
 songdict = Song_DictCreate(FullSongList) # create song dictonary
-sn,isp = Roomba.Query(36,37)
-Roomba.StartQueryStream(36,37)  # start of query stream
 Song_Write(songdict[i],tone_mod,i) # writing the first song segment before te start of the main loop
 
 message = '1' # Change this to any character string you want
 Xbee.write(message.encode()) # Send the number over the Xbee
 while True: # Wait for everyone loop
 	# time if statement
-	if(time.time()-timer)>5:
+	if(time.time()-waitTimer)>5:
 		break
 	# receive if statement
 	if Xbee.inWaiting() > 0: # If there is something in the receive buffer
 		message = Xbee.read(Xbee.inWaiting()).decode() # Read all data in
 		#print(message) # To see what the message is
 		# Reset timer
-		timer = time.time()
+		waitTimer = time.time()
 # End while loop
-
+sn,isp = Roomba.Query(36,37)
+Roomba.StartQueryStream(36,37)  # start of query stream
 # start main loop
 while True:
     try:
@@ -198,21 +181,6 @@ while True:
             if isp == 0:
                 Play_Song(j) # plays the i'th song segment
                 print(songdict[i]) # Include for debugging
-
-            # moving the Roomba, needs to be under Roomba.Available (update to sync with song)
-            if (time.time() - timer2) > (0.015625 * t_list[y]) :
-                timer2 = time.time() 
-                Roomba.Move(0,0) #stop roomba movement
-                if spin:
-                    Roomba.Move(0,0) # spin clockwise
-                    spin = False
-                else:
-                    Roomba.Move(0,0) # spin counterclockwise
-                    spin = True
-                y = y + 1
-                if y == len(t_list):
-                   y = 0
-
         # blinking the LED
         if (time.time() - timer) > 0.5:
             timer = time.time() # using a timer, every 0.5 seconds a LED will toggle on/off
