@@ -2,19 +2,29 @@
 ''' Purpose: Store compositions for use in Roomba_SongTesting'''
 #work on making file structure cleaner, need to get which composition from user, then which part
 
-DKTest = ["C5",16,"R",8,"D5",16,"G5",8,"A5",16,"R",8,"G5",16,"R",8,"C6",16,"R",8,"B5",16,"G5",8,"F5",16,"R",32,\
+# Donkey Kong 64 theme, by Grant Kirkhope
+DK64Theme = ["C5",16,"R",8,"D5",16,"G5",8,"A5",16,"R",8,"G5",16,"R",8,"C6",16,"R",8,"B5",16,"G5",8,"F5",16,"R",32,\
 		"B4",16,"R",8,"D5",16,"F5",8,"B5",16,"R",8,"A5",16,"R",8,"Ab5",16,"R",8,"G5",16,"F5",8,"E5",16,"R",32,\
 		"C5",16,"R",8,"D5",16,"G5",8,"A5",16,"R",8,"G5",16,"R",8,"E6",16,"R",8,"D6",16,"C6",8,"A6",16,"R",32,\
-		"A5",16,"R",8,"B5",16,"C5",8,"C5",16,"G5",8,"E5",16,"C5",8,"Gb5",16,"R",8,"F5",8,"R",8,"E5",16,"R",32] # Donkey Kong 64 theme, by Grant Kirkhope
+		"A5",16,"R",8,"B5",16,"C5",8,"C5",16,"G5",8,"E5",16,"C5",8,"Gb5",16,"R",8,"F5",8,"R",8,"E5",16,"R",32]
 
+# Never Gonna Give You Up, by Rick Astley
 RickRoll = ["C5",8,"D5",8,"F5",8,"D5",8,"A5",24,"A5",24,"G5",48,"C5",8,"D5",8,"F5",8,"D5",8,"G5",24,"G5",24,"F5",16,"E5",8,"D5",24,\
 		"D5",8,"D5",8,"F5",8,"D5",8,"F5",32,"G5",16,"E5",24,"D5",8,"C5",32,"C5",16,"G5",32,"F5",48,"R",16,\
 		"C5",8,"D5",8,"F5",8,"D5",8,"A5",24,"A5",24,"G5",48,"C5",8,"D5",8,"F5",8,"D5",8,"C6",32,"E5",16,"F5",24,"E5",8,"D5",16,\
-		"D5",8,"D5",8,"F5",8,"D5",8,"F5",32,"G5",16,"E5",24,"D5",8,"C5",32,"C5",16,"G5",32,"F5",56,"R",4] # Never Gonna Give You Up, by Rick Astley
+		"D5",8,"D5",8,"F5",8,"D5",8,"F5",32,"G5",16,"E5",24,"D5",8,"C5",32,"C5",16,"G5",32,"F5",56,"R",4]
 
+# Super Mario Bros. Theme Introduction, by Koji Kondo
+SMBIntro = ["E5",8, "E5",12, "R",4, "E5",12, "R",4, "C5",8, "E5",12, "R",4, "G5",12, "R",20, "G4",12, "R",20]
+
+ # Super Mario Bros. Super Star Theme, by Koji Kondo
 SuperStar = ["F5",12,"F5",12,"F5",18,"F5",12,"F5",12,"F5",6,"F5",12,"F5",12,\
-			"E5",12,"E5",12,"E5",18,"E5",12,"E5",12,"E5",6,"E5",12,"E5",12] # Super Mario Bros. Super Star Theme, by Koji Kondo
+			"E5",12,"E5",12,"E5",18,"E5",12,"E5",12,"E5",6,"E5",12,"E5",12]
 
+# Super Mario Galaxy Start-up Theme
+SMGTheme = ["G5",20, "Ab5",4, "A5",4, "Bb5",4, "B5",4, "C6",24, "R",8, "G4",32, "C5",32, "G5",32, "Gb5",16, "D5",16, "E5",64]
+
+# All available notes in chromatic sequence (for testing)
 Chromatic = ["G1",8, "Ab1",8, "A1",8, "Bb1",8, "B1",8, "C2",8, "Db2",8, "D2",8, "Eb2",8, "E2",8, "F2",8, "Gb2",8,\
 			"G2",8, "Ab2",8, "A2",8, "Bb2",8, "B2",8, "C3",8, "Db3",8, "D3",8, "Eb3",8, "E3",8, "F3",8, "Gb3",8,\
 			"G3",8, "Ab3",8, "A3",8, "Bb3",8, "B3",8, "C4",8, "Db4",8, "D4",8, "Eb4",8, "E4",8, "F4",8, "Gb4",8,\
@@ -35,9 +45,11 @@ AGrace_s = ["C4",4, "F4",8, "A4",2, "F4",2, "A4",8, "G4",4, "F4",8, "D4",4, "C4"
 		"C4",4, "F4",8, "A4",2, "F4",2, "A4",8, "G4",4, "F4",12, "R",8]
 
 #class Music:
-Comp_dict = {"Demos": {"DK64" : DKTest,
+Comp_dict = {"Demos": {"DK64" : DK64Theme,
 						"RickRoll" : RickRoll,
+						"SMBIntro": SMBIntro,
 						"SuperStar": SuperStar,
+						"MarioGalaxy": SMGTheme,
 						"AllNotes": Chromatic
 						},
 			"AmazingGrace":{"1" : AGrace_s

@@ -37,39 +37,6 @@ def Song_Split(fullsonglist):
 	remain = fullsonglist[32:]
 	return [song, remain]
 
-'''
-def Play_Song(j):
-    Roomba.DirectWrite(141)
-    Roomba.DirectWrite(j)
-
-# plays the song in sections of 32
-def Song_Write(songlist,ts,tm,j):
-    songlength = int(len(songlist)/2) # number of notes in song
-    Roomba.DirectWrite(140)
-    Roomba.DirectWrite(j)
-    Roomba.DirectWrite(songlength)
-    timetotal = 0
-    for i in range(len(songlist)):
-        if i % 2 == 0:
-            Roomba.DirectWrite(songlist[i] + tm) 
-        else:
-            Roomba.DirectWrite(songlist[i] * ts)
-            timetotal = timetotal + songlist[i]
-    return timetotal
-'''
-def Movement_Sync_list(songlist,ts,rest):
-    t_list = []
-    t = 0
-    for i in range(len(songlist)):
-       if (i % 2 == 0):
-           if songlist[i] == rest:
-               t_list.append(t * ts)
-               t = 0
-       else:
-            t = t + songlist[i]
-    print(t_list)
-    return t_list
-
 ## -- Code Starts Here -- ##
 # Setup Code #
 GPIO.setmode(GPIO.BCM) # Use BCM pin numbering for GPIO
@@ -106,10 +73,6 @@ program objectives
 '''
 
 '''main program starts'''
-
-#timestep = 8 # (1/64)ths of a second
-tone_mod = -7 # half step modulation of key
-rest = 15 - tone_mod #Rest note
 while True:
 #clean up the user interface
     for key in comps.Comp_dict.keys():
@@ -130,19 +93,16 @@ while True:
         print("Song Name not Valid")
         continue 
 # declare vars.
-i = 0
-y = 0
+i = 0 # Song dictionary index
 is_on = False
-spin = False
 wsp = 1 # added a var. to see if there was a song playing
 timer = time.time() # start timer
-timer2 = time.time() #start a second timer for movement
 #t_list = Movement_Sync_list(FullSongList,timestep,rest)
-j = 0 # song position, i is song dictonary position
+j = 0 # Roomba song number
 songdict = Song_DictCreate(FullSongList) # create song dictonary
 sn,isp = Roomba.Query(36,37)
 Roomba.StartQueryStream(36,37) # start of query stream
-Roomba.Write_Song(songdict[i],j,tone_mod) # writing the first song segment before te start of the main loop
+Roomba.Write_Song(songdict[i],j,0) # writing the first song segment before te start of the main loop
 
 # start main loop
 while True:
@@ -155,7 +115,7 @@ while True:
 			if isp == 1 and wsp == 0:
 				i = (i+1)%(len(songdict)) # update i, changed to use the number elements in the song dictonary
 				j = (j+1) % 2
-				Roomba.Write_Song(songdict[i],j,tone_mod) # wirtes the i'th song segment 
+				Roomba.Write_Song(songdict[i],j,0) # wirtes the i'th song segment 
 			# End if isp == 1
 			# playing the song segment
 			if isp == 0:
