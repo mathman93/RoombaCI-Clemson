@@ -73,15 +73,13 @@ while True:
 	disp_str = ""
 	for key in complist:
 		disp_str = disp_str + key + "; "
-		#print(key)
-		#print(" ")
 	# End for
 	print(disp_str + "\n")
 	compstr = input("Which song would you like to play? ")
 	if compstr in complist:
 		break
 	else:
-		print("Song Name not Valid")
+		print("Composition Name not valid. Try again.")
 		continue
 	# End if
 # End while
@@ -93,8 +91,6 @@ while True:
 	disp_str = ""
 	for key in partlist:
 		disp_str = disp_str + key + "; "
-		#print(key)
-		#print(" ")
 	# End for
 	print(disp_str + "\n")
 	partstr = input("Which part would you like to play? ")
@@ -102,7 +98,7 @@ while True:
 		FullSongList = comps.Comp_dict[compstr][partstr]
 		break
 	else:
-		print("Part Name not Valid. Try again")
+		print("Part Name not valid. Try again.")
 		continue
 	# End if
 # End while
@@ -152,13 +148,14 @@ while True:
 				print(songdict[i]) # Include for debugging
 			# End if isp == 0
 		# End if Roomba.Available
-		# blinking the LED
+		
+		# The LED will toggle on/off every 0.5 seconds 
 		if (time.time() - timer) > 0.5:
-			timer = time.time() # using a timer, every 0.5 seconds a LED will toggle on/off
-			if is_on:
+			timer = time.time() # Reset timer value 
+			if is_on: # If LED was on...
 				GPIO.output(gled, GPIO.LOW) # Turn off green LED
 				is_on = False
-			else:
+			else: # If LED was off...
 				GPIO.output(gled, GPIO.HIGH) # Turn on green LED
 				is_on = True
 			# End if is_on
