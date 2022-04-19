@@ -63,16 +63,9 @@ if Roomba.Available() > 0: # If anything is in the Roomba receive buffer
 print(" ROOMBA Setup Complete")
 GPIO.output(gled, GPIO.LOW) # Indicate all set sequences are complete
 
-'''
-Start of song setup after roomba setup
-
-program objectives
-1. play the currently programed song
-2. while roomba is playing the current song the roomba should be blinking the green LED
-3. later this will be changed out for movement of the roomba while playing a song
-'''
-
 '''main program starts'''
+global Xbee # Specifies connection to Xbee
+Xbee = serial.Serial('/dev/ttyUSB0', 115200) # Baud rate should be 115200
 while True:
 	print("Here are the available compositions:\n")
 	# Display Composition key names:
@@ -122,6 +115,9 @@ timer = time.time() # start timer
 #t_list = Movement_Sync_list(FullSongList,timestep,rest)
 j = 0 # Roomba song number
 songdict = Song_DictCreate(FullSongList) # create song dictonary
+
+
+
 sn,isp = Roomba.Query(36,37)
 Roomba.StartQueryStream(36,37) # start of query stream
 Roomba.Write_Song(songdict[i],j,0) # writing the first song segment before te start of the main loop
