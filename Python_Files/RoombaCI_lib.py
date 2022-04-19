@@ -12,6 +12,7 @@ import time
 import math
 import serial
 import numpy as np
+import RoombaCI_comps as comps
 try: # May not need this either (?)
 	import struct
 except ImportError:
@@ -859,7 +860,7 @@ class Create_2:
 		timetotal = 0 # Number of time units (1/64 sec.) the song will play
 		for i in range(len(songlist)):
 			if i % 2 == 0: # For notes
-				self.DirectWrite(songlist[i] + tm) 
+				self.DirectWrite(comps.Note_dict[songlist[i]] + tm) 
 			else: # For durations
 				self.DirectWrite(songlist[i])
 				timetotal = timetotal + songlist[i] # Update time units of the song
