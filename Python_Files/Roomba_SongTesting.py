@@ -111,17 +111,28 @@ while True:
 i = 0 # Song dictionary index
 is_on = False
 wsp = 1 # added a var. to see if there was a song playing
-timer = time.time() # start timer
-#t_list = Movement_Sync_list(FullSongList,timestep,rest)
 j = 0 # Roomba song number
 songdict = Song_DictCreate(FullSongList) # create song dictonary
-
-
-
-sn,isp = Roomba.Query(36,37)
-Roomba.StartQueryStream(36,37) # start of query stream
 Roomba.Write_Song(songdict[i],j,0) # writing the first song segment before te start of the main loop
 
+message = '1' # Change this to any character string you want
+Xbee.write(message.encode()) # Send the number over the Xbee
+waitTimer = time.time()
+while True: # Wait for everyone loop
+	# time if statement
+	if(time.time() - waitTimer) > 5:
+		break
+	# receive if statement
+	if Xbee.inWaiting() > 0: # If there is something in the receive buffer
+		message = Xbee.read(Xbee.inWaiting()).decode() # Read all data in
+		#print(message) # To see what the message is
+		# Reset timer
+		waitTimer = time.time()
+# End while loop
+
+sn,isp = Roomba.Query(36,37) # Get initial values
+Roomba.StartQueryStream(36,37) # start of query stream
+timer = time.time() # start timer
 # start main loop
 while True:
 	try:
