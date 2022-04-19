@@ -74,25 +74,47 @@ program objectives
 
 '''main program starts'''
 while True:
-#clean up the user interface
-    for key in comps.Comp_dict.keys():
-        print(key)
-        print(" ")
-    compstr = input("Which song would you like to play? ")
-    list = comps.Comp_dict.keys()
-    if compstr in list:
-        for key in comps.Comp_dict[compstr].keys():
-            print(key)
-            print(" ")
-        partstr = input("Which part would you like to play? ")
-        list = comps.Comp_dict[compstr].keys()
-        if partstr in list:
-            FullSongList = comps.Comp_dict[compstr][partstr]
-            break
-    else:
-        print("Song Name not Valid")
-        continue 
-# declare vars.
+	print("Here are the available compositions:\n")
+	# Display Composition key names:
+	complist = comps.Comp_dict.keys()
+	disp_str = ""
+	for key in complist:
+		disp_str = disp_str + key + "; "
+		#print(key)
+		#print(" ")
+	# End for
+	print(disp_str + "\n")
+	compstr = input("Which song would you like to play? ")
+	if compstr in complist:
+		break
+	else:
+		print("Song Name not Valid")
+		continue
+	# End if
+# End while
+
+while True:
+	print("The available parts for this composition are:\n")
+	# Display Part key names:
+	partlist = comps.Comp_dict[compstr].keys()
+	disp_str = ""
+	for key in partlist:
+		disp_str = disp_str + key + "; "
+		#print(key)
+		#print(" ")
+	# End for
+	print(disp_str + "\n")
+	partstr = input("Which part would you like to play? ")
+	if partstr in partlist:
+		FullSongList = comps.Comp_dict[compstr][partstr]
+		break
+	else:
+		print("Part Name not Valid. Try again")
+		continue
+	# End if
+# End while
+
+# Declare variables
 i = 0 # Song dictionary index
 is_on = False
 wsp = 1 # added a var. to see if there was a song playing
