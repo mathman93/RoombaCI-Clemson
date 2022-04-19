@@ -19,11 +19,24 @@ gled = 13
 
 # creates each 16 note segment
 def Song_DictCreate(songlist):
-    songdict = {}
-    for i in range(0,int(len(songlist) / 32)):
-        songdict[i] = songlist[32 * i : 32 * (i+1)]
-    songdict[i+1] = songlist[32*(i+1):] # remaining bit
-    return songdict
+	songdict = {}
+	index = 0
+	n = len(songlist)
+	while n > 32:
+		song, songlist = Song_Split(songlist) # Get first 16 notes for song
+		songdict[index] = song # Assign song to dictionary
+		index += 1 # Increment counter
+		n -= 32 # Update length of songlist
+	# End while
+	songdict[index] = songlist
+	return songdict
+
+# Split off first 16 note-duration pairs from fullsonglist
+def Song_Split(fullsonglist):
+	song = fullsonglist[0:32]
+	remain = fullsonglist[32:]
+	return [song, remain]
+
 '''
 def Play_Song(j):
     Roomba.DirectWrite(141)
