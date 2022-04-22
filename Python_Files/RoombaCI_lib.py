@@ -12,7 +12,7 @@ import time
 import math
 import serial
 import numpy as np
-import RoombaCI_comps as comps
+import RoombaCI_comps
 try: # May not need this either (?)
 	import struct
 except ImportError:
@@ -854,6 +854,7 @@ class Create_2:
 	'''
 	def Write_Song(self, songlist, song_index, tm):
 		songlength = int(len(songlist)/2) # number of note-duration pairs in the song
+		comps = RoombaCI_comps.Music() # May change later when files are combined.......
 		self.DirectWrite(140) # Roomba op-code for writing song to memory
 		self.DirectWrite(song_index) # Roomba song index
 		self.DirectWrite(songlength) # Number of note-duration pairs in the song
