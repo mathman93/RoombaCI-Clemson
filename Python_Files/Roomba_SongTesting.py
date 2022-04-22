@@ -8,7 +8,7 @@ import serial
 import time
 import RPi.GPIO as GPIO
 import RoombaCI_lib
-import RoombaCI_comps as comps
+import RoombaCI_comps
 ## Variables and Constants ##
 # LED pin numbers
 yled = 5
@@ -16,26 +16,6 @@ rled = 6
 gled = 13
 
 ## Functions and Definitions ##
-
-# Splits songlist into segments of 16 note-duration pairs for Roomba playback
-def Song_DictCreate(songlist):
-	songdict = {}
-	index = 0
-	n = len(songlist)
-	while n > 32:
-		song, songlist = Song_Split(songlist) # Get 16 note-duration pairs for song
-		songdict[index] = song # Assign song to dictionary
-		index += 1 # Increment counter
-		n -= 32 # Update length of songlist
-	# End while
-	songdict[index] = songlist
-	return songdict
-
-# Separate first 16 note-duration pairs from fullsonglist
-def Song_Split(fullsonglist):
-	song = fullsonglist[0:32]
-	remain = fullsonglist[32:]
-	return [song, remain]
 
 ## -- Code Starts Here -- ##
 # Setup Code #
@@ -66,49 +46,15 @@ GPIO.output(gled, GPIO.LOW) # Indicate all set sequences are complete
 '''main program starts'''
 global Xbee # Specifies connection to Xbee
 Xbee = serial.Serial('/dev/ttyUSB0', 115200) # Baud rate should be 115200
-while True:
-	print("Here are the available compositions:\n")
-	# Display Composition key names:
-	complist = sorted(comps.Comp_dict.keys())
-	disp_str = ""
-	for key in complist:
-		disp_str = disp_str + key + "; "
-	# End for
-	print(disp_str + "\n")
-	compstr = input("Which composition would you like to play? ")
-	if compstr in complist:
-		break
-	else:
-		print("Composition Name not valid. Try again.")
-		continue
-	# End if
-# End while
-
-while True:
-	print("The available parts for this composition are:\n")
-	# Display Part key names:
-	partlist = sorted(comps.Comp_dict[compstr].keys())
-	disp_str = ""
-	for key in partlist:
-		disp_str = disp_str + key + "; "
-	# End for
-	print(disp_str + "\n")
-	partstr = input("Which part would you like to play? ")
-	if partstr in partlist:
-		FullSongList = comps.Comp_dict[compstr][partstr]
-		break
-	else:
-		print("Part Name not valid. Try again.")
-		continue
-	# End if
-# End while
+comps = RoombaCI_comps.Music()
+FullSongList = comps.SongSelect()
 
 # Declare variables
 i = 0 # Song dictionary index
 is_on = False
 wsp = 1 # added a var. to see if there was a song playing
 j = 0 # Roomba song number
-songdict = Song_DictCreate(FullSongList) # create song dictonary
+songdict = comps.Song_DictCreate(FullSongList) # create song dictonary
 Roomba.Write_Song(songdict[i],j,0) # writing the first song segment before te start of the main loop
 
 message = '1' # Change this to any character string you want
