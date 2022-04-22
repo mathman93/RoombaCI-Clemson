@@ -19,7 +19,7 @@ RickRoll = ["C5",8,"D5",8,"F5",8,"D5",8,"A5",24,"A5",24,"G5",48,"C5",8,"D5",8,"F
 BaldiSong = ["G4",8,"G5",8,"G4",8,"G5",8,"G4",8,"G5",8,"G4",8,"G5",8,"A4",8,"A5",8,"A4",8,"A5",8,"A4",8,"A5",8,"A4",8,"A5",8] # Hayride Too I Don't Even Care, composed by Cady McGonigal 
 
 # Super Mario Bros. Theme Introduction, by Koji Kondo
-SMBIntro = ["E5",8, "E5",12, "R",4, "E5",12, "R",4, "C5",8, "E5",12, "R",4, "G5",12, "R",20, "G4",12, "R",20]
+SMBIntro = ["E5",8, "E5",12, "r",4, "E5",12, "r",4, "C5",8, "E5",12, "r",4, "G5",12, "r",20, "G4",12, "r",20]
 
 VoiceOfPeaceT = ["G4", 128,"Ab4",64, "Ab4",96, "Bb4",32, "Ab4",64, "F4", 64,"G4", 192,"Ab4",32, "Ab4",32, "Ab4",32,\
                  "G4", 32, "Ab4",32, "Bb4",32, "C5", 32, "Bb4",32, "C5", 32,"Bb4",32, "Ab4",128,"C5", 64, "Eb5",32,\
