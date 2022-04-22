@@ -69,7 +69,7 @@ Xbee = serial.Serial('/dev/ttyUSB0', 115200) # Baud rate should be 115200
 while True:
 	print("Here are the available compositions:\n")
 	# Display Composition key names:
-	complist = comps.Comp_dict.keys()
+	complist = sorted(comps.Comp_dict.keys())
 	disp_str = ""
 	for key in complist:
 		disp_str = disp_str + key + "; "
@@ -87,7 +87,7 @@ while True:
 while True:
 	print("The available parts for this composition are:\n")
 	# Display Part key names:
-	partlist = comps.Comp_dict[compstr].keys()
+	partlist = sorted(comps.Comp_dict[compstr].keys())
 	disp_str = ""
 	for key in partlist:
 		disp_str = disp_str + key + "; "
@@ -145,7 +145,7 @@ while True:
 			# playing the song segment
 			if isp == 0:
 				Roomba.Play_Song(j) # plays the i'th song segment
-				print(songdict[i]) # Include for debugging
+				#print(songdict[i]) # Include for debugging
 			# End if isp == 0
 		# End if Roomba.Available
 		
