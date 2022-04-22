@@ -136,7 +136,7 @@ program objectives
 '''main program starts'''
 
 timestep = 8 # (1/64)ths of a second
-tone_mod = -7 # half step modulation of key
+tone_mod = 0 # half step modulation of key
 rest = 15 - tone_mod #Rest note
 #while True:
 #clean up the user interface
