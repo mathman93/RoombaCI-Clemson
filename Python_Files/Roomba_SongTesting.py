@@ -75,7 +75,7 @@ while True:
 		disp_str = disp_str + key + "; "
 	# End for
 	print(disp_str + "\n")
-	compstr = input("Which song would you like to play? ")
+	compstr = input("Which composition would you like to play? ")
 	if compstr in complist:
 		break
 	else:
