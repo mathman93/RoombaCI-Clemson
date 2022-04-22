@@ -47,7 +47,7 @@ GPIO.output(gled, GPIO.LOW) # Indicate all set sequences are complete
 global Xbee # Specifies connection to Xbee
 Xbee = serial.Serial('/dev/ttyUSB0', 115200) # Baud rate should be 115200
 comps = RoombaCI_comps.Music()
-FullSongList = comps.SongSelect()
+FullSongList = comps.Song_Select()
 
 # Declare variables
 i = 0 # Song dictionary index
