@@ -132,12 +132,12 @@ class Music:
 			print(disp_str + "\n")
 			partstr = input("Which part would you like to play? ")
 			if partstr in partlist:
-				FullSongList = self.Comp_dict[compstr][partstr]
-				break
+				break # Everything checks out.
 			else:
 				print("Part Name not valid. Try again.")
 				continue
 			# End if
 		# End while
+		return self.Comp_dict[compstr][partstr]
 # End class Music
        
