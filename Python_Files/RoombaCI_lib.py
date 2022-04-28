@@ -988,7 +988,7 @@ class Create_2:
 	''' You are not expected to understand this. :)
 		'''
 	def PlaySMB(self):
-		smb = self.Comp_dict["Demos"]["SBMIntro"]
+		smb = self.Comp_dict["Demos"]["SMBIntro"]
 		#smb = [76,8,76,12,15,4,76,12,15,4,72,8,76,12,15,4,79,12,15,20,67,12]
 		wait = self.Write_Song(smb,0,0)
 		self.Play_Song(0)
