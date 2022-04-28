@@ -1,8 +1,14 @@
 ''' RoombaCI_comps.py
 Purpose: To store data for musical compositions for use in Roomba code
+Made By: Timothy A., Parker H., and Erick C.
 May incorporate directly into RoombaCI_lib.py at a later date.
 '''
-#work on making file structure cleaner, need to get which composition from user, then which part
+'''Ideas for future compositions
+Star-Spangled Banner
+Tiger Band Rag
+Voice of Peace (Parker H.)
+Super Mario Bros. Theme
+'''
 class Music:
 	# Donkey Kong 64 theme, by Grant Kirkhope
 	DK64Theme = ["C5",16,"R",8,"D5",16,"G5",8,"A5",16,"R",8,"G5",16,"R",8,"C6",16,"R",8,"B5",16,"G5",8,"F5",16,"R",32,\
@@ -67,6 +73,7 @@ class Music:
 						}
 			}
 
+	# Dictionary defining note names to corresponding value
 	Note_dict = {"R":15, "G1":31, "Ab1":32, "A1":33, "Bb1":34, "B1":35, "C2":36, "Db2":37,
 				"D2":38, "Eb2":39, "E2":40, "F2":41, "Gb2":42, "G2":43, "Ab2":44,
 				"A2":45, "Bb2":46, "B2":47, "C3":48, "Db3":49, "D3":50, "Eb3":51,
@@ -81,31 +88,70 @@ class Music:
 
 	def __init__(self):
 		pass
+		# Should load in composition dictionary and note name dictionary from separate file
+		# Import RoombaCI_comps as comps
+		# self.Comp_dict = comps.Comp_dict
+		# self.Note_dict = comps.Note_dict
 	# End __init__
-	# Splits songlist into segments of 16 note-duration pairs for Roomba playback
+
+	'''Splits songlist into segments of 16 note-duration pairs for Roomba playback
+	Parameters: 
+		songlist = list; Note-duration pairs for a single composition part
+	Returns:
+		songdict = dictionary; part segmented into songs of 16 (or less) note-duration pairs
+			Element 0 of songdict is the first "song" of the parameter songlist
+			Element len(songdict.keys)-1 is the last "song" of the parameter songlist
+	'''
 	def Song_DictCreate(self, songlist):
+		# initialize local variables
 		songdict = {}
 		index = 0
-		n = len(songlist)
-		while n > 32:
-			song, songlist = self.Song_Split(songlist) # Get 16 note-duration pairs for song
-			songdict[index] = song # Assign song to dictionary
+		n = len(songlist) # Number of note-duration pairs in original composition part
+		while n > 32: # If the part has more than 16 note-duration pairs...
+			song, songlist = self.Song_Split(songlist) # Split first 16 note-duration pairs from the rest of songlist
+			songdict[index] = song # Assign song to next entry in dictionary
 			index += 1 # Increment counter
-			n -= 32 # Update length of songlist
+			n -= 32 # Update length of songlist (could also use "n = len(songlist)" again)
 		# End while
-		songdict[index] = songlist
+		songdict[index] = songlist # assign remaining segment of the part to the dictionary
 		return songdict
-
-	# Separate first 16 note-duration pairs from fullsonglist
+	# End Song_DictCreate
+	'''Separate first 16 note-duration pairs from fullsonglist; Used in Song_DictCreate()
+	Parameters:
+		fullsonglist = list; segment of note-duration pairs to split
+	Returns:
+		song = list; first 16 note-duration pairs of fullsonglist
+		remain = list; remaining part of fullsonglist not in song
+	'''
 	def Song_Split(self, fullsonglist):
 		song = fullsonglist[0:32]
 		remain = fullsonglist[32:]
 		return [song, remain]
-	
-	# Select composition and part to play on the Roomba
+	# End Song_Split
+	'''Lets user select the composition/part to play on the Roomba
+	Returns:
+		comp_part = list; note-duration pairs of the selected composition/part
+	'''
 	def Song_Select(self):
 		while True:
-			print("Here are the available compositions:\n")
+			affirm = ["y","yes"]
+			compstr = self.Comp_Select() # Ask for composition string
+			partstr = self.Part_Select(compstr) # Ask for part string
+			response = input("Did you want to select this part (y/n)? ") # Ask for confirmation
+			if response.lower() in affirm:
+				comp_part = self.Comp_dict[compstr][partstr] # Retrieve part list
+				break # Exit loop
+			else:
+				print("OK. Select a new composition.")
+				continue # Return back to composition selection
+			# End if
+		# End while
+		return comp_part
+	# End Song_Select
+
+	def Comp_Select(self):
+		while True:
+			print("Here are the available compositions:")
 			# Display Composition key names:
 			complist = sorted(self.Comp_dict.keys())
 			disp_str = ""
@@ -115,14 +161,17 @@ class Music:
 			print(disp_str + "\n")
 			compstr = input("Which composition would you like to play? ")
 			if compstr in complist:
-				break
+				break # Continue to part selection
 			else:
 				print("Composition Name not valid. Try again.")
 				continue
 			# End if
 		# End while
+		return compstr
+
+	def Part_Select(self, compstr):
 		while True:
-			print("The available parts for this composition are:\n")
+			print("The available parts for this composition are:")
 			# Display Part key names:
 			partlist = sorted(self.Comp_dict[compstr].keys())
 			disp_str = ""
@@ -132,12 +181,12 @@ class Music:
 			print(disp_str + "\n")
 			partstr = input("Which part would you like to play? ")
 			if partstr in partlist:
-				break # Everything checks out.
+				break # Continue to part confirmation
 			else:
 				print("Part Name not valid. Try again.")
 				continue
 			# End if
 		# End while
-		return self.Comp_dict[compstr][partstr]
+		return partstr
 # End class Music
        
