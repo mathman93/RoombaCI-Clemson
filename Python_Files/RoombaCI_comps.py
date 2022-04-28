@@ -90,7 +90,7 @@ Comp_dict = {"SMBIntro": {"1": SMBIntro},
 			"DK": {"1" : DKTest},
 			"RickRoll": {"1" : RickRoll},
 			"Baldi": {"1": BaldiSong},
-			"VOP":{"1":VoiceOfPeaceT, "2":VoiceOfPeaceS,"3":VoiceOfPeaceB,"4":VoiceOfPeaceA,"5",VoiceOfPeaceMSolo,"6",VoiceOfPeaceFSolo}}
+			"VOP":{"1":VoiceOfPeaceT, "2":VoiceOfPeaceS,"3":VoiceOfPeaceB,"4":VoiceOfPeaceA,"5":VoiceOfPeaceMSolo,"6":VoiceOfPeaceFSolo}}
 
 
 Note_dict = {"r":30, "G1":31, "Ab1":32, "A1":33, "Bb1":34, "B1":35, "C2":36, "Db2":37,
