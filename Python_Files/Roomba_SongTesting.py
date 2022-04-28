@@ -46,15 +46,14 @@ GPIO.output(gled, GPIO.LOW) # Indicate all set sequences are complete
 '''main program starts'''
 global Xbee # Specifies connection to Xbee
 Xbee = serial.Serial('/dev/ttyUSB0', 115200) # Baud rate should be 115200
-comps = RoombaCI_comps.Music()
-FullSongList = comps.Song_Select()
+FullSongList = Roomba.Song_Select()
 
 # Declare variables
 i = 0 # Song dictionary index
 is_on = False
 wsp = 1 # added a var. to see if there was a song playing
 j = 0 # Roomba song number
-songdict = comps.Song_DictCreate(FullSongList) # create song dictonary
+songdict = Roomba.Song_DictCreate(FullSongList) # create song dictonary
 Roomba.Write_Song(songdict[i],j,0) # writing the first song segment before te start of the main loop
 
 message = '1' # Change this to any character string you want
