@@ -923,6 +923,7 @@ class Create_2:
 			affirm = ["y","yes"]
 			compstr = self.Comp_Select() # Ask for composition string
 			partstr = self.Part_Select(compstr) # Ask for part string
+			print("You have selected part {0} of composition {1}.".format(partstr,compstr))
 			response = input("Did you want to select this part (y/n)? ") # Ask for confirmation
 			if response.lower() in affirm:
 				comp_part = self.Comp_dict[compstr][partstr] # Retrieve part list
