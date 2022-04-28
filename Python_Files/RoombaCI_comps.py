@@ -21,6 +21,12 @@ RickRoll = ["C5",8,"D5",8,"F5",8,"D5",8,"A5",24,"A5",24,"G5",48,"C5",8,"D5",8,"F
 			"C5",8,"D5",8,"F5",8,"D5",8,"A5",24,"A5",24,"G5",48,"C5",8,"D5",8,"F5",8,"D5",8,"C6",32,"E5",16,"F5",24,"E5",8,"D5",16,\
 			"D5",8,"D5",8,"F5",8,"D5",8,"F5",32,"G5",16,"E5",24,"D5",8,"C5",32,"C5",16,"G5",32,"F5",56,"R",4]
 
+# Hayride Too I Don't Even Care, composed by Cady McGonigal 
+BaldiSong = ["G4",6,"G5",6,"G4",6,"G5",6,"G4",6,"G5",6,"G4",6,"G5",6,"A4",6,"A5",6,"A4",6,"A5",6,"A4",6,"A5",6,"A4",6,"A5",6,\
+			"G4",6,"G5",6,"G4",6,"G5",6,"G4",6,"G5",6,"G4",6,"G5",6,"A4",6,"A5",6,"A4",6,"A5",6,"G4",6,"G5",6,"G4",6,"G5",6,\
+			"G4",6,"G5",6,"G4",6,"G5",6,"G4",6,"G5",6,"G4",6,"G5",6,"A4",6,"A5",6,"A4",6,"A5",6,"A4",6,"A5",6,"A4",6,"A5",6,\
+			"A4",6,"A5",6,"A4",6,"A5",6,"G4",6,"G5",6,"C4",6,"G5",6,"C4",6,"G5",6,"C4",6,"R",6,"G4",6,"D4",6,"C5",6,"R",6]
+
 # Super Mario Bros. Theme Introduction, by Koji Kondo
 SMBIntro = ["E5",8, "E5",12, "R",4, "E5",12, "R",4, "C5",8, "E5",12, "R",4, "G5",12, "R",20, "G4",12, "R",20]
 
@@ -60,6 +66,7 @@ AGrace_a = ["C4",32, "A3",64, "C4",16, "A3",16, "C4",64, "C4",32, "Bb3",64, "Bb3
 # Dictionary combining and structuring the previously defined songs
 Comp_dict = {"Demos": {"DK64" : DK64Theme,
 					"RickRoll" : RickRoll,
+					"Baldi": BaldiSong,
 					"SMBIntro": SMBIntro,
 					"SuperStar": SuperStar,
 					"MarioGalaxy": SMGTheme,
