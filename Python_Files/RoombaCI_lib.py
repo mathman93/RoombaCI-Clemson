@@ -989,20 +989,9 @@ class Create_2:
 		'''
 	def PlaySMB(self):
 		smb = self.Comp_dict["Demos"]["SMBIntro"]
-		#smb = [76,8,76,12,15,4,76,12,15,4,72,8,76,12,15,4,79,12,15,20,67,12]
 		wait = self.Write_Song(smb,0,0)
 		self.Play_Song(0)
 		time.sleep(wait/64)
-		'''
-		#Define SMB Theme song
-		self.conn.write(b'\x8c\x00\x0b') # 140, 0, 11
-		self.conn.write(b'\x4c\x08\x4c\x0c\x1e\x04\x4c\x0c\x1e\x04\x48\x08\x4c\x0c\x1e\x04\x4f\x0c\x1e\x14\x43\x0c')
-		#                   76,  8, 76, 12, 30,  4, 76, 12, 30,  4, 72,  8, 76, 12, 30,  4, 79, 12, 30, 20, 67, 12
-		time.sleep(0.05)
-		#Play song
-		self.conn.write(b'\x8d\x00') # 141, 0
-		time.sleep(2) # Wait for song to play
-		'''
 	# End PlaySMB
 # End Class Create2
 ##################################################################
