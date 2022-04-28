@@ -20,7 +20,7 @@ Xbee = serial.Serial('/dev/ttyUSB0', 115200) # Baud rate should be 115200
 yled = 5
 rled = 6
 gled = 13
-file_create = True # Boolean to set for creation of data file
+file_create = False # Boolean to set for creation of data file
 data_counter = 0 # Initialize data_counter
 #global A # Accelerometer transformation matrix
 
