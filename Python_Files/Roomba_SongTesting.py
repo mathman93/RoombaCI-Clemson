@@ -18,6 +18,8 @@ gled = 13
 ## Functions and Definitions ##
 
 ## -- Code Starts Here -- ##
+global Xbee # Specifies connection to Xbee
+Xbee = serial.Serial('/dev/ttyUSB0', 115200) # Baud rate should be 115200
 # Setup Code #
 GPIO.setmode(GPIO.BCM) # Use BCM pin numbering for GPIO
 RoombaCI_lib.DisplayDateTime() # Display current date and time
@@ -44,8 +46,6 @@ print(" ROOMBA Setup Complete")
 GPIO.output(gled, GPIO.LOW) # Indicate all set sequences are complete
 
 '''main program starts'''
-global Xbee # Specifies connection to Xbee
-Xbee = serial.Serial('/dev/ttyUSB0', 115200) # Baud rate should be 115200
 FullSongList = Roomba.Song_Select()
 
 # Declare variables
