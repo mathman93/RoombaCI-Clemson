@@ -1,12 +1,12 @@
 ''' RoombaCI_comps.py
 Purpose: To store data for musical compositions for use in Roomba code
 Made By: Timothy A., Parker H., and Erick C.
-May incorporate directly into RoombaCI_lib.py at a later date.
 '''
 '''Ideas for future compositions
 Star-Spangled Banner
 Tiger Band Rag
 Super Mario Bros. Theme
+Amazing Grace
 '''
 # Donkey Kong 64 theme, by Grant Kirkhope
 DK64Theme = ["C5",16, "R",8, "D5",16, "G5",8, "A5",16, "R",8, "G5",16, "R",8, "C6",16, "R",8, "B5",16, "G5",8, "F5",16, "R",32,\
