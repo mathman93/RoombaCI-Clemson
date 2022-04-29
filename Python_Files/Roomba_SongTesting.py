@@ -1,7 +1,7 @@
-''' Roomba_SongTesting edit (copy of Roomba_SongAndSomething.py)
-Purpose: Play a song and do somthing else, by looking at the status regrester of the roomba to tell when it is playing a song or not
+''' Roomba_SongTesting
+Purpose: Play a song in unison with other Roombas
 IMPORTANT: Must be run using Python 3 (python3)
-Last Modified: 10/4/21
+Last Modified: 04/29/22
 '''
 ## Import libraries ##
 import serial

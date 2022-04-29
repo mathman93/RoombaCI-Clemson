@@ -4,7 +4,7 @@ Purpose: Python Library with LSM9DS1 class, iRobot Create 2 (Roomba) class, and 
 Import this file in your main Python file to access functions;
 
 Made by: Timothy Anglea, Joshua Harvey, Madeline Corvin; 
-Last Modified: 02/06/2021
+Last Modified: 04/29/2022
 '''
 ## Import Libraries ##
 from ctypes import * # May not need this anymore
